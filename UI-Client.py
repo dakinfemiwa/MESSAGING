@@ -11,7 +11,7 @@ def recv_data():            #Receive data from other clients connected to server
         except:
             #Process terminates
             print("Server closed connection")
-            _thread.interrupt_main()     # Interrupt main when socket closes
+            _thread.interrupt_main()     # Interrupt main wen socket closes
             break
         if not recv_data:               # If recv has no data, close conection (error)
                 print("Server closed connection")
