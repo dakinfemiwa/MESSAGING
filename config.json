@@ -1,0 +1,20 @@
+{
+        "window": {
+                "title": "CHAT-UI",
+                "background": "#141414",
+                "foreground": "#ffffff",
+                "resolution": "900x400",
+                "theme": "#8A2BE2"
+        },
+        "information": {
+                "version": "2",
+                "stage": "P R I V A T E  B E T A"
+        },
+        "layout": {
+                "percentage": "true",
+                "percentage-symbol": "false",
+                "version": "true",
+                "stage": "true",
+                "clock": "true"
+        }
+}
