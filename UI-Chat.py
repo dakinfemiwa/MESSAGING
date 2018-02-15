@@ -9,20 +9,49 @@ with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
 def sendMessage(msgInput):
+    def add(MESSAGE, colour=colourTheme):
+        ChatLog.config(state=NORMAL)
+        ChatLog.insert(END, '\n')
+        LineNumber = float(ChatLog.index(END))-1.0
+        ChatLog.insert(END, MESSAGE)
+        num = len(MESSAGE)
+        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
+        ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
+        ChatLog.config(state=DISABLED)
+        ChatLog.see(END)
+    
     entryBox.delete(0, END)
     sendData = msgInput
-    CODES = USERNAME + ': ' + sendData
-    clientSocket.send(str.encode('\n'))
-    clientSocket.send(str.encode(CODES))
-    ChatLog.config(state=NORMAL)
-    ChatLog.insert(END, '\n')
-    LineNumber = float(ChatLog.index(END))-1.0
-    ChatLog.insert(END, CODES)
-    num = len(CODES)
-    ChatLog.tag_add("You", LineNumber, LineNumber+num)
-    ChatLog.tag_config("You", foreground=colourTheme, font=("courier new", 11, "bold"))
-    ChatLog.config(state=DISABLED)
-    ChatLog.see(END)
+    
+    if msgInput == '.help':
+        HELP_MSG = '''.help - prints the help menu
+.quit - exit the server gracefully
+.name - change current username
+.clear - clear chat (client-side)
+'''
+        add(HELP_MSG, '#FFFFFF')
+    elif msgInput == '.clear':
+        ChatLog.config(state=NORMAL)
+        ChatLog.delete(1.0, END)
+        CLEAR_MSG = 'Chat was cleared successfully.'
+        add(CLEAR_MSG, '#FFFFFF')
+    elif msgInput == '.name':
+        UN_MSG = 'This function is unavailable right now.'
+        add(UN_MSG, '#FFFFFF')
+    elif msgInput == '.quit':
+        Window.destroy()
+        clientSocket.close()
+    elif msgInput == '.colour':
+        CL_MSG = 'Open UI-Settings to change the theme.'
+        add(CL_MSG, '#FFFFFF')
+    elif len(msgInput) > 150:
+        SPAM_MSG = 'Your message was not sent due to potential spam.'
+        add(SPAM_MSG, '#FFFFFF')
+    else:
+        CODES = USERNAME + ': ' + sendData
+        clientSocket.send(str.encode('\n'))
+        clientSocket.send(str.encode(CODES))
+        add(CODES)
 
 def PressAction(event):
     entryBox.config(state=NORMAL)
@@ -80,6 +109,8 @@ entryBox.place(relx=.18,rely=.855)
 entryBox.bind("<Return>", DisableEntry)
 entryBox.bind("<KeyRelease-Return>", PressAction)
 
+entryBox.insert(END, '.help')
+
 connectingLabel = Label(Window, textvariable=connectingText, font='Arial 8 bold', fg=colourTheme, bg=windowBackground)
 connectingLabel.place(relx=.040,rely=.225)
 
@@ -120,7 +151,6 @@ def Receive():
 
 IP = '86.153.124.215'
 PORT = 6666
-People = []
 # USERNAME = 'NO'
 
 print("WELCOME: Ready to connect.")
@@ -132,15 +162,12 @@ for char in USERNAME.upper():
     FINAL_NAME = FINAL_NAME + char + ' '
     
 JOIN_MSG = USERNAME + ' has joined the server'
-REGISTER = '$$$' + USERNAME
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     clientSocket.connect((IP, PORT))
-    # clientSocket.send(str.encode(REGISTER))
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode(JOIN_MSG))
-    #clientSocket.send(str.encode('\n'))
 
     _thread.start_new_thread(Receive, ())
     _thread.start_new_thread(Window.mainloop())
