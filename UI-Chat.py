@@ -26,8 +26,15 @@ def sendMessage(msgInput):
     if msgInput == '.help':
         HELP_MSG = '''.help - prints the help menu
 .quit - exit the server gracefully
-.name - change current username
+.name - change current username (unavailable)
 .clear - clear chat (client-side)
+'''
+
+        ADMIN_MSG = '''.kick - kick a client off
+.clearall - clears messages for everyone
+.fq - force quits all clients
+.status - view server status
+.message - private message a user
 '''
         add(HELP_MSG, '#FFFFFF')
     elif msgInput == '.clear':
@@ -160,14 +167,18 @@ FINAL_NAME = ''
 USERNAME = str(input("INPUT: Enter username: "))
 for char in USERNAME.upper():
     FINAL_NAME = FINAL_NAME + char + ' '
-    
+
+ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = USERNAME + ' has joined the server'
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     clientSocket.connect((IP, PORT))
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
+    clientSocket.send(str.encode('\n'))
     clientSocket.send(str.encode(JOIN_MSG))
+    #clientSocket.send(str.encode('\n'))
+    #clientSocket.send(str.encode(ADMIN_MSG))
 
     _thread.start_new_thread(Receive, ())
     _thread.start_new_thread(Window.mainloop())
