@@ -18,6 +18,7 @@ def broadcast (sock, message, usr):
 if __name__ == "__main__":
 
     CLIST = []
+    People = []
     
     print('INFO: Chat server - BETA')
     # port = str(input("Enter IP to bind server: "))
@@ -58,7 +59,16 @@ if __name__ == "__main__":
                         print("STATUS: Client [%s, %s] quit" % addr)
                         sock.close()                    # Close socket
                         CLIST.remove(sock)              # Remove from our list
+                    #elif "$$$" in data.decode():
+                        #THIS_NAME = data.strip(b'$$$')
+                        #People.append(THIS_NAME)
+                        #for socket in CLIST:
+                            #if socket != server_socket and socket != sock:
+                                #print(People)
+                                #for person in People:
+                                    #socket.send(person)
+                                    #socket.send(b' | ')
                     else:
-                        broadcast(sock, data, addr)                       
+                        broadcast(sock, data, addr)                  
                 
     server_socket.close()    

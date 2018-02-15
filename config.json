@@ -1,20 +1,20 @@
 {
         "window": {
                 "title": "CHAT-UI",
-                "background": "#141414",
+                "theme": "#FF8C00",
                 "foreground": "#ffffff",
-                "resolution": "900x400",
-                "theme": "#8A2BE2"
-        },
-        "information": {
-                "version": "2",
-                "stage": "P R I V A T E  B E T A"
+                "background": "#141414",
+                "resolution": "900x400"
         },
         "layout": {
-                "percentage": "true",
+                "clock": "true",
                 "percentage-symbol": "false",
                 "version": "true",
-                "stage": "true",
-                "clock": "true"
+                "percentage": "true",
+                "stage": "true"
+        },
+        "information": {
+                "stage": "P R I V A T E  B E T A",
+                "version": "2"
         }
 }

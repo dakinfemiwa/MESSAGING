@@ -20,7 +20,7 @@ def sendMessage(msgInput):
     ChatLog.insert(END, CODES)
     num = len(CODES)
     ChatLog.tag_add("You", LineNumber, LineNumber+num)
-    ChatLog.tag_config("You", foreground=colourTheme, font=("Arial", 11, "bold"))
+    ChatLog.tag_config("You", foreground=colourTheme, font=("courier new", 11, "bold"))
     ChatLog.config(state=DISABLED)
     ChatLog.see(END)
 
@@ -60,6 +60,9 @@ buttonText.set('S E N D')
 connectingText = StringVar()
 connectingText.set('Connecting to the chat server...')
 
+versionText = StringVar()
+versionText.set('V E R S I O N  ' + programVersion)
+
 bLabel = Label(Window, bg=windowBackground, fg=windowBackground).pack()
 
 lineLabel = Label(Window, textvariable=lineText, font='Arial 15 bold', fg=colourTheme, bg=windowBackground)
@@ -83,7 +86,10 @@ connectingLabel.place(relx=.040,rely=.225)
 sendButton = Button(Window, textvariable=buttonText, font='Arial 7 bold', width=13, height=1, command=lambda:PressAction("<Return>"))
 sendButton.place(relx=.86,rely=.855)
 
-ChatLog = Text(Window, bd=0, bg="gray", height="13", width="91", font="Arial")
+verionLabel = Label(Window, textvariable=versionText, font='Arial 11 bold', bg=windowBackground, fg=colourTheme)
+verionLabel.place(relx=.08, rely=.17)
+
+ChatLog = Text(Window, bd=1, bg="#141414", height="13", width="91", font="Arial")
 ChatLog.place(relx=.043,rely=.23)
 
 # Receiving data from other clients.	
@@ -93,43 +99,48 @@ def Receive():
             receiveData = clientSocket.recv(4096)            
         except:
             # When the server goes down.
-            print("Server closed connection")
+            print("INFO: Server closed connection")
 			# When the connection closes, interrupt the main thread.
             _thread.interrupt_main()
             break
 		# If not data is returned, close the connection.	
         if not receiveData:
-                print("Server closed connection")
-                _thread.interrupt_main()
-                break
+            print("INFO: Server closed connection")
+            _thread.interrupt_main()
+            break
         else:
             ChatLog.config(state=NORMAL)
             LineNumber = float(ChatLog.index(END))-1.0
             ChatLog.insert(END, receiveData)
             num = len(receiveData)
             ChatLog.tag_add("Them", LineNumber, LineNumber+num)
-            ChatLog.tag_config("Them", foreground='#ffffff', font=("Arial", 11, "bold"))
+            ChatLog.tag_config("Them", foreground='#ffffff', font=("courier new", 11, "bold"))
             ChatLog.config(state=DISABLED)
             ChatLog.see(END)
 
 IP = '86.153.124.215'
 PORT = 6666
+People = []
 # USERNAME = 'NO'
 
 print("WELCOME: Ready to connect.")
 print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
-final = ''
+FINAL_NAME = ''
+
 USERNAME = str(input("INPUT: Enter username: "))
 for char in USERNAME.upper():
-    final = final + char + ' '
-JOIN_MSG = '[ ! ]  ' + final + '  J O I N E D  T H E  C H A T'
+    FINAL_NAME = FINAL_NAME + char + ' '
+    
+JOIN_MSG = USERNAME + ' has joined the server'
+REGISTER = '$$$' + USERNAME
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     clientSocket.connect((IP, PORT))
-    print("INFO: Connected to ", str(IP) + str(PORT))
-    clientSocket.send(str.encode('\n'))
+    # clientSocket.send(str.encode(REGISTER))
+    print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode(JOIN_MSG))
+    #clientSocket.send(str.encode('\n'))
 
     _thread.start_new_thread(Receive, ())
     _thread.start_new_thread(Window.mainloop())
