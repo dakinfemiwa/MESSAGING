@@ -7,7 +7,7 @@ import string
 def broadcast (sock, message, usr):
     try:
         for socket in CLIST:
-            if socket != server_socket and socket != sock:
+            if socket != server_socket:
                 print('FROM: ', usr)
                 print('MESSAGE: ' , message)
                 print('INFO: Broadcasting...\n')
@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
     CLIST = []
     People = []
+    Users = {}
     
     print('INFO: Chat server - BETA')
     # IP = str(input("Enter IP to bind server: "))
@@ -45,8 +46,9 @@ if __name__ == "__main__":
                 try:
                     data = sock.recv(4096, )            # Data recieved from client
                 except:
-                    broadcast(sock, "STATUS: Client [%s, %s] is offline" % addr,
+                    broadcast(sock, str.encode("\n") + str.encode(str(Users[addr]) + " has left the server"),
                             addr)
+                    del Users[addr]
                     print("STATUS: Client [%s, %s] is offline" % addr)
                     sock.close()
                     CLIST.remove(sock)
@@ -58,6 +60,21 @@ if __name__ == "__main__":
                         sock.close()                    # Close socket
                         CLIST.remove(sock)
                         # Remove from our list
+                    elif '$$$' in data.decode():
+                        username = data.decode().strip('$$$')
+                        Users[addr] = username
+                    elif '$-$online' in data.decode():
+                        #try:
+                            #for x in range(0, 100):
+                        broadcast(sock, str.encode("\nCurrent connected users:"), 'ALL')
+                        #broadcast(sock, str.encode("\n") + str.encode(str(Users)), 'ALL')
+                        print(len(CLIST))
+                        print(Users.values())
+                        
+                        for x in range(0, len(CLIST)-1):
+                            client = list(Users.values())[x]
+                            client = str(client)
+                            broadcast(sock, str.encode("\n") + str.encode(client), 'ALL')
                     else:
                         broadcast(sock, data, addr)                  
                 

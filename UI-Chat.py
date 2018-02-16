@@ -28,6 +28,7 @@ def sendMessage(msgInput):
 .quit - exit the server gracefully
 .name - change current username (unavailable)
 .clear - clear chat (client-side)
+.online - view online users
 '''
 
         ADMIN_MSG = '''.kick - kick a client off
@@ -54,11 +55,12 @@ def sendMessage(msgInput):
     elif len(msgInput) > 150:
         SPAM_MSG = 'Your message was not sent due to potential spam.'
         add(SPAM_MSG, '#FFFFFF')
+    elif msgInput == '.online':
+        clientSocket.send(str.encode('$-$online'))
     else:
         CODES = USERNAME + ': ' + sendData
         clientSocket.send(str.encode('\n'))
         clientSocket.send(str.encode(CODES))
-        add(CODES)
 
 def PressAction(event):
     entryBox.config(state=NORMAL)
@@ -166,7 +168,7 @@ FINAL_NAME = ''
 
 USERNAME = str(input("INPUT: Enter username: "))
 for char in USERNAME.upper():
-    FINAL_NAME = FINAL_NAME + char + ' '
+    FINAL_NAME = '$$$' + USERNAME
 
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = USERNAME + ' has joined the server'
@@ -174,11 +176,15 @@ JOIN_MSG = USERNAME + ' has joined the server'
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     clientSocket.connect((IP, PORT))
+    clientSocket.send(str.encode(FINAL_NAME))
+    print("INFO: Sending client information...")
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode('\n'))
     clientSocket.send(str.encode(JOIN_MSG))
-    #clientSocket.send(str.encode('\n'))
-    #clientSocket.send(str.encode(ADMIN_MSG))
+    clientSocket.send(str.encode('\n'))
+    # clientSocket.send(str.encode('$$$Latest'))
+    # clientSocket.send(str.encode('\n'))
+    # clientSocket.send(str.encode(ADMIN_MSG))
 
     _thread.start_new_thread(Receive, ())
     _thread.start_new_thread(Window.mainloop())
