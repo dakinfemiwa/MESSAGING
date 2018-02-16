@@ -22,6 +22,13 @@ def sendMessage(msgInput):
     
     entryBox.delete(0, END)
     sendData = msgInput
+
+    ADMIN_MSG = '''.kick - kick a client off
+.clearall - clears messages for everyone
+.fq - force quits all clients
+.status - view server status
+.message - private message a user (unavailable)
+'''
     
     if msgInput == '.help':
         HELP_MSG = '''.help - prints the help menu
@@ -29,13 +36,6 @@ def sendMessage(msgInput):
 .name - change current username (unavailable)
 .clear - clear chat (client-side)
 .online - view online users
-'''
-
-        ADMIN_MSG = '''.kick - kick a client off
-.clearall - clears messages for everyone
-.fq - force quits all clients
-.status - view server status
-.message - private message a user
 '''
         add(HELP_MSG, '#FFFFFF')
     elif msgInput == '.clear':
@@ -57,6 +57,20 @@ def sendMessage(msgInput):
         add(SPAM_MSG, '#FFFFFF')
     elif msgInput == '.online':
         clientSocket.send(str.encode('$-$online'))
+    elif msgInput == '.admin':
+        add(ADMIN_MSG)
+    elif msgInput == '.clearall':
+        CLALL_MSG = 'Chat has been cleared for all users by ' + USERNAME
+        clientSocket.send(str.encode('$-$clear'))
+        clientSocket.send(CLALL_MSG)
+    elif msgInput == '.fq':
+        clientSocket.send(str.encode('$-$quit'))
+    elif msgInput == '.status':
+        STAT_MSG = 'Current server and client status:'
+        add(STAT_MSG)
+    elif msgInput == '.messsage':
+        MSG_MSG = 'This function is unavailable right now.'
+        add(MSG_MSG)
     else:
         CODES = USERNAME + ': ' + sendData
         clientSocket.send(str.encode('\n'))
@@ -149,14 +163,19 @@ def Receive():
             _thread.interrupt_main()
             break
         else:
-            ChatLog.config(state=NORMAL)
-            LineNumber = float(ChatLog.index(END))-1.0
-            ChatLog.insert(END, receiveData)
-            num = len(receiveData)
-            ChatLog.tag_add("Them", LineNumber, LineNumber+num)
-            ChatLog.tag_config("Them", foreground='#ffffff', font=("courier new", 11, "bold"))
-            ChatLog.config(state=DISABLED)
-            ChatLog.see(END)
+            if receiveData.decode() == '$-$quit':
+                Window.destroy()
+                clientSocket.close()
+                _thread.interrupt_main()
+            else:
+                ChatLog.config(state=NORMAL)
+                LineNumber = float(ChatLog.index(END))-1.0
+                ChatLog.insert(END, receiveData)
+                num = len(receiveData)
+                ChatLog.tag_add("Them", LineNumber, LineNumber+num)
+                ChatLog.tag_config("Them", foreground='#ffffff', font=("courier new", 11, "bold"))
+                ChatLog.config(state=DISABLED)
+                ChatLog.see(END)
 
 IP = '86.153.124.215'
 PORT = 6666
