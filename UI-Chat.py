@@ -210,6 +210,8 @@ USERNAME = str(input("INPUT: Enter username: "))
 for char in USERNAME.upper():
     FINAL_NAME = '$$$' + USERNAME
 
+FINAL_VERSION = '-$$' + programVersion
+
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = USERNAME + ' has joined the server'
 
@@ -218,12 +220,11 @@ try:
     clientSocket.connect((IP, PORT))
     clientSocket.send(str.encode(FINAL_NAME))
     print("INFO: Sending client information...")
+    clientSocket.send(str.encode(FINAL_VERSION))
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode('\n'))
     clientSocket.send(str.encode(JOIN_MSG))
     clientSocket.send(str.encode('\n'))
-    # clientSocket.send(str.encode('$$$Latest'))
-    # clientSocket.send(str.encode('\n'))
     # clientSocket.send(str.encode(ADMIN_MSG))
 
     _thread.start_new_thread(Receive, ())

@@ -62,6 +62,9 @@ if __name__ == "__main__":
                     elif '$$$' in data.decode():
                         username = data.decode().strip('$$$')
                         Users[addr] = username
+                    elif '-$$' in data.decode():
+                        version = data.decode().strip('-$$')
+                        broadcast(sock, str.encode("\nThis user is connected through version " + version), 'ALL')
                     elif '$-$online' in data.decode():
                         broadcast(sock, str.encode("\nCurrent connected users:"), 'ALL')
                         

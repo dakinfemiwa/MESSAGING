@@ -2,14 +2,16 @@ import socket
 import _thread
 import sys
 
-def recv_data():            # Receive data from other clients connected to server
+pin ='ABC'
+	
+def recv_data():            #Receive data from other clients connected to server
     while 1:
         try:
             recv_data = client_socket.recv(4096)            
         except:
-            # Process terminates
+            #Process terminates
             print("Server closed connection")
-            _thread.interrupt_main()     # Interrupt main wHen socket closes
+            _thread.interrupt_main()     # Interrupt main wen socket closes
             break
         if not recv_data:               # If recv has no data, close conection (error)
                 print("Server closed connection")
@@ -26,7 +28,10 @@ def send_data():                # Send data from client to server"
             _thread.interrupt_main()
             break
         else:
-            CODES = user + ': ' + send_data
+            CODES = '[' + user + '] - ' + send_data
+            print(CODES)
+            #full_msg = str.encode
+            #client_socket.send(str.encode(user))
             client_socket.send(str.encode('\n'))
             client_socket.send(str.encode(CODES))
         
@@ -41,6 +46,7 @@ if __name__ == "__main__":
     client_socket.connect((ip, 6666))
 
     print("Connected to ", ip,":6666")
+    #usr = str(raw_input("Enter username: ")
 
     _thread.start_new_thread(recv_data,())
     _thread.start_new_thread(send_data,())
