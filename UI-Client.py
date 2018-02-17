@@ -1,59 +1,60 @@
 import socket
 import _thread
 import sys
-
-pin ='ABC'
 	
-def recv_data():            #Receive data from other clients connected to server
+def Receive():
     while 1:
         try:
             recv_data = client_socket.recv(4096)            
         except:
-            #Process terminates
-            print("Server closed connection")
-            _thread.interrupt_main()     # Interrupt main wen socket closes
+            print("INFO: Server closed connection")
+            _thread.interrupt_main()
             break
-        if not recv_data:               # If recv has no data, close conection (error)
-                print("Server closed connection")
+        if not recv_data:
+                print("INFO: Server closed connection")
                 _thread.interrupt_main()
                 break
         else:
             print(recv_data.decode())
 
-def send_data():                # Send data from client to server"
+def Send():
     while 1:
-        send_data = str(input("Message [Q for QUIT]: "))
-        if send_data == "q" or send_data == "Q":
-            client_socket.send(str.encode(send_data))
-            _thread.interrupt_main()
-            break
-        else:
-            CODES = '[' + user + '] - ' + send_data
-            print(CODES)
-            #full_msg = str.encode
-            #client_socket.send(str.encode(user))
-            client_socket.send(str.encode('\n'))
-            client_socket.send(str.encode(CODES))
+        SEND_DATA = str(input("INPUT: Enter your message: "))
+        SEND_MESSAGE = user + ': ' + SEND_DATA
+        clientSocket.send(str.encode('\n'))
+        clientSocket.send(str.encode(SEND_MESSAGE))
         
 if __name__ == "__main__":
 
-    print("||||| TCP Client ||||")
-    ip = str(input("Enter server IP to connect: "))
-    print("Connecting to ",ip,":6666")
+    IP = '86.153.124.215'
+    PORT = 6666
+
+    print("INFO: Ready to connect")
+    print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
     
-    user = str(input("Enter username:"))
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((ip, 6666))
+    USERNAME = str(input("INPUT: Enter username: "))
 
-    print("Connected to ", ip,":6666")
-    #usr = str(raw_input("Enter username: ")
+    ADMIN_MSG = 'An Admin has joined with elevated permissions'
+    JOIN_MSG = USERNAME + ' has joined the server (through basic UI)'
+    FINAL_VERSION = '-$$' + 'BASIC UI'
 
-    _thread.start_new_thread(recv_data,())
-    _thread.start_new_thread(send_data,())
+    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clientSocket.connect((IP, PORT))
+
+    print("INFO: Sending client information...")
+
+    print("INFO: Connected to ", str(IP) + ':' + str(PORT))
+
+    clientSocket.send(str.encode('\n'))
+    clientSocket.send(str.encode(JOIN_MSG))
+    clientSocket.send(str.encode('\n'))
+
+    _thread.start_new_thread(Receive,())
+    _thread.start_new_thread(Send,())
 
     try:
         while 1:
             continue
     except:
-        print("Client program quits....")
-        client_socket.close()       
+        print("INFO: Client program quit....")
+        clientSocket.close()       

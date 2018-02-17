@@ -9,7 +9,7 @@ with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
 def sendMessage(msgInput):
-    def add(MESSAGE, colour=colourTheme):
+    def Log(MESSAGE, colour=colourTheme):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
         LineNumber = float(ChatLog.index(END))-1.0
@@ -24,14 +24,7 @@ def sendMessage(msgInput):
     entryBox.delete(0, END)
     sendData = msgInput
 
-    ADMIN_MSG = '''.kick - kick a client off (unavailable)
-.clearall - clears messages for everyone
-.fq - force quits all clients (unstable - causes server shut down)
-.message - private message a user (unavailable)
-'''
-    try:
-        if msgInput == '.help':
-            HELP_MSG = '''.help - prints the help menu
+    HELP_MSG = '''.help - prints the help menu
 .quit - exit the server gracefully
 .name - change current username (unavailable)
 .clear - clear chat (client-side)
@@ -39,46 +32,67 @@ def sendMessage(msgInput):
 .colour - change theme colour (dependent)
 .update - update the client (unavailable)
     '''
+
+    ADMIN_MSG = '''.kick - kick a client off (unavailable)
+.clearall - clears messages for everyone
+.fq - force quits all clients (unstable - causes server shut down)
+.message - private message a user (unavailable)
+'''
+    try:
+        if msgInput == '.help':
             add(HELP_MSG, '#FFFFFF')
+            
         elif msgInput == '.clear':
             ChatLog.config(state=NORMAL)
             ChatLog.delete(1.0, END)
             CLEAR_MSG = 'Chat was cleared successfully.'
-            add(CLEAR_MSG, '#FFFFFF')
+            Log(CLEAR_MSG, '#FFFFFF')
+            
         elif msgInput == '.name':
             UN_MSG = 'This function is unavailable right now.'
-            add(UN_MSG, '#FFFFFF')
+            Log(UN_MSG, '#FFFFFF')
+            
+        elif msgInput == '.colour':
+            CL_MSG = 'Open UI-Settings to change the theme.'
+            Log(CL_MSG, '#FFFFFF')
+            
+        elif len(msgInput) > 150:
+            SPAM_MSG = 'Your message was not sent due to potential spam.'
+            Log(SPAM_MSG, '#FFFFFF')
+            
         elif msgInput == '.quit':
             Window.destroy()
             clientSocket.close()
-        elif msgInput == '.colour':
-            CL_MSG = 'Open UI-Settings to change the theme.'
-            add(CL_MSG, '#FFFFFF')
-        elif len(msgInput) > 150:
-            SPAM_MSG = 'Your message was not sent due to potential spam.'
-            add(SPAM_MSG, '#FFFFFF')
+            
         elif msgInput == '.online':
             clientSocket.send(str.encode('$-$online'))
+            
         elif msgInput == '.admin':
-            add(ADMIN_MSG)
+            Log(ADMIN_MSG)
+            
+        elif msgInput == '.fq':
+            clientSocket.send(str.encode('$-$quit'))
+
         elif msgInput == '.clearall':
             CLALL_MSG = 'Chat has been cleared for all users by ' + USERNAME
             clientSocket.send(str.encode('$-$clear'))
-        elif msgInput == '.fq':
-            clientSocket.send(str.encode('$-$quit'))
+            
         elif msgInput == '.messsage':
             MSG_MSG = 'This function is unavailable right now.'
-            add(MSG_MSG)
+            Log(MSG_MSG)
+            
         elif msgInput == '.kick':
             KICK_MSG = 'This function is unavailable right now.'
-            add(KICK_MSG)
+            Log(KICK_MSG)
+            
         elif msgInput == '.update':
             UPDT_MSG = 'No updates are available right now.'
-            add(UPDT_MSG)
+            Log(UPDT_MSG)
+            
         else:
-            CODES = USERNAME + ': ' + sendData
+            SEND_MESSAGE = USERNAME + ': ' + sendData
             clientSocket.send(str.encode('\n'))
-            clientSocket.send(str.encode(CODES))
+            clientSocket.send(str.encode(SEND_MESSAGE))
     except:
         pass
 
@@ -154,7 +168,7 @@ ChatLog.place(relx=.043,rely=.23)
 
 # Receiving data from other clients.	
 def Receive():
-    def add(MESSAGE, colour=colourTheme):
+    def Log(MESSAGE, colour=colourTheme):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
         LineNumber = float(ChatLog.index(END))-1.0
@@ -170,10 +184,8 @@ def Receive():
         except:
             # When the server goes down.
             print("INFO: Server closed connection")
-			# When the connection closes, interrupt the main thread.
             _thread.interrupt_main()
-            break
-		# If not data is returned, close the connection.	
+            break	
         if not receiveData:
             print("INFO: Server closed connection")
             _thread.interrupt_main()
@@ -187,7 +199,7 @@ def Receive():
                 ChatLog.config(state=NORMAL)
                 ChatLog.delete(1.0, END)
                 CLEAR_MSG = 'Chat was cleared by an admin'
-                add(CLEAR_MSG, '#FFFFFF')
+                Log(CLEAR_MSG, '#FFFFFF')
             else:
                 ChatLog.config(state=NORMAL)
                 LineNumber = float(ChatLog.index(END))-1.0
@@ -200,20 +212,15 @@ def Receive():
 
 IP = '86.153.124.215'
 PORT = 6666
-# USERNAME = 'NO'
 
 print("WELCOME: Ready to connect.")
 print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
-FINAL_NAME = ''
 
 USERNAME = str(input("INPUT: Enter username: "))
-for char in USERNAME.upper():
-    FINAL_NAME = '$$$' + USERNAME
-
-FINAL_VERSION = '-$$' + programVersion
 
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = USERNAME + ' has joined the server'
+FINAL_VERSION = '-$$' + programVersion
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
@@ -224,7 +231,7 @@ try:
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode('\n'))
     clientSocket.send(str.encode(JOIN_MSG))
-    clientSocket.send(str.encode('\n'))
+    # clientSocket.send(str.encode('\n'))
     # clientSocket.send(str.encode(ADMIN_MSG))
 
     _thread.start_new_thread(Receive, ())
@@ -236,5 +243,5 @@ try:
     while True:
         continue
 except:
-    print("INFO: Client program quits....")
+    print("INFO: Client program quit....")
     clientSocket.close()       
