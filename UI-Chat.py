@@ -15,9 +15,9 @@ def sendMessage(msgInput):
         LineNumber = float(ChatLog.index(END))-1.0
         ChatLog.insert(END, MESSAGE)
         num = len(MESSAGE)
-        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+1)
+        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
         ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
-        ChatLog.tag_remove(MESSAGE, LineNumber, LineNumber+num)
+        #ChatLog.tag_remove(MESSAGE, LineNumber, LineNumber+num)
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
     
@@ -40,7 +40,7 @@ def sendMessage(msgInput):
 '''
     try:
         if msgInput == '.help':
-            add(HELP_MSG, '#FFFFFF')
+            Log(HELP_MSG, '#FFFFFF')
             
         elif msgInput == '.clear':
             ChatLog.config(state=NORMAL)
@@ -221,11 +221,13 @@ USERNAME = str(input("INPUT: Enter username: "))
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = USERNAME + ' has joined the server'
 FINAL_VERSION = '-$$' + programVersion
+FINAL_NAME = '$$$' + USERNAME
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     clientSocket.connect((IP, PORT))
     print("INFO: Sending client information...")
+    clientSocket.send(str.encode(FINAL_NAME))
     clientSocket.send(str.encode(FINAL_VERSION))
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode('\n'))
