@@ -25,56 +25,57 @@ def sendMessage(msgInput):
 
     ADMIN_MSG = '''.kick - kick a client off
 .clearall - clears messages for everyone
-.fq - force quits all clients
-.status - view server status
+.fq - force quits all clients (unstable - causes server shut down)
 .message - private message a user (unavailable)
 '''
-    
-    if msgInput == '.help':
-        HELP_MSG = '''.help - prints the help menu
+    try:
+        if msgInput == '.help':
+            HELP_MSG = '''.help - prints the help menu
 .quit - exit the server gracefully
 .name - change current username (unavailable)
 .clear - clear chat (client-side)
 .online - view online users
-'''
-        add(HELP_MSG, '#FFFFFF')
-    elif msgInput == '.clear':
-        ChatLog.config(state=NORMAL)
-        ChatLog.delete(1.0, END)
-        CLEAR_MSG = 'Chat was cleared successfully.'
-        add(CLEAR_MSG, '#FFFFFF')
-    elif msgInput == '.name':
-        UN_MSG = 'This function is unavailable right now.'
-        add(UN_MSG, '#FFFFFF')
-    elif msgInput == '.quit':
-        Window.destroy()
-        clientSocket.close()
-    elif msgInput == '.colour':
-        CL_MSG = 'Open UI-Settings to change the theme.'
-        add(CL_MSG, '#FFFFFF')
-    elif len(msgInput) > 150:
-        SPAM_MSG = 'Your message was not sent due to potential spam.'
-        add(SPAM_MSG, '#FFFFFF')
-    elif msgInput == '.online':
-        clientSocket.send(str.encode('$-$online'))
-    elif msgInput == '.admin':
-        add(ADMIN_MSG)
-    elif msgInput == '.clearall':
-        CLALL_MSG = 'Chat has been cleared for all users by ' + USERNAME
-        clientSocket.send(str.encode('$-$clear'))
-        clientSocket.send(CLALL_MSG)
-    elif msgInput == '.fq':
-        clientSocket.send(str.encode('$-$quit'))
-    elif msgInput == '.status':
-        STAT_MSG = 'Current server and client status:'
-        add(STAT_MSG)
-    elif msgInput == '.messsage':
-        MSG_MSG = 'This function is unavailable right now.'
-        add(MSG_MSG)
-    else:
-        CODES = USERNAME + ': ' + sendData
-        clientSocket.send(str.encode('\n'))
-        clientSocket.send(str.encode(CODES))
+.colour - change theme colour
+    '''
+            add(HELP_MSG, '#FFFFFF')
+        elif msgInput == '.clear':
+            ChatLog.config(state=NORMAL)
+            ChatLog.delete(1.0, END)
+            CLEAR_MSG = 'Chat was cleared successfully.'
+            add(CLEAR_MSG, '#FFFFFF')
+        elif msgInput == '.name':
+            UN_MSG = 'This function is unavailable right now.'
+            add(UN_MSG, '#FFFFFF')
+        elif msgInput == '.quit':
+            Window.destroy()
+            clientSocket.close()
+        elif msgInput == '.colour':
+            CL_MSG = 'Open UI-Settings to change the theme.'
+            add(CL_MSG, '#FFFFFF')
+        elif len(msgInput) > 150:
+            SPAM_MSG = 'Your message was not sent due to potential spam.'
+            add(SPAM_MSG, '#FFFFFF')
+        elif msgInput == '.online':
+            clientSocket.send(str.encode('$-$online'))
+        elif msgInput == '.admin':
+            add(ADMIN_MSG)
+        elif msgInput == '.clearall':
+            CLALL_MSG = 'Chat has been cleared for all users by ' + USERNAME
+            clientSocket.send(str.encode('$-$clear'))
+        elif msgInput == '.fq':
+            clientSocket.send(str.encode('$-$quit'))
+        elif msgInput == '.messsage':
+            MSG_MSG = 'This function is unavailable right now.'
+            add(MSG_MSG)
+        elif msgInput == '.kick':
+            KICK_MSG = 'This function is unavailable right now.'
+            add(KICK_MSG)
+        else:
+            CODES = USERNAME + ': ' + sendData
+            clientSocket.send(str.encode('\n'))
+            clientSocket.send(str.encode(CODES))
+    except:
+        pass
 
 def PressAction(event):
     entryBox.config(state=NORMAL)
@@ -148,6 +149,16 @@ ChatLog.place(relx=.043,rely=.23)
 
 # Receiving data from other clients.	
 def Receive():
+    def add(MESSAGE, colour=colourTheme):
+        ChatLog.config(state=NORMAL)
+        ChatLog.insert(END, '\n')
+        LineNumber = float(ChatLog.index(END))-1.0
+        ChatLog.insert(END, MESSAGE)
+        num = len(MESSAGE)
+        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
+        ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
+        ChatLog.config(state=DISABLED)
+        ChatLog.see(END)
     while True:
         try:
             receiveData = clientSocket.recv(4096)            
@@ -167,6 +178,11 @@ def Receive():
                 Window.destroy()
                 clientSocket.close()
                 _thread.interrupt_main()
+            elif receiveData.decode() == '$-$clear':
+                ChatLog.config(state=NORMAL)
+                ChatLog.delete(1.0, END)
+                CLEAR_MSG = 'Chat was cleared by an admin'
+                add(CLEAR_MSG, '#FFFFFF')
             else:
                 ChatLog.config(state=NORMAL)
                 LineNumber = float(ChatLog.index(END))-1.0
