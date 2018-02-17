@@ -225,7 +225,6 @@ FINAL_VERSION = '-$$' + programVersion
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     clientSocket.connect((IP, PORT))
-    clientSocket.send(str.encode(FINAL_NAME))
     print("INFO: Sending client information...")
     clientSocket.send(str.encode(FINAL_VERSION))
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
