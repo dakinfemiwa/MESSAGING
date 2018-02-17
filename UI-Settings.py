@@ -2,6 +2,7 @@ import json
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
+    
 print('INFO: Choose a colour:')
 print('1: White')
 print('2: Red')
@@ -10,6 +11,7 @@ print('4: Green')
 print('5: Yellow')
 print('6: Purple')
 print('7: Orange')
+
 colourInput = input('-> ')
 if colourInput == '1':
     config['window']['theme'] = '#FFFFFF'

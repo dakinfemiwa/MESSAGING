@@ -15,15 +15,16 @@ def sendMessage(msgInput):
         LineNumber = float(ChatLog.index(END))-1.0
         ChatLog.insert(END, MESSAGE)
         num = len(MESSAGE)
-        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
+        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+1)
         ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
+        ChatLog.tag_remove(MESSAGE, LineNumber, LineNumber+num)
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
     
     entryBox.delete(0, END)
     sendData = msgInput
 
-    ADMIN_MSG = '''.kick - kick a client off
+    ADMIN_MSG = '''.kick - kick a client off (unavailable)
 .clearall - clears messages for everyone
 .fq - force quits all clients (unstable - causes server shut down)
 .message - private message a user (unavailable)
@@ -35,7 +36,8 @@ def sendMessage(msgInput):
 .name - change current username (unavailable)
 .clear - clear chat (client-side)
 .online - view online users
-.colour - change theme colour
+.colour - change theme colour (dependent)
+.update - update the client (unavailable)
     '''
             add(HELP_MSG, '#FFFFFF')
         elif msgInput == '.clear':
@@ -70,6 +72,9 @@ def sendMessage(msgInput):
         elif msgInput == '.kick':
             KICK_MSG = 'This function is unavailable right now.'
             add(KICK_MSG)
+        elif msgInput == '.update':
+            UPDT_MSG = 'No updates are available right now.'
+            add(UPDT_MSG)
         else:
             CODES = USERNAME + ': ' + sendData
             clientSocket.send(str.encode('\n'))

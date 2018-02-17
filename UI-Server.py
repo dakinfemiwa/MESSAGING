@@ -10,7 +10,6 @@ def broadcast (sock, message, usr):
             if socket != server_socket:
                 print('FROM: ', usr)
                 print('MESSAGE: ' , message)
-                print('INFO: Broadcasting...\n')
                 socket.send(message)
     except:
         print('ERROR: Broadcast error - perhaps a client disconnected?')
@@ -64,12 +63,7 @@ if __name__ == "__main__":
                         username = data.decode().strip('$$$')
                         Users[addr] = username
                     elif '$-$online' in data.decode():
-                        #try:
-                            #for x in range(0, 100):
                         broadcast(sock, str.encode("\nCurrent connected users:"), 'ALL')
-                        #broadcast(sock, str.encode("\n") + str.encode(str(Users)), 'ALL')
-                        print(len(CLIST))
-                        print(Users.values())
                         
                         for x in range(0, len(CLIST)-1):
                             client = list(Users.values())[x]
