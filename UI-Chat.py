@@ -77,7 +77,7 @@ def sendMessage(msgInput):
             CLALL_MSG = 'Chat has been cleared for all users by ' + USERNAME
             clientSocket.send(str.encode('$-$clear'))
             
-        elif msgInput == '.messsage':
+        elif msgInput == '.message':
             MSG_MSG = 'This function is unavailable right now.'
             Log(MSG_MSG)
             

@@ -5,10 +5,10 @@ import select
 import string
 from datetime import datetime
 	
-def broadcast (sock, message, usr):
+def Broadcast (sock, message, usr):
     try:
         for socket in CLIST:
-            if socket != server_socket:
+            if socket != serverSocket:
                 if message.decode() != '\n':
                     print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + message.decode())
                 socket.send(message)
@@ -21,33 +21,34 @@ if __name__ == "__main__":
     People = []
     Users = {}
     
-    print('INFO: Chat server - BETA')
-    # IP = str(input("Enter IP to bind server: "))
+    print('INFO: Chat server - V2')
     IP = '0.0.0.0'
 
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((IP, 6666))
-    server_socket.listen(10)
+    # IP = str(input("Enter IP to bind server: "))
+
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serverSocket.bind((IP, 6666))
+    serverSocket.listen(10)
  
-    CLIST.append(server_socket)   # Add socket
+    CLIST.append(serverSocket)
 
     while 1:
-        # Get list of ready to be read with select
+
         read_sockets, write_sockets, error_sockets = select.select(CLIST, [], [])
 
         for sock in read_sockets:
 
-            if sock == server_socket: 
-                sockfd, addr = server_socket.accept()   # New connection recieved 
-                CLIST.append(sockfd)                    # Append the new connection
+            if sock == serverSocket: 
+                sockfd, addr = serverSocket.accept()
+                CLIST.append(sockfd)
                 print("STATUS: Client [%s, %s] connected" % addr)
 
             else:
                 try:
-                    data = sock.recv(4096, )            # Data recieved from client
+                    data = sock.recv(4096, )
                 except:
                     try:
-                        broadcast(sock, str.encode("\n") + str.encode(str(Users[addr]) + " has left the server"),
+                        Broadcast(sock, str.encode("\n") + str.encode(str(Users[addr]) + " has left the server"),
                                 addr)
                     except:
                         print('ERROR: Unable to notify clients of disconnect.')
@@ -60,29 +61,24 @@ if __name__ == "__main__":
                     CLIST.remove(sock)
                     continue
 
-                if data:# Client send data
+                if data:
                     
-                    if data == "q" or data == "Q":      # If client quit
-                        print("STATUS: Client [%s, %s] quit" % addr)
-                        sock.close()                    # Close socket
-                        CLIST.remove(sock)
-                        # Remove from our list
-                    elif '$$$' in data.decode():
-                        username = data.decode().strip('$$$')
-                        Users[addr] = username
+                    if '$$$' in data.decode():
+                        USERNAME = data.decode().strip('$$$')
+                        Users[addr] = USERNAME
 
                     elif '-$$' in data.decode():
-                        version = data.decode().strip('-$$')
-                        broadcast(sock, str.encode("\nThis user is connected through version " + version), Users[addr])
+                        VERSION = data.decode().strip('-$$')
+                        Broadcast(sock, str.encode("\nThis user is connected through version " + VERSION), Users[addr])
                         
                     elif '$-$online' in data.decode():
-                        broadcast(sock, str.encode("\nCurrent connected users:"), Users[addr])
+                        Broadcast(sock, str.encode("\nCurrent connected users:"), Users[addr])
                         
                         for x in range(0, len(CLIST)-1):
                             client = list(Users.values())[x]
                             client = str(client)
-                            broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
+                            Broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
                     else:
-                        broadcast(sock, data, Users[addr])                  
+                        Broadcast(sock, data, Users[addr])                  
                 
-    server_socket.close()    
+    serverSocket.close()    
