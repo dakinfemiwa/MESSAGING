@@ -23,6 +23,15 @@ def sendMessage(msgInput):
     
     entryBox.delete(0, END)
     sendData = msgInput
+    colours = [
+        'blue',
+        'green',
+        'purple',
+        'yellow',
+        'red',
+        'orange',
+        'white'
+        ]
 
     HELP_MSG = '''.help - prints the help menu
 .quit - exit the server gracefully
@@ -31,6 +40,7 @@ def sendMessage(msgInput):
 .online - view online users
 .colour - change theme colour (dependent)
 .update - update the client (unavailable)
+.restart - restart the client
     '''
 
     ADMIN_MSG = '''.kick - kick a client off (unavailable)
@@ -52,9 +62,18 @@ def sendMessage(msgInput):
             UN_MSG = 'This function is unavailable right now.'
             Log(UN_MSG, '#FFFFFF')
             
-        elif msgInput == '.colour':
-            CL_MSG = 'Open UI-Settings to change the theme.'
-            Log(CL_MSG, '#FFFFFF')
+        elif '.colour' in msgInput:
+            if len(msgInput) < 9:
+                CL_MSG = 'The correct usage is .colour <colour>'
+                Log(CL_MSG, '#FFFFFF')
+            else:
+                colour = msgInput.strip('.colour ')
+                if colour in colours:
+                    CL_MSG = 'Theme colour was changed; restart client'
+                    Log(CL_MSG, '#FFFFFF')
+                else:
+                    CL_MSG = 'You selected an invalid colour'
+                    Log(CL_MSG, '#FFFFFF')
             
         elif len(msgInput) > 150:
             SPAM_MSG = 'Your message was not sent due to potential spam.'
