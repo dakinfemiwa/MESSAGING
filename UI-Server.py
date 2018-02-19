@@ -79,6 +79,9 @@ if __name__ == "__main__":
                             client = str(client)
                             Broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
                     else:
-                        Broadcast(sock, data, Users[addr])                  
+                        try:
+                            Broadcast(sock, data, Users[addr])
+                        except:
+                            print('ERROR: Broadcast error - perhaps a solo client disconnected?')
                 
     serverSocket.close()    

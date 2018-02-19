@@ -4,6 +4,7 @@ import json
 import socket
 import _thread
 import sys
+import os
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
@@ -17,7 +18,6 @@ def sendMessage(msgInput):
         num = len(MESSAGE)
         ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
         ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
-        #ChatLog.tag_remove(MESSAGE, LineNumber, LineNumber+num)
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
     
@@ -38,7 +38,7 @@ def sendMessage(msgInput):
 .name - change current username (unavailable)
 .clear - clear chat (client-side)
 .online - view online users
-.colour - change theme colour (dependent)
+.colour - change theme colour
 .update - update the client (unavailable)
 .restart - restart the client
     '''
@@ -67,10 +67,29 @@ def sendMessage(msgInput):
                 CL_MSG = 'The correct usage is .colour <colour>'
                 Log(CL_MSG, '#FFFFFF')
             else:
-                colour = msgInput.strip('.colour ')
+                colour = msgInput[8:]
                 if colour in colours:
+                    if colour == 'white':
+                        config['window']['theme'] = '#FFFFFF'
+                    elif colour == 'red':
+                        config['window']['theme'] = '#FF0000'
+                    elif colour == 'blue':
+                        config['window']['theme'] = '#00BFFF'
+                    elif colour == 'green':
+                        config['window']['theme'] = '#7CFC00'
+                    elif colour == 'yellow':
+                        config['window']['theme'] = '#FFFF00'
+                    elif colour == 'purple':
+                        config['window']['theme'] = '#8A2BE2'
+                    elif colour == 'orange':
+                        config['window']['theme'] = '#FF8C00'
+
+                    with open('config.json', 'w') as jsonConfig:
+                        jsonConfig.write(json.dumps(config, indent=8))
+                    
                     CL_MSG = 'Theme colour was changed; restart client'
                     Log(CL_MSG, '#FFFFFF')
+                    
                 else:
                     CL_MSG = 'You selected an invalid colour'
                     Log(CL_MSG, '#FFFFFF')
