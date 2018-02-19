@@ -1,20 +1,20 @@
 {
-        "window": {
-                "title": "CHAT-UI",
-                "theme": "#7CFC00",
-                "foreground": "#ffffff",
-                "background": "#141414",
-                "resolution": "900x400"
-        },
         "layout": {
+                "stage": "true",
+                "percentage": "true",
                 "clock": "true",
                 "percentage-symbol": "false",
-                "version": "true",
-                "percentage": "true",
-                "stage": "true"
+                "version": "true"
         },
         "information": {
                 "stage": "P R I V A T E  B E T A",
                 "version": "2"
+        },
+        "window": {
+                "foreground": "#ffffff",
+                "background": "#141414",
+                "resolution": "900x400",
+                "theme": "#FF0000",
+                "title": "CHAT-UI"
         }
 }
