@@ -88,12 +88,7 @@ def sendMessage(msgInput):
                         jsonConfig.write(json.dumps(config, indent=8))
                     
                     CL_MSG = 'Theme colour was changed; restart client'
-<<<<<<< HEAD
-                    Log(CL_MSG, '#FFFFFF')
-                    
-=======
                     Log(CL_MSG, '#FFFFFF')                    
->>>>>>> 8248c72b4e2ac8c1a4e8c25f62fac8c04ab6c4df
                 else:
                     CL_MSG = 'You selected an invalid colour'
                     Log(CL_MSG, '#FFFFFF')
