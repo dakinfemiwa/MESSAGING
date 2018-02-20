@@ -178,13 +178,13 @@ lineLabel = Label(Window, textvariable=lineText, font='Arial 15 bold', fg=colour
 lineLabel.place(relx=.04, rely=.14)
 
 titleLabel = Label(Window, textvariable=titleText, font='Arial 20 bold', bg=windowBackground, fg=windowForeground)
-titleLabel.place(relx=.04,rely=.09)
+titleLabel.place(relx=.04, rely=.09)
 
 enterMessageLabel = Label(Window, textvariable=enterMessageText, font='Arial 13 bold', bg=windowBackground, fg=windowForeground)
-enterMessageLabel.place(relx=.04,rely=.85)
+enterMessageLabel.place(relx=.04, rely=.85)
 
 entryBox = Entry(Window, width=100)
-entryBox.place(relx=.18,rely=.855)
+entryBox.place(relx=.18, rely=.855)
 
 entryBox.bind("<Return>", DisableEntry)
 entryBox.bind("<KeyRelease-Return>", PressAction)
@@ -192,16 +192,16 @@ entryBox.bind("<KeyRelease-Return>", PressAction)
 entryBox.insert(END, '.help')
 
 connectingLabel = Label(Window, textvariable=connectingText, font='Arial 8 bold', fg=colourTheme, bg=windowBackground)
-connectingLabel.place(relx=.040,rely=.225)
+connectingLabel.place(relx=.040, rely=.225)
 
 sendButton = Button(Window, textvariable=buttonText, font='Arial 7 bold', width=13, height=1, command=lambda:PressAction("<Return>"))
-sendButton.place(relx=.86,rely=.855)
+sendButton.place(relx=.86, rely=.855)
 
 verionLabel = Label(Window, textvariable=versionText, font='Arial 11 bold', bg=windowBackground, fg=colourTheme)
 verionLabel.place(relx=.08, rely=.17)
 
 ChatLog = Text(Window, bd=1, bg="#141414", height="13", width="91", font="Arial")
-ChatLog.place(relx=.043,rely=.23)
+ChatLog.place(relx=.043, rely=.23)
 
 # Receiving data from other clients.	
 def Receive():
@@ -255,6 +255,7 @@ print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
 
 USERNAME = str(input("INPUT: Enter username: "))
 
+# Admin permissions not sorted yet
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = USERNAME + ' has joined the server'
 FINAL_VERSION = '-$$' + programVersion
@@ -281,5 +282,5 @@ try:
     while True:
         continue
 except:
-    print("INFO: Client program quit....")
+    print("INFO: The client was forced to close.")
     clientSocket.close()       
