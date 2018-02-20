@@ -1,71 +1,42 @@
 from tkinter import *
-import tkinter.ttk
 import json
 import socket
 import _thread
-import sys
-import os
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
+
 def sendMessage(msgInput):
-    def Log(MESSAGE, colour=colourTheme):
+    def Log(message):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
-        LineNumber = float(ChatLog.index(END))-1.0
-        ChatLog.insert(END, MESSAGE)
-        num = len(MESSAGE)
-        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
-        ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
+        ChatLog.insert(END, message)
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
-    
+
+    COLOUR_COMMAND = 'The correct usage is .colour <colour>'
     entryBox.delete(0, END)
     sendData = msgInput
     colours = [
-        'blue',
-        'green',
-        'purple',
-        'yellow',
-        'red',
-        'orange',
-        'white'
+        'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white'
         ]
 
-    HELP_MSG = '''.help - prints the help menu
-.quit - exit the server gracefully
-.name - change current username (unavailable)
-.clear - clear chat (client-side)
-.online - view online users
-.colour - change theme colour
-.update - update the client (unavailable)
-.restart - restart the client
-    '''
-
-    ADMIN_MSG = '''.kick - kick a client off (unavailable)
-.clearall - clears messages for everyone
-.fq - force quits all clients (unstable - causes server shut down)
-.message - private message a user (unavailable)
-'''
     try:
         if msgInput == '.help':
-            Log(HELP_MSG, '#FFFFFF')
+            Log(HELP_MESSAGE)
             
         elif msgInput == '.clear':
             ChatLog.config(state=NORMAL)
             ChatLog.delete(1.0, END)
-            CLEAR_MSG = 'Chat was cleared successfully.'
-            Log(CLEAR_MSG, '#FFFFFF')
+            Log(CLEAR_COMMAND)
             
         elif msgInput == '.name':
-            UN_MSG = 'This function is unavailable right now.'
-            Log(UN_MSG, '#FFFFFF')
+            Log(NAME_COMMAND)
             
         elif '.colour' in msgInput:
             if len(msgInput) < 9:
-                CL_MSG = 'The correct usage is .colour <colour>'
-                Log(CL_MSG, '#FFFFFF')
+                Log(COLOUR_COMMAND)
             else:
                 colour = msgInput[8:]
                 if colour in colours:
@@ -86,16 +57,15 @@ def sendMessage(msgInput):
 
                     with open('config.json', 'w') as jsonConfig:
                         jsonConfig.write(json.dumps(config, indent=8))
-                    
-                    CL_MSG = 'Theme colour was changed; restart client'
-                    Log(CL_MSG, '#FFFFFF')                    
+
+                    COLOUR_COMMAND = 'Theme colour was changed; restart client'
+                    Log(COLOUR_COMMAND)
                 else:
-                    CL_MSG = 'You selected an invalid colour'
-                    Log(CL_MSG, '#FFFFFF')
+                    COLOUR_COMMAND = 'You selected an invalid colour'
+                    Log(COLOUR_COMMAND)
             
         elif len(msgInput) > 150:
-            SPAM_MSG = 'Your message was not sent due to potential spam.'
-            Log(SPAM_MSG, '#FFFFFF')
+            Log(SPAM_MESSAGE)
             
         elif msgInput == '.quit':
             Window.destroy()
@@ -104,27 +74,23 @@ def sendMessage(msgInput):
         elif msgInput == '.online':
             clientSocket.send(str.encode('$-$online'))
             
-        elif msgInput == '.admin':
-            Log(ADMIN_MSG)
-            
         elif msgInput == '.fq':
             clientSocket.send(str.encode('$-$quit'))
 
-        elif msgInput == '.clearall':
-            CLALL_MSG = 'Chat has been cleared for all users by ' + USERNAME
+        elif msgInput == '.ca':
             clientSocket.send(str.encode('$-$clear'))
+
+        elif msgInput == '.admin':
+            Log(ADMIN_MESSAGE)
             
         elif msgInput == '.message':
-            MSG_MSG = 'This function is unavailable right now.'
-            Log(MSG_MSG)
+            Log(MESSAGE_COMMAND)
             
         elif msgInput == '.kick':
-            KICK_MSG = 'This function is unavailable right now.'
-            Log(KICK_MSG)
+            Log(KICK_COMMAND)
             
         elif msgInput == '.update':
-            UPDT_MSG = 'No updates are available right now.'
-            Log(UPDT_MSG)
+            Log(UPDATE_COMMAND)
             
         else:
             SEND_MESSAGE = USERNAME + ': ' + sendData
@@ -133,11 +99,15 @@ def sendMessage(msgInput):
     except:
         pass
 
+
 def PressAction(event):
     entryBox.config(state=NORMAL)
     sendMessage(entryBox.get())
+
+
 def DisableEntry(event):
     entryBox.config(state=DISABLED)
+
 
 # Config incorporation.
 colourTheme = config['window']['theme']
@@ -166,9 +136,6 @@ enterMessageText.set('M E S S A G E: ')
 buttonText = StringVar()
 buttonText.set('S E N D')
 
-connectingText = StringVar()
-connectingText.set('Connecting to the chat server...')
-
 versionText = StringVar()
 versionText.set('V E R S I O N  ' + programVersion)
 
@@ -191,17 +158,15 @@ entryBox.bind("<KeyRelease-Return>", PressAction)
 
 entryBox.insert(END, '.help')
 
-connectingLabel = Label(Window, textvariable=connectingText, font='Arial 8 bold', fg=colourTheme, bg=windowBackground)
-connectingLabel.place(relx=.040, rely=.225)
-
-sendButton = Button(Window, textvariable=buttonText, font='Arial 7 bold', width=13, height=1, command=lambda:PressAction("<Return>"))
+sendButton = Button(Window, textvariable=buttonText, font='Arial 7 bold', width=13, height=1, command=lambda: PressAction("<Return>"))
 sendButton.place(relx=.86, rely=.855)
 
-verionLabel = Label(Window, textvariable=versionText, font='Arial 11 bold', bg=windowBackground, fg=colourTheme)
-verionLabel.place(relx=.08, rely=.17)
+versionLabel = Label(Window, textvariable=versionText, font='Arial 11 bold', bg=windowBackground, fg=colourTheme)
+versionLabel.place(relx=.08, rely=.17)
 
 ChatLog = Text(Window, bd=1, bg="#141414", height="13", width="91", font="Arial")
 ChatLog.place(relx=.043, rely=.23)
+
 
 # Receiving data from other clients.	
 def Receive():
@@ -235,17 +200,38 @@ def Receive():
             elif receiveData.decode() == '$-$clear':
                 ChatLog.config(state=NORMAL)
                 ChatLog.delete(1.0, END)
-                CLEAR_MSG = 'Chat was cleared by an admin'
-                Log(CLEAR_MSG, '#FFFFFF')
+                Log(CLEAR_MESSAGE_ADMIN, '#FFFFFF')
             else:
                 ChatLog.config(state=NORMAL)
-                LineNumber = float(ChatLog.index(END))-1.0
                 ChatLog.insert(END, receiveData)
-                num = len(receiveData)
-                ChatLog.tag_add("Them", LineNumber, LineNumber+num)
-                ChatLog.tag_config("Them", foreground='#ffffff', font=("courier new", 11, "bold"))
                 ChatLog.config(state=DISABLED)
                 ChatLog.see(END)
+
+
+HELP_MESSAGE = '''.help - prints the help menu
+.quit - exit the server gracefully
+.name - change current username (unavailable)
+.clear - clear chat (client-side)
+.online - view online users
+.colour - change theme colour
+.update - update the client (unavailable)
+.restart - restart the client
+.about - view information about client
+    '''
+
+ADMIN_MESSAGE = '''.kick - kick a client off (unavailable)
+.ca - clears messages for everyone
+.fq - force quits all clients (unstable - causes server shut down)
+.message - private message a user (unavailable)
+'''
+
+CLEAR_MESSAGE_ADMIN = 'Chat was cleared by an admin'
+CLEAR_COMMAND = 'Chat was cleared successfully.'
+NAME_COMMAND = 'This function is unavailable right now.'
+SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
+MESSAGE_COMMAND = 'This function is unavailable right now.'
+KICK_COMMAND = 'This function is unavailable right now.'
+UPDATE_COMMAND = 'No updates are available right now.'
 
 IP = '86.153.124.215'
 PORT = 6666

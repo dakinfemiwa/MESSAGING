@@ -4,7 +4,8 @@ import threading
 import select
 import string
 from datetime import datetime
-	
+
+
 def Broadcast (sock, message, usr):
     try:
         for socket in CLIST:
@@ -14,6 +15,7 @@ def Broadcast (sock, message, usr):
                 socket.send(message)
     except:
         print('ERROR: Broadcast error - perhaps a client disconnected?')
+
 
 if __name__ == "__main__":
 
@@ -48,8 +50,7 @@ if __name__ == "__main__":
                     data = sock.recv(4096, )
                 except:
                     try:
-                        Broadcast(sock, str.encode("\n") + str.encode(str(Users[addr]) + " has left the server"),
-                                addr)
+                        Broadcast(sock, str.encode("\n") + str.encode(str(Users[addr]) + " has left the server"), addr)
                     except:
                         print('ERROR: Unable to notify clients of disconnect.')
                     try:
