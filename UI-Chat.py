@@ -37,7 +37,10 @@ def sendMessage(msgInput):
             
         elif msgInput == '.name':
             Log(NAME_COMMAND)
-            
+
+        elif msgInput == '.about':
+            Log(VERSION_MESSAGE)
+
         elif '.colour' in msgInput:
             if len(msgInput) < 9:
                 Log(COLOUR_COMMAND)
@@ -88,10 +91,16 @@ def sendMessage(msgInput):
             Log(ADMIN_MESSAGE)
             
         elif msgInput == '.message':
-            Log(MESSAGE_COMMAND)
+            if len(msgInput) < 10:
+                Log(MESSAGE_COMMAND)
+            else:
+                targetUser = msgInput[9:]
             
         elif msgInput == '.kick':
-            Log(KICK_COMMAND)
+            if len(msgInput) < 7:
+                Log(KICK_COMMAND)
+            else:
+                targetUser = msgInput[6:]
             
         elif msgInput == '.update':
             Log(UPDATE_COMMAND)
@@ -229,7 +238,7 @@ HELP_MESSAGE = '''.help - prints the help menu
 
 ADMIN_MESSAGE = '''.kick - kick a client off (unavailable)
 .ca - clears messages for everyone
-.fq - force quits all clients (unstable - causes server shut down)
+.fq - force quits all clients
 .message - private message a user (unavailable)
 '''
 
@@ -238,8 +247,9 @@ CLEAR_COMMAND = 'Chat was cleared successfully.'
 NAME_COMMAND = 'This function is unavailable right now.'
 SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
 MESSAGE_COMMAND = 'This function is unavailable right now.'
-KICK_COMMAND = 'This function is unavailable right now.'
+KICK_COMMAND = 'The correct usage for this command is .kick <user>'
 UPDATE_COMMAND = 'No updates are available right now.'
+VERSION_MESSAGE = 'Running GUI version of chat client [' + programVersion + ']'
 
 IP = '86.153.124.215'
 PORT = 6666
