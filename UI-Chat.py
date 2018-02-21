@@ -11,7 +11,11 @@ def sendMessage(msgInput):
     def Log(message):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
+        LineNumber = float(ChatLog.index(END)) - 1.0
         ChatLog.insert(END, message)
+        num = len(message)
+        ChatLog.tag_add(message, LineNumber, LineNumber + num)
+        ChatLog.tag_config(message, foreground=colour, font=("courier new", 11, "bold"))
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
 
@@ -203,7 +207,11 @@ def Receive():
                 Log(CLEAR_MESSAGE_ADMIN, '#FFFFFF')
             else:
                 ChatLog.config(state=NORMAL)
+                LineNumber = float(ChatLog.index(END)) - 1.0
                 ChatLog.insert(END, receiveData)
+                num = len(receiveData)
+                ChatLog.tag_add("Them", LineNumber, LineNumber + num)
+                ChatLog.tag_config("Them", foreground='#ffffff', font=("courier new", 11, "bold"))
                 ChatLog.config(state=DISABLED)
                 ChatLog.see(END)
 
