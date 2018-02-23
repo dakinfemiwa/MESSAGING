@@ -1,9 +1,5 @@
 {
         "layout": {
-                "stage": "true",
-                "percentage": "true",
-                "clock": "true",
-                "percentage-symbol": "false",
                 "version": "true"
         },
         "information": {

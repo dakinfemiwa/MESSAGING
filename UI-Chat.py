@@ -6,8 +6,9 @@ import _thread
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
-
 def sendMessage(msgInput):
+    global username
+
     def Log(message):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
@@ -15,7 +16,7 @@ def sendMessage(msgInput):
         ChatLog.insert(END, message)
         num = len(message)
         ChatLog.tag_add(message, LineNumber, LineNumber + num)
-        ChatLog.tag_config(message, foreground=colour, font=("courier new", 11, "bold"))
+        ChatLog.tag_config(message, foreground=colourTheme, font=("courier new", 11, "bold"))
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
 
@@ -24,19 +25,29 @@ def sendMessage(msgInput):
     sendData = msgInput
     colours = [
         'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white'
-        ]
-
-    try:
+    ]
+    if True:
         if msgInput == '.help':
             Log(HELP_MESSAGE)
-            
+
         elif msgInput == '.clear':
             ChatLog.config(state=NORMAL)
             ChatLog.delete(1.0, END)
             Log(CLEAR_COMMAND)
-            
-        elif msgInput == '.name':
-            Log(NAME_COMMAND)
+
+        elif '.name' in msgInput:
+            if len(msgInput) < 7:
+                Log(NAME_COMMAND)
+            else:
+                new_name = msgInput[6:]
+                SEND_MESSAGE = username_old + ' has changed their name to ' + new_name
+                clientSocket.send(str.encode('\n'))
+                clientSocket.send(str.encode(SEND_MESSAGE))
+                Window.after(500)
+                clientSocket.send(str.encode('\n'))
+                final2 = '$$$' + new_name
+                username = new_name
+                clientSocket.send(str.encode(final2))
 
         elif msgInput == '.about':
             Log(VERSION_MESSAGE)
@@ -70,17 +81,17 @@ def sendMessage(msgInput):
                 else:
                     COLOUR_COMMAND = 'You selected an invalid colour'
                     Log(COLOUR_COMMAND)
-            
+
         elif len(msgInput) > 150:
             Log(SPAM_MESSAGE)
-            
+
         elif msgInput == '.quit':
             Window.destroy()
             clientSocket.close()
-            
+
         elif msgInput == '.online':
             clientSocket.send(str.encode('$-$online'))
-            
+
         elif msgInput == '.fq':
             clientSocket.send(str.encode('$-$quit'))
 
@@ -89,28 +100,28 @@ def sendMessage(msgInput):
 
         elif msgInput == '.admin':
             Log(ADMIN_MESSAGE)
-            
+
         elif msgInput == '.message':
             if len(msgInput) < 10:
                 Log(MESSAGE_COMMAND)
             else:
                 targetUser = msgInput[9:]
-            
+
         elif msgInput == '.kick':
             if len(msgInput) < 7:
                 Log(KICK_COMMAND)
             else:
                 targetUser = msgInput[6:]
-            
+
         elif msgInput == '.update':
             Log(UPDATE_COMMAND)
-            
+
         else:
-            SEND_MESSAGE = USERNAME + ': ' + sendData
+            sendmsg = username + ': ' + sendData
             clientSocket.send(str.encode('\n'))
-            clientSocket.send(str.encode(SEND_MESSAGE))
-    except:
-        pass
+            clientSocket.send(str.encode(sendmsg))
+    # except:
+    # pass
 
 
 def PressAction(event):
@@ -160,7 +171,8 @@ lineLabel.place(relx=.04, rely=.14)
 titleLabel = Label(Window, textvariable=titleText, font='Arial 20 bold', bg=windowBackground, fg=windowForeground)
 titleLabel.place(relx=.04, rely=.09)
 
-enterMessageLabel = Label(Window, textvariable=enterMessageText, font='Arial 13 bold', bg=windowBackground, fg=windowForeground)
+enterMessageLabel = Label(Window, textvariable=enterMessageText, font='Arial 13 bold', bg=windowBackground,
+                          fg=windowForeground)
 enterMessageLabel.place(relx=.04, rely=.85)
 
 entryBox = Entry(Window, width=100)
@@ -171,7 +183,8 @@ entryBox.bind("<KeyRelease-Return>", PressAction)
 
 entryBox.insert(END, '.help')
 
-sendButton = Button(Window, textvariable=buttonText, font='Arial 7 bold', width=13, height=1, command=lambda: PressAction("<Return>"))
+sendButton = Button(Window, textvariable=buttonText, font='Arial 7 bold', width=13, height=1,
+                    command=lambda: PressAction("<Return>"))
 sendButton.place(relx=.86, rely=.855)
 
 versionLabel = Label(Window, textvariable=versionText, font='Arial 11 bold', bg=windowBackground, fg=colourTheme)
@@ -181,26 +194,27 @@ ChatLog = Text(Window, bd=1, bg="#141414", height="13", width="91", font="Arial"
 ChatLog.place(relx=.043, rely=.23)
 
 
-# Receiving data from other clients.	
+# Receiving data from other clients.
 def Receive():
     def Log(MESSAGE, colour=colourTheme):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
-        LineNumber = float(ChatLog.index(END))-1.0
+        LineNumber = float(ChatLog.index(END)) - 1.0
         ChatLog.insert(END, MESSAGE)
         num = len(MESSAGE)
-        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber+num)
+        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber + num)
         ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
+
     while True:
         try:
-            receiveData = clientSocket.recv(4096)            
+            receiveData = clientSocket.recv(4096)
         except:
             # When the server goes down.
             print("INFO: Server closed connection")
             _thread.interrupt_main()
-            break	
+            break
         if not receiveData:
             print("INFO: Server closed connection")
             _thread.interrupt_main()
@@ -257,13 +271,14 @@ PORT = 6666
 print("WELCOME: Ready to connect.")
 print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
 
-USERNAME = str(input("INPUT: Enter username: "))
+username = str(input("INPUT: Enter username: "))
+username_old = username
 
 # Admin permissions not sorted yet
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
-JOIN_MSG = USERNAME + ' has joined the server'
+JOIN_MSG = username + ' has joined the server'
 FINAL_VERSION = '-$$' + programVersion
-FINAL_NAME = '$$$' + USERNAME
+FINAL_NAME = '$$$' + username
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
@@ -287,4 +302,4 @@ try:
         continue
 except:
     print("INFO: The client was forced to close.")
-    clientSocket.close()       
+    clientSocket.close()

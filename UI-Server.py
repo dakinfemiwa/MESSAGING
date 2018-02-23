@@ -61,27 +61,25 @@ if __name__ == "__main__":
                     continue
 
                 if data:
-                    try:
-                        if '$$$' in data.decode():
-                            USERNAME = data.decode().strip('$$$')
-                            Users[addr] = USERNAME
+                    if '$$$' in data.decode():
+                        print('NAME RECEIVED')
+                        USERNAME = data.decode().strip('$$$')
+                        Users[addr] = USERNAME
 
-                        elif '-$$' in data.decode():
-                            VERSION = data.decode().strip('-$$')
-                            Broadcast(sock, str.encode("\nThis user is connected through version " + VERSION), Users[addr])
+                    elif '-$$' in data.decode():
+                        VERSION = data.decode().strip('-$$')
+                        Broadcast(sock, str.encode("\nThis user is connected through version " + VERSION), Users[addr])
 
-                        elif '$-$online' in data.decode():
-                            try:
-                                Broadcast(sock, str.encode("\nCurrent connected users:"), Users[addr])
+                    elif '$-$online' in data.decode():
+                        try:
+                            Broadcast(sock, str.encode("\nCurrent connected users:"), Users[addr])
 
-                                for x in range(0, len(CLIST)-1):
-                                    client = list(Users.values())[x]
-                                    client = str(client)
-                                    Broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
-                            except:
-                                print('ERROR: Could not print online user list.')
-                    except:
-                        print('ERROR: Data handling failed.')
+                            for x in range(0, len(CLIST)-1):
+                                client = list(Users.values())[x]
+                                client = str(client)
+                                Broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
+                        except:
+                            print('ERROR: Could not print online user list.')
                     else:
                         try:
                             Broadcast(sock, data, Users[addr])
