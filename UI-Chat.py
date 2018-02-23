@@ -275,6 +275,7 @@ ADMIN_COMMAND_NICKNAME = 'admin.commands.nickname'
 ADMIN_MESSAGE_JOIN = 'admin.messages.join'
 ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
+
 IP = '86.153.124.215'
 PORT = 6666
 
