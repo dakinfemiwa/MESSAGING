@@ -265,6 +265,8 @@ KICK_COMMAND = 'The correct usage for this command is .kick <user>'
 UPDATE_COMMAND = 'No updates are available right now.'
 VERSION_MESSAGE = 'Running GUI version of chat client [' + programVersion + ']'
 
+
+# Admin permissions - to be handled in configuration file.
 ADMIN_COMMAND_SYNTAX = 'admin.commands.show'
 ADMIN_COMMAND_KICK = 'admin.commands.kick'
 ADMIN_COMMAND_MESSAGE = 'admin.commands.message'
@@ -274,7 +276,6 @@ ADMIN_COMMAND_RESTART = 'admin.commands.restart'
 ADMIN_COMMAND_NICKNAME = 'admin.commands.nickname'
 ADMIN_MESSAGE_JOIN = 'admin.messages.join'
 ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
-
 
 IP = '86.153.124.215'
 PORT = 6666

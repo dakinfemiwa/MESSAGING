@@ -14,6 +14,11 @@ def Broadcast (sock, message, usr):
         print('ERROR: Broadcast error - perhaps a client disconnected?')
 
 
+def Handler():
+    # Handles permissions
+    pass
+
+
 if __name__ == "__main__":
 
     CLIST = []
