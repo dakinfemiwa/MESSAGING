@@ -1,11 +1,11 @@
 import socket
 import _thread
-import sys
-	
+
+
 def Receive():
     while 1:
         try:
-            recv_data = client_socket.recv(4096)            
+            recv_data = clientSocket.recv(4096)
         except:
             print("INFO: Server closed connection")
             _thread.interrupt_main()
@@ -17,13 +17,15 @@ def Receive():
         else:
             print(recv_data.decode())
 
+
 def Send():
     while 1:
         SEND_DATA = str(input("INPUT: Enter your message: "))
-        SEND_MESSAGE = user + ': ' + SEND_DATA
+        SEND_MESSAGE = USERNAME + ': ' + SEND_DATA
         clientSocket.send(str.encode('\n'))
         clientSocket.send(str.encode(SEND_MESSAGE))
-        
+
+
 if __name__ == "__main__":
 
     IP = '86.153.124.215'
@@ -49,8 +51,8 @@ if __name__ == "__main__":
     clientSocket.send(str.encode(JOIN_MSG))
     clientSocket.send(str.encode('\n'))
 
-    _thread.start_new_thread(Receive,())
-    _thread.start_new_thread(Send,())
+    _thread.start_new_thread(Receive, ())
+    _thread.start_new_thread(Send, ())
 
     try:
         while 1:
