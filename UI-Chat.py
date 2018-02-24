@@ -132,6 +132,10 @@ def PressAction(event):
 def DisableEntry(event):
     entryBox.config(state=DISABLED)
 
+def permCheck(permission):
+    QUERY = '---' + permission
+    clientSocket.send(QUERY)
+
 
 # Config incorporation.
 colourTheme = config['window']['theme']

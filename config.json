@@ -13,4 +13,7 @@
                 "theme": "#00BFFF",
                 "title": "CHAT-UI"
         }
+        "settings": {
+                "auto-update:": "true"
+        }
 }
