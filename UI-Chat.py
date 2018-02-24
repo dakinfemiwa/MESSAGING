@@ -24,7 +24,7 @@ def sendMessage(msgInput):
     entryBox.delete(0, END)
     sendData = msgInput
     colours = [
-        'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white'
+        'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white', 'gray'
     ]
     if True:
         if msgInput == '.help':
@@ -72,6 +72,8 @@ def sendMessage(msgInput):
                         config['window']['theme'] = '#8A2BE2'
                     elif colour == 'orange':
                         config['window']['theme'] = '#FF8C00'
+                    elif colour == 'gray':
+                        config['window']['theme'] = '#CCCCCC'
 
                     with open('config.json', 'w') as jsonConfig:
                         jsonConfig.write(json.dumps(config, indent=8))
@@ -158,7 +160,7 @@ enterMessageText = StringVar()
 enterMessageText.set('M E S S A G E: ')
 
 buttonText = StringVar()
-buttonText.set('S E N D')
+buttonText.set(' ➤ ')
 
 versionText = StringVar()
 versionText.set('V E R S I O N  ' + programVersion)
@@ -293,6 +295,7 @@ FINAL_VERSION = '-$$' + programVersion
 FINAL_NAME = '$$$' + username
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 try:
     clientSocket.connect((IP, PORT))
     print("INFO: Sending client information...")
@@ -315,3 +318,4 @@ try:
 except:
     print("INFO: The client was forced to close.")
     clientSocket.close()
+

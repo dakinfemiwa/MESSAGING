@@ -10,6 +10,8 @@ print('4: Green')
 print('5: Yellow')
 print('6: Purple')
 print('7: Orange')
+print('8: Gray')
+
 colourInput = input('-> ')
 if colourInput == '1':
     config['window']['theme'] = '#FFFFFF'
@@ -25,6 +27,8 @@ elif colourInput == '6':
     config['window']['theme'] = '#8A2BE2'
 elif colourInput == '7':
     config['window']['theme'] = '#FF8C00'
-        
+elif colourInput == '8':
+    config['window']['theme'] = '#CCCCCC'
+      
 with open('config.json', 'w') as jsonConfig:
     jsonConfig.write(json.dumps(config, indent=8))
