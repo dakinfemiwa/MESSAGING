@@ -283,7 +283,7 @@ ADMIN_COMMAND_NICKNAME = 'admin.commands.nickname'
 ADMIN_MESSAGE_JOIN = 'admin.messages.join'
 ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
-IP = '86.153.124.215'
+IP = '86.172.96.18'
 PORT = 6666
 
 print("WELCOME: Ready to connect.")
