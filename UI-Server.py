@@ -92,17 +92,18 @@ if __name__ == "__main__":
                             print('ERROR: Could not print online user list.')
                     elif '$-$shutdown' in data.decode():
                         try:
-                            Broadcast(sock, str.encode("\nServer is shutting down"), Users[addr])
+                            serverSocket.close()
+                            Broadcast(sock, str.encode("\nServer is shutting down"), 'game')
                             serverSocket.close()
                         except:
-                            Broadcast(sock, str.encode("\nServer shutdown failed"), Users[addr])
+                            Broadcast(sock, str.encode("\nServer shutdown failed"), 'game')
                     elif '$-$restart' in data.decode():
                         try:
-                            Broadcast(sock, str.encode("\nServer is restarting"), Users[addr])
                             serverSocket.close()
                             startUp()
+                            Broadcast(sock, str.encode("\nServer is restarting"), 'game')
                         except:
-                            Broadcast(sock, str.encode("\nServer restart failed"), Users[addr])
+                            Broadcast(sock, str.encode("\nServer restart failed"), 'game')
                     else:
                         try:
                             Broadcast(sock, data, Users[addr])

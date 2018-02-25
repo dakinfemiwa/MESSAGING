@@ -7,7 +7,7 @@ with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
 def sendMessage(msgInput):
-    global username
+    global username, clientSocket
 
     def Log(message):
         ChatLog.config(state=NORMAL)
@@ -106,7 +106,17 @@ def sendMessage(msgInput):
         elif msgInput == '.restart':
             clientSocket.send(str.encode('$-$restart'))
             clientSocket.close()
-            Window.destroy()
+            clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            Window.after(2000)
+            clientSocket.connect((IP, PORT))
+            print("INFO: Sending client information...")
+            clientSocket.send(str.encode(FINAL_NAME))
+            clientSocket.send(str.encode(FINAL_VERSION))
+            print("INFO: Connected to ", str(IP) + ':' + str(PORT))
+            clientSocket.send(str.encode('\n'))
+            clientSocket.send(str.encode(JOIN_MSG))
+            _thread.start_new_thread(Receive, ())
+            _thread.start_new_thread(Window.mainloop())
 
         elif msgInput == '.message':
             if len(msgInput) < 10:
