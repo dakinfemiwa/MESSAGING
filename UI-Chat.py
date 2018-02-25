@@ -118,6 +118,26 @@ def sendMessage(msgInput):
             _thread.start_new_thread(Receive, ())
             _thread.start_new_thread(Window.mainloop())
 
+        elif msgInput == '.shutdown':
+            clientSocket.send(str.encode('$-$shutdown'))
+            try:
+                Window.quit()
+            except:
+                pass
+            try:
+                Window.destroy()
+            except:
+                pass
+            try:
+                _thread.interrupt_main()
+            except:
+                pass
+            try:
+                clientSocket.close()
+            except:
+                pass
+            exit(0)
+
         elif msgInput == '.message':
             if len(msgInput) < 10:
                 Log(MESSAGE_COMMAND)
