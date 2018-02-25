@@ -103,6 +103,11 @@ def sendMessage(msgInput):
         elif msgInput == '.admin':
             Log(ADMIN_MESSAGE)
 
+        elif msgInput == '.restart':
+            clientSocket.send(str.encode('$-$restart'))
+            clientSocket.close()
+            Window.destroy()
+
         elif msgInput == '.message':
             if len(msgInput) < 10:
                 Log(MESSAGE_COMMAND)

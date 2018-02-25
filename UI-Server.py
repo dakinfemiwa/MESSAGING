@@ -21,20 +21,25 @@ def Handler():
 
 if __name__ == "__main__":
 
-    CLIST = []
-    People = []
-    Users = {}
-    
-    print('INFO: Chat server - V2')
-    IP = '0.0.0.0'
+    def startUp():
+        global CLIST, People, Users, IP, serverSocket
 
-    # IP = str(input("Enter IP to bind server: "))
+        CLIST = []
+        People = []
+        Users = {}
 
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serverSocket.bind((IP, 6666))
-    serverSocket.listen(10)
- 
-    CLIST.append(serverSocket)
+        print('INFO: Chat server - V2')
+        IP = '0.0.0.0'
+
+        # IP = str(input("Enter IP to bind server: "))
+
+        serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        serverSocket.bind((IP, 6666))
+        serverSocket.listen(10)
+
+        CLIST.append(serverSocket)
+
+    startUp()
 
     while 1:
 
@@ -85,6 +90,19 @@ if __name__ == "__main__":
                                 Broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
                         except:
                             print('ERROR: Could not print online user list.')
+                    elif '$-$shutdown' in data.decode():
+                        try:
+                            Broadcast(sock, str.encode("\nServer is shutting down"), Users[addr])
+                            serverSocket.close()
+                        except:
+                            Broadcast(sock, str.encode("\nServer shutdown failed"), Users[addr])
+                    elif '$-$restart' in data.decode():
+                        try:
+                            Broadcast(sock, str.encode("\nServer is restarting"), Users[addr])
+                            serverSocket.close()
+                            startUp()
+                        except:
+                            Broadcast(sock, str.encode("\nServer restart failed"), Users[addr])
                     else:
                         try:
                             Broadcast(sock, data, Users[addr])
