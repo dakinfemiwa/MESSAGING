@@ -287,7 +287,6 @@ HELP_MESSAGE = '''.help - prints the help menu
 .online - view online users
 .colour - change theme colour
 .update - update the client (unavailable)
-.restart - restart the client
 .about - view information about client
     '''
 
@@ -295,6 +294,8 @@ ADMIN_MESSAGE = '''.kick - kick a client off (unavailable)
 .ca - clears messages for everyone
 .fq - force quits all clients
 .message - private message a user (unavailable)
+.restart - restarts the server
+.shutdown - shuts down the server
 '''
 
 CLEAR_MESSAGE_ADMIN = 'Chat was cleared by an admin'
@@ -313,10 +314,13 @@ ADMIN_COMMAND_KICK = 'admin.commands.kick'
 ADMIN_COMMAND_MESSAGE = 'admin.commands.message'
 ADMIN_COMMAND_CLEARALL = 'admin.commands.clearall'
 ADMIN_COMMAND_FORCEQUIT = 'admin.commands.forcequit'
-ADMIN_COMMAND_RESTART = 'admin.commands.restart'
 ADMIN_COMMAND_NICKNAME = 'admin.commands.nickname'
+ADMIN_COMMAND_RESTART = 'admin.commands.restart'
+ADMIN_COMMAND_SHUTDOWN = 'admin.commands.shutdown'
 ADMIN_MESSAGE_JOIN = 'admin.messages.join'
 ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
+
+USER_PERMISSIONS = []
 
 IP = '86.172.96.18'
 PORT = 6666
@@ -326,6 +330,19 @@ print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
 
 username = str(input("INPUT: Enter username: "))
 username_old = username
+
+ADMIN_LEVEL = 1
+
+if ADMIN_LEVEL == 1:
+    USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_COMMAND_CLEARALL, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
+elif ADMIN_LEVEL == 2:
+    USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_COMMAND_CLEARALL, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
+    USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_FORCEQUIT, ADMIN_COMMAND_MESSAGE))
+elif ADMIN_LEVEL == 3:
+    USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_COMMAND_CLEARALL, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
+    USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_FORCEQUIT, ADMIN_COMMAND_MESSAGE))
+    USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN))
+
 
 # Admin permissions not sorted yet
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
