@@ -72,7 +72,6 @@ if __name__ == "__main__":
 
                 if data:
                     if '$$$' in data.decode():
-                        print('NAME RECEIVED')
                         USERNAME = data.decode().strip('$$$')
                         Users[addr] = USERNAME
 
@@ -104,6 +103,8 @@ if __name__ == "__main__":
                             Broadcast(sock, str.encode("\nServer is restarting"), 'game')
                         except:
                             Broadcast(sock, str.encode("\nServer restart failed"), 'game')
+                    elif '$-$cpl' in data.decode():
+                        Broadcast(sock, str.encode('\nServer is now being being controlled by a control panel'), 'SVR')
                     else:
                         try:
                             Broadcast(sock, data, Users[addr])

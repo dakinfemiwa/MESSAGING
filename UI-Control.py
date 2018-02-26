@@ -6,6 +6,11 @@ import tkinter.ttk
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
+# Control panel used to monitor servers.
+# This will simulate a client but will only
+# send messages to the server as codes which
+# then execute a set of commands on the
+# server end.
 
 def check_status():
     global server1
@@ -36,15 +41,46 @@ def restart(server):
 
     shutdown(server)
 
-    message = 'Unable to shutdown server ' + str(server)
-    add(message)
-
     start(server)
 
 
 def shutdown(server):
+    control_socket = ''
+
     message = 'Attempting to shutdown server ' + str(server)
     add(message)
+    message = 'Attempting to connect to server ' + str(server)
+    add(message)
+
+    try:
+
+        IP = '86.172.96.18'
+        PORT = 6666
+
+        control_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        control_socket.connect((IP, PORT))
+
+        control_socket.send(str.encode('\n'))
+        control_socket.send(str.encode('$-$cpl'))
+
+    except:
+        add('Connection to the server failed.')
+
+    try:
+
+        if server1 is True:
+            # Server is online, shutdown process can continue successfully.
+            control_socket.send(str.encode('\n'))
+            control_socket.send(str.encode('$-$shutdown'))
+
+            add('Server was shutdown successfully')
+
+        else:
+            pass
+
+    except:
+        add('There was an unhandled error')
+
 
 
 def start(server):
