@@ -8,7 +8,14 @@ with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
 
-def Notify(NOTIFICATION_TYPE, MESSAGE):
+def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
+    def Command():
+        if MODE is None:
+            Notification.destroy()
+        elif MODE is 'UPDATE':
+            Notification.destroy()
+            UpdaterCore.Two()
+
     Notification = Tk()
     Notification.configure(bg='#141414')
     Notification.geometry('520x180')
@@ -37,17 +44,32 @@ def Notify(NOTIFICATION_TYPE, MESSAGE):
     titleLabel2 = Label(Notification, textvariable=titleType, font='Arial 16 bold', bg=titleColour, fg='#141414')
     titleLabel2.place(relx=.046, rely=.09)
 
-    errorLabel = Label(Notification, textvariable=errorMessage, font='Arial 9 bold', fg='#FFFFFF', bg='#141414', justify=LEFT)
+    errorLabel = Label(Notification, textvariable=errorMessage, font='Arial 9 bold', fg='#FFFFFF', bg='#141414',
+                       justify=LEFT)
     errorLabel.place(relx=.045, rely=.4)
 
-    okButton = tkinter.ttk.Button(Notification, text='OK', command=lambda: (Notification.destroy()))
+    okButton = tkinter.ttk.Button(Notification, text='OK', command=lambda: (Command()))
     okButton.place(relx=.81, rely=.79)
 
     Notification.mainloop()
 
 
-Notify('NORMAL', 'THERE WAS AN ERROR WHILE HANDLING DATA BROADCASTED FROM THE SERVER.'
-                     '\nTHE CLIENT WILL NOW ATTEMPT TO RESTART.')
+# Notify('NORMAL', 'THERE WAS AN ERROR WHILE HANDLING DATA BROADCASTED FROM THE SERVER \n'
+#                  'THE CLIENT WILL NOW ATTEMPT TO RESTART.')
+
+
+class Updater:
+    def Update(self):
+        Notify('WARNING', 'UPDATING IS CURRENTLY UNSTABLE DOING SO MAY PREVENT THE PROGRAM FROM \n'
+                          'RUNNING OR CRASHING DURING RUNTIME', 'UPDATE')
+
+    def Two(self):
+        Notify('NORMAL', 'SEARCHING FOR UPDATES THROUGH GITHUB')
+
+
+UpdaterCore = Updater()
+# UpdaterCore.Update()
+
 
 def sendMessage(msgInput):
     global username, clientSocket
@@ -214,6 +236,7 @@ def PressAction(event):
 def DisableEntry(event):
     entryBox.config(state=DISABLED)
 
+
 def permCheck(permission):
     QUERY = '---' + permission
     clientSocket.send(QUERY)
@@ -352,7 +375,6 @@ KICK_COMMAND = 'The correct usage for this command is .kick <user>'
 UPDATE_COMMAND = 'No updates are available right now.'
 VERSION_MESSAGE = 'Running GUI version of chat client [' + programVersion + ']'
 
-
 # Admin permissions - to be handled in configuration file.
 ADMIN_COMMAND_SYNTAX = 'admin.commands.show'
 ADMIN_COMMAND_KICK = 'admin.commands.kick'
@@ -388,7 +410,6 @@ elif ADMIN_LEVEL == 3:
     USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_FORCEQUIT, ADMIN_COMMAND_MESSAGE))
     USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN))
 
-
 # Admin permissions not sorted yet
 ADMIN_MSG = 'An Admin has joined with elevated permissions'
 JOIN_MSG = username + ' has joined the server'
@@ -419,4 +440,3 @@ try:
 except:
     print("INFO: The client was forced to close.")
     clientSocket.close()
-
