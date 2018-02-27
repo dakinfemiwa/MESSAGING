@@ -1,10 +1,53 @@
 from tkinter import *
+import tkinter.ttk
 import json
 import socket
 import _thread
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
+
+
+def Notify(NOTIFICATION_TYPE, MESSAGE):
+    Notification = Tk()
+    Notification.configure(bg='#141414')
+    Notification.geometry('520x180')
+    Notification.title('Notification')
+
+    titleType = StringVar()
+    errorMessage = StringVar()
+    errorMessage.set(MESSAGE)
+
+    if NOTIFICATION_TYPE == 'ERROR':
+        titleColour = '#F2473F'
+        titleType.set('E R R O R')
+    elif NOTIFICATION_TYPE == 'WARNING':
+        titleColour = '#FF8C00'
+        titleType.set('W A R N I N G')
+    elif NOTIFICATION_TYPE == 'NORMAL':
+        titleColour = '#CCCCCC'
+        titleType.set('N O T I F I C A T I O N')
+
+    lineText2 = StringVar()
+    lineText2.set('___________________________________________')
+
+    lineLabel2 = Label(Notification, textvariable=lineText2, font='Arial 15 bold', fg=titleColour, bg='#141414')
+    lineLabel2.place(relx=.04, rely=.14)
+
+    titleLabel2 = Label(Notification, textvariable=titleType, font='Arial 16 bold', bg=titleColour, fg='#141414')
+    titleLabel2.place(relx=.046, rely=.09)
+
+    errorLabel = Label(Notification, textvariable=errorMessage, font='Arial 9 bold', fg='#FFFFFF', bg='#141414', justify=LEFT)
+    errorLabel.place(relx=.045, rely=.4)
+
+    okButton = tkinter.ttk.Button(Notification, text='OK', command=lambda: (Notification.destroy()))
+    okButton.place(relx=.81, rely=.79)
+
+    Notification.mainloop()
+
+
+Notify('NORMAL', 'THERE WAS AN ERROR WHILE HANDLING DATA BROADCASTED FROM THE SERVER.'
+                     '\nTHE CLIENT WILL NOW ATTEMPT TO RESTART.')
 
 def sendMessage(msgInput):
     global username, clientSocket
@@ -23,10 +66,12 @@ def sendMessage(msgInput):
     COLOUR_COMMAND = 'The correct usage is .colour <colour>'
     entryBox.delete(0, END)
     sendData = msgInput
+
     colours = [
         'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white', 'gray'
     ]
-    if True:
+
+    try:
         if msgInput == '.help':
             Log(HELP_MESSAGE)
 
@@ -157,8 +202,8 @@ def sendMessage(msgInput):
             sendmsg = username + ': ' + sendData
             clientSocket.send(str.encode('\n'))
             clientSocket.send(str.encode(sendmsg))
-    # except:
-    # pass
+    except:
+        pass
 
 
 def PressAction(event):

@@ -12,6 +12,7 @@ with open('config.json') as jsonConfig:
 # then execute a set of commands on the
 # server end.
 
+
 def check_status():
     global server1
     try:
@@ -22,6 +23,8 @@ def check_status():
         server1 = False
     except OSError:
         server1 = True
+
+    Window.after(1000, fix_labels())
 
 
 def add(message):
@@ -43,19 +46,16 @@ def restart(server):
 
     start(server)
 
+    check_status()
+
 
 def shutdown(server):
     control_socket = ''
 
-    message = 'Attempting to shutdown server ' + str(server)
-    add(message)
-    message = 'Attempting to connect to server ' + str(server)
-    add(message)
+    add('Attempting to shutdown server ' + str(server))
+    add('Attempting to connect to server ' + str(server))
 
     try:
-
-        IP = '86.172.96.18'
-        PORT = 6666
 
         control_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         control_socket.connect((IP, PORT))
@@ -81,12 +81,17 @@ def shutdown(server):
     except:
         add('There was an unhandled error')
 
+    Window.after(1000, lambda: check_status())
 
 
 def start(server):
-    message = 'Attempting to start server ' + str(server)
-    add(message)
+    add('Attempting to start server ' + str(server))
 
+    check_status()
+
+
+IP = '86.172.96.18'
+PORT = 6666
 
 # Config incorporation.
 colourTheme = config['window']['theme']
@@ -103,18 +108,32 @@ Window.configure(bg=windowBackground)
 Window.geometry('700x300')
 Window.title(windowTitle)
 
+server1 = 'DEFAULT'
+serverOneStatusText = StringVar()
+
+
+def fix_labels():
+    global serverOneStatusColour, serverOneStatusText
+
+    if server1 is False:
+        serverOneStatusText.set('O F F L I N E')
+        serverOneStatusColour = '#FF0000'
+
+    elif server1 is True:
+        serverOneStatusText.set('O N L I N E')
+        serverOneStatusColour = '#00FF00'
+
+    else:
+        serverOneStatusText.set('U N A V A I L A B L E')
+        serverOneStatusColour = '#B5B5B5'
+
+    serverOneStatus = Label(Window, textvariable=serverOneStatusText, font='Arial 10 bold', fg=serverOneStatusColour,
+                            bg=windowBackground)
+    serverOneStatus.place(relx=.2, rely=.272)
+
+
 check_status()
-
-
-if server1 is False:
-    serverOneStatusText = StringVar()
-    serverOneStatusText.set('O F F L I N E')
-    serverOneStatusColour = '#FF0000'
-
-elif server1 is True:
-    serverOneStatusText = StringVar()
-    serverOneStatusText.set('O N L I N E')
-    serverOneStatusColour = '#00FF00'
+fix_labels()
 
 titleText = StringVar()
 titleText.set('C O N T R O L  P A N E L')
