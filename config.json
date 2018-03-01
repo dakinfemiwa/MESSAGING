@@ -10,7 +10,7 @@
                 "foreground": "#ffffff",
                 "background": "#141414",
                 "resolution": "900x400",
-                "theme": "#CCCCCC",
+                "theme": "#FF0000",
                 "title": "CHAT-UI"
         },
         "settings": {

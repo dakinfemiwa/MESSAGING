@@ -28,7 +28,7 @@ def Send():
 
 if __name__ == "__main__":
 
-    IP = '86.153.124.215'
+    IP = '192.168.1.66'
     PORT = 6666
 
     print("INFO: Ready to connect")

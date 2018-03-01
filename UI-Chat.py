@@ -7,6 +7,7 @@ import _thread
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
+SUBVERSION = '2.99'
 
 def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
     def Command():
@@ -15,11 +16,16 @@ def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
         elif MODE is 'UPDATE':
             Notification.destroy()
             UpdaterCore.Two()
+        elif MODE is 'UPDATE2':
+            Notification.destroy()
+            UpdaterCore.Three()
 
     Notification = Tk()
     Notification.configure(bg='#141414')
-    Notification.geometry('520x180')
+    Notification.geometry('520x180+10+10')
     Notification.title('Notification')
+
+    Notification.overrideredirect(1)
 
     titleType = StringVar()
     errorMessage = StringVar()
@@ -38,18 +44,27 @@ def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
     lineText2 = StringVar()
     lineText2.set('___________________________________________')
 
+    lineText3 = StringVar()
+    lineText3.set('______________________________________')
+
     lineLabel2 = Label(Notification, textvariable=lineText2, font='Arial 15 bold', fg=titleColour, bg='#141414')
     lineLabel2.place(relx=.04, rely=.14)
+
+    lineLabel3 = Label(Notification, textvariable=lineText3, font='Arial 19 bold', fg=titleColour, bg='#141414')
+    lineLabel3.place(relx=.0, rely=.8)
 
     titleLabel2 = Label(Notification, textvariable=titleType, font='Arial 16 bold', bg=titleColour, fg='#141414')
     titleLabel2.place(relx=.046, rely=.09)
 
-    errorLabel = Label(Notification, textvariable=errorMessage, font='Arial 9 bold', fg='#FFFFFF', bg='#141414',
+    errorLabel = Label(Notification, textvariable=errorMessage, font=('system', 11, 'bold'), fg='#FFFFFF', bg='#141414',
                        justify=LEFT)
     errorLabel.place(relx=.045, rely=.4)
 
     okButton = tkinter.ttk.Button(Notification, text='OK', command=lambda: (Command()))
     okButton.place(relx=.81, rely=.79)
+
+    # if MODE is 'UPDATE2':
+        # okButton.place_forget()
 
     Notification.mainloop()
 
@@ -60,15 +75,30 @@ def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
 
 class Updater:
     def Update(self):
-        Notify('WARNING', 'UPDATING IS CURRENTLY UNSTABLE DOING SO MAY PREVENT THE PROGRAM FROM \n'
+        Notify('WARNING', 'UPDATING IS CURRENTLY UNSTABLE DOING SO MAY PREVENT\nTHE PROGRAM FROM'
                           'RUNNING OR CRASHING DURING RUNTIME', 'UPDATE')
 
     def Two(self):
-        Notify('NORMAL', 'SEARCHING FOR UPDATES THROUGH GITHUB')
+        Notify('NORMAL', 'SEARCHING FOR UPDATES THROUGH GITHUB\nYOU ARE CURRENTLY RUNNING ON VERSION ' + SUBVERSION, 'UPDATE2')
+
+    def Three(self):
+        currentInfo = open('version.txt', 'r+')
+        currentVersion = currentInfo.readlines()[0]
+        # Download()
+        updateInfo = open('version.txt', 'r+')
+        latestVersion = updateInfo.readlines()[0]
+
+        if float(latestVersion) > float(currentVersion):
+            # Update is available
+            Notify('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V ' + latestVersion)
+        else:
+            # Update is not available
+            Notify('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + currentVersion)
+
 
 
 UpdaterCore = Updater()
-# UpdaterCore.Update()
+UpdaterCore.Update()
 
 
 def sendMessage(msgInput):
@@ -218,6 +248,9 @@ def sendMessage(msgInput):
                 targetUser = msgInput[6:]
 
         elif msgInput == '.update':
+            Window.destroy()
+            # clientSocket.close()
+            UpdaterCore.Update()
             Log(UPDATE_COMMAND)
 
         else:
