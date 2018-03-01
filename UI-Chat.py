@@ -3,6 +3,7 @@ import tkinter.ttk
 import json
 import socket
 import _thread
+import urllib.request
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
