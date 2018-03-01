@@ -3,23 +3,26 @@ import tkinter.ttk
 import json
 import socket
 import _thread
-import urllib.request
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
 
 SUBVERSION = '2.99'
 
-def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
-    def Command():
-        if MODE is None:
+
+def Notify(type_n, msg, mode=None):
+    global Notification
+
+    def command():
+        if mode is None:
             Notification.destroy()
-        elif MODE is 'UPDATE':
+        elif mode is 'UPDATE':
             Notification.destroy()
             UpdaterCore.Two()
-        elif MODE is 'UPDATE2':
-            Notification.destroy()
+        elif mode is 'UPDATE2':
             UpdaterCore.Three()
+        elif mode is 'UPDATE3':
+            Notification.destroy()
 
     Notification = Tk()
     Notification.configure(bg='#141414')
@@ -28,133 +31,136 @@ def Notify(NOTIFICATION_TYPE, MESSAGE, MODE=None):
 
     Notification.overrideredirect(1)
 
-    titleType = StringVar()
-    errorMessage = StringVar()
-    errorMessage.set(MESSAGE)
+    title_colour = ''
+    title_type = StringVar()
+    error_message = StringVar()
+    error_message.set(msg)
 
-    if NOTIFICATION_TYPE == 'ERROR':
-        titleColour = '#F2473F'
-        titleType.set('E R R O R')
-    elif NOTIFICATION_TYPE == 'WARNING':
-        titleColour = '#FF8C00'
-        titleType.set('W A R N I N G')
-    elif NOTIFICATION_TYPE == 'NORMAL':
-        titleColour = '#CCCCCC'
-        titleType.set('N O T I F I C A T I O N')
+    if type_n == 'ERROR':
+        title_colour = '#F2473F'
+        title_type.set('E R R O R')
+    elif type_n == 'WARNING':
+        title_colour = '#FF8C00'
+        title_type.set('W A R N I N G')
+    elif type_n == 'NORMAL':
+        title_colour = '#CCCCCC'
+        title_type.set('N O T I F I C A T I O N')
 
-    lineText2 = StringVar()
-    lineText2.set('___________________________________________')
+    line_text2 = StringVar()
+    line_text2.set('___________________________________________')
 
-    lineText3 = StringVar()
-    lineText3.set('______________________________________')
+    line_text3 = StringVar()
+    line_text3.set('______________________________________')
 
-    lineLabel2 = Label(Notification, textvariable=lineText2, font='Arial 15 bold', fg=titleColour, bg='#141414')
-    lineLabel2.place(relx=.04, rely=.14)
+    line_label2 = Label(Notification, textvariable=line_text2, font='Arial 15 bold', fg=title_colour, bg='#141414')
+    line_label2.place(relx=.04, rely=.14)
 
-    lineLabel3 = Label(Notification, textvariable=lineText3, font='Arial 19 bold', fg=titleColour, bg='#141414')
-    lineLabel3.place(relx=.0, rely=.8)
+    line_label3 = Label(Notification, textvariable=line_text3, font='Arial 19 bold', fg=title_colour, bg='#141414')
+    line_label3.place(relx=.0, rely=.8)
 
-    titleLabel2 = Label(Notification, textvariable=titleType, font='Arial 16 bold', bg=titleColour, fg='#141414')
-    titleLabel2.place(relx=.046, rely=.09)
+    title_label2 = Label(Notification, textvariable=title_type, font='Arial 16 bold', bg=title_colour, fg='#141414')
+    title_label2.place(relx=.046, rely=.09)
 
-    errorLabel = Label(Notification, textvariable=errorMessage, font=('system', 11, 'bold'), fg='#FFFFFF', bg='#141414',
-                       justify=LEFT)
-    errorLabel.place(relx=.045, rely=.4)
+    error_label = Label(Notification, textvariable=error_message, font='system 11 bold', fg='#FFFFFF', bg='#141414',
+                        justify=LEFT)
+    error_label.place(relx=.045, rely=.4)
 
-    okButton = tkinter.ttk.Button(Notification, text='OK', command=lambda: (Command()))
-    okButton.place(relx=.81, rely=.79)
+    ok_button = tkinter.ttk.Button(Notification, text='OK', command=lambda: (command()))
+    ok_button.place(relx=.81, rely=.79)
 
-    # if MODE is 'UPDATE2':
-        # okButton.place_forget()
+    if mode is 'UPDATE2':
+        ok_button.place_forget()
+        command()
 
     Notification.mainloop()
 
 
-# Notify('NORMAL', 'THERE WAS AN ERROR WHILE HANDLING DATA BROADCASTED FROM THE SERVER \n'
-#                  'THE CLIENT WILL NOW ATTEMPT TO RESTART.')
-
-
 class Updater:
-    def Update(self):
-        Notify('WARNING', 'UPDATING IS CURRENTLY UNSTABLE DOING SO MAY PREVENT\nTHE PROGRAM FROM'
-                          'RUNNING OR CRASHING DURING RUNTIME', 'UPDATE')
+    def Start(self):
+        Notify('WARNING', 'UPDATING IS CURRENTLY UNSTABLE DOING SO MAY PREVENT\n'
+                          'THE PROGRAM FROM RUNNING OR CRASHING DURING RUNTIME', 'UPDATE')
 
     def Two(self):
-        Notify('NORMAL', 'SEARCHING FOR UPDATES THROUGH GITHUB\nYOU ARE CURRENTLY RUNNING ON VERSION ' + SUBVERSION, 'UPDATE2')
+        Notify('NORMAL', 'SEARCHING FOR UPDATES THROUGH GITHUB\n'
+                         'YOU ARE CURRENTLY RUNNING ON VERSION ' + SUBVERSION, 'UPDATE2')
 
     def Three(self):
+        global Notification
         currentInfo = open('version.txt', 'r+')
         currentVersion = currentInfo.readlines()[0]
-        # Download()
-        updateInfo = open('version.txt', 'r+')
-        latestVersion = updateInfo.readlines()[0]
+        currentInfo.close()
+
+        import Updater
+        Main = Updater.Update()
+        latestVersion = Main.Download()
+        print('DONE')
+        Notification.destroy()
 
         if float(latestVersion) > float(currentVersion):
             # Update is available
-            Notify('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V ' + latestVersion)
+            Notify('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V ' + latestVersion, 'UPDATE3')
+            Main.Switch()
         else:
             # Update is not available
             Notify('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + currentVersion)
 
 
-
 UpdaterCore = Updater()
-UpdaterCore.Update()
+# UpdaterCore.Update()
 
 
-def sendMessage(msgInput):
+def sendMessage(message):
     global username, clientSocket
 
-    def Log(message):
+    def Log(chat):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
-        LineNumber = float(ChatLog.index(END)) - 1.0
-        ChatLog.insert(END, message)
-        num = len(message)
-        ChatLog.tag_add(message, LineNumber, LineNumber + num)
-        ChatLog.tag_config(message, foreground=colourTheme, font=("courier new", 11, "bold"))
+        line_number = float(ChatLog.index(END)) - 1.0
+        ChatLog.insert(END, chat)
+        num = len(chat)
+        ChatLog.tag_add(chat, line_number, line_number + num)
+        ChatLog.tag_config(chat, foreground=colourTheme, font=("courier new", 11, "bold"))
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
 
-    COLOUR_COMMAND = 'The correct usage is .colour <colour>'
     entryBox.delete(0, END)
-    sendData = msgInput
+    send_data = message
 
     colours = [
         'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white', 'gray'
     ]
 
     try:
-        if msgInput == '.help':
+        if message == '.help':
             Log(HELP_MESSAGE)
 
-        elif msgInput == '.clear':
+        elif message == '.clear':
             ChatLog.config(state=NORMAL)
             ChatLog.delete(1.0, END)
             Log(CLEAR_COMMAND)
 
-        elif '.name' in msgInput:
-            if len(msgInput) < 7:
+        elif '.name' in message:
+            if len(message) < 7:
                 Log(NAME_COMMAND)
             else:
-                new_name = msgInput[6:]
-                SEND_MESSAGE = username_old + ' has changed their name to ' + new_name
+                new_name = message[6:]
+                updated_name = username_old + ' has changed their name to ' + new_name
                 clientSocket.send(str.encode('\n'))
-                clientSocket.send(str.encode(SEND_MESSAGE))
+                clientSocket.send(str.encode(updated_name))
                 Window.after(500)
                 clientSocket.send(str.encode('\n'))
-                final2 = '$$$' + new_name
+                second_name = '$$$' + new_name
                 username = new_name
-                clientSocket.send(str.encode(final2))
+                clientSocket.send(str.encode(second_name))
 
-        elif msgInput == '.about':
+        elif message == '.about':
             Log(VERSION_MESSAGE)
 
-        elif '.colour' in msgInput:
-            if len(msgInput) < 9:
-                Log(COLOUR_COMMAND)
+        elif '.colour' in message:
+            if len(message) < 9:
+                Log('The correct usage is .colour <colour>')
             else:
-                colour = msgInput[8:]
+                colour = message[8:]
                 if colour in colours:
                     if colour == 'white':
                         config['window']['theme'] = '#FFFFFF'
@@ -173,35 +179,33 @@ def sendMessage(msgInput):
                     elif colour == 'gray':
                         config['window']['theme'] = '#CCCCCC'
 
-                    with open('config.json', 'w') as jsonConfig:
-                        jsonConfig.write(json.dumps(config, indent=8))
+                    with open('config.json', 'w') as config_file:
+                        config_file.write(json.dumps(config, indent=8))
 
-                    COLOUR_COMMAND = 'Theme colour was changed; restart client'
-                    Log(COLOUR_COMMAND)
+                    Log('Theme colour was changed; restart client')
                 else:
-                    COLOUR_COMMAND = 'You selected an invalid colour'
-                    Log(COLOUR_COMMAND)
+                    Log('You selected an invalid colour')
 
-        elif len(msgInput) > 150:
+        elif len(message) > 150:
             Log(SPAM_MESSAGE)
 
-        elif msgInput == '.quit':
+        elif message == '.quit':
             Window.destroy()
             clientSocket.close()
 
-        elif msgInput == '.online':
+        elif message == '.online':
             clientSocket.send(str.encode('$-$online'))
 
-        elif msgInput == '.fq':
+        elif message == '.fq':
             clientSocket.send(str.encode('$-$quit'))
 
-        elif msgInput == '.ca':
+        elif message == '.ca':
             clientSocket.send(str.encode('$-$clear'))
 
-        elif msgInput == '.admin':
+        elif message == '.admin':
             Log(ADMIN_MESSAGE)
 
-        elif msgInput == '.restart':
+        elif message == '.restart':
             clientSocket.send(str.encode('$-$restart'))
             clientSocket.close()
             clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -216,7 +220,7 @@ def sendMessage(msgInput):
             _thread.start_new_thread(Receive, ())
             _thread.start_new_thread(Window.mainloop())
 
-        elif msgInput == '.shutdown':
+        elif message == '.shutdown':
             clientSocket.send(str.encode('$-$shutdown'))
             try:
                 Window.quit()
@@ -236,28 +240,30 @@ def sendMessage(msgInput):
                 pass
             exit(0)
 
-        elif msgInput == '.message':
-            if len(msgInput) < 10:
+        elif message == '.message':
+            if len(message) < 10:
                 Log(MESSAGE_COMMAND)
             else:
-                targetUser = msgInput[9:]
+                target_user = message[9:]
+                print(target_user)
 
-        elif msgInput == '.kick':
-            if len(msgInput) < 7:
+        elif message == '.kick':
+            if len(message) < 7:
                 Log(KICK_COMMAND)
             else:
-                targetUser = msgInput[6:]
+                target_user = message[6:]
+                print(target_user)
 
-        elif msgInput == '.update':
+        elif message == '.update':
             Window.destroy()
             # clientSocket.close()
-            UpdaterCore.Update()
+            UpdaterCore.Start()
             Log(UPDATE_COMMAND)
 
         else:
-            sendmsg = username + ': ' + sendData
+            send_msg = username + ': ' + send_data
             clientSocket.send(str.encode('\n'))
-            clientSocket.send(str.encode(sendmsg))
+            clientSocket.send(str.encode(send_msg))
     except:
         pass
 
@@ -339,44 +345,44 @@ ChatLog.place(relx=.043, rely=.23)
 
 # Receiving data from other clients.
 def Receive():
-    def Log(MESSAGE, colour=colourTheme):
+    def Log(message, colour=colourTheme):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, '\n')
-        LineNumber = float(ChatLog.index(END)) - 1.0
-        ChatLog.insert(END, MESSAGE)
-        num = len(MESSAGE)
-        ChatLog.tag_add(MESSAGE, LineNumber, LineNumber + num)
-        ChatLog.tag_config(MESSAGE, foreground=colour, font=("courier new", 11, "bold"))
+        line_number2 = float(ChatLog.index(END)) - 1.0
+        ChatLog.insert(END, message)
+        number = len(message)
+        ChatLog.tag_add(message, line_number2, line_number2 + number)
+        ChatLog.tag_config(message, foreground=colour, font=("courier new", 11, "bold"))
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
 
     while True:
         try:
-            receiveData = clientSocket.recv(4096)
+            receive_data = clientSocket.recv(4096)
         except:
             # When the server goes down.
             print("INFO: Server closed connection")
             _thread.interrupt_main()
             break
-        if not receiveData:
+        if not receive_data:
             print("INFO: Server closed connection")
             _thread.interrupt_main()
             break
         else:
-            if receiveData.decode() == '$-$quit':
+            if receive_data.decode() == '$-$quit':
                 Window.destroy()
                 clientSocket.close()
                 _thread.interrupt_main()
-            elif receiveData.decode() == '$-$clear':
+            elif receive_data.decode() == '$-$clear':
                 ChatLog.config(state=NORMAL)
                 ChatLog.delete(1.0, END)
                 Log(CLEAR_MESSAGE_ADMIN, '#FFFFFF')
             else:
                 ChatLog.config(state=NORMAL)
-                LineNumber = float(ChatLog.index(END)) - 1.0
-                ChatLog.insert(END, receiveData)
-                num = len(receiveData)
-                ChatLog.tag_add("Them", LineNumber, LineNumber + num)
+                line_number = float(ChatLog.index(END)) - 1.0
+                ChatLog.insert(END, receive_data)
+                num = len(receive_data)
+                ChatLog.tag_add("Them", line_number, line_number + num)
                 ChatLog.tag_config("Them", foreground='#ffffff', font=("courier new", 11, "bold"))
                 ChatLog.config(state=DISABLED)
                 ChatLog.see(END)
