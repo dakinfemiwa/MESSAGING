@@ -3,6 +3,7 @@ import tkinter.ttk
 import json
 import socket
 import _thread
+import Updater
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
@@ -90,7 +91,7 @@ class Updater:
         currentVersion = currentInfo.readlines()[0]
         currentInfo.close()
 
-        import Updater
+
         Main = Updater.Update()
         latestVersion = Main.Download()
         print('DONE')
@@ -429,7 +430,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
 USER_PERMISSIONS = []
 
-IP = '86.172.96.18'
+IP = '86.153.124.149'
 PORT = 6666
 
 print("WELCOME: Ready to connect.")
