@@ -156,6 +156,18 @@ def sendMessage(message):
         'blue', 'green', 'purple', 'yellow', 'red', 'orange', 'white', 'gray'
     ]
 
+    # Admin permissions - to be handled in configuration file.
+    ADMIN_COMMAND_SYNTAX = 'admin.commands.show'
+    ADMIN_COMMAND_KICK = 'admin.commands.kick'
+    ADMIN_COMMAND_MESSAGE = 'admin.commands.message'
+    ADMIN_COMMAND_CLEARALL = 'admin.commands.clearall'
+    ADMIN_COMMAND_FORCEQUIT = 'admin.commands.forcequit'
+    ADMIN_COMMAND_NICKNAME = 'admin.commands.nickname'
+    ADMIN_COMMAND_RESTART = 'admin.commands.restart'
+    ADMIN_COMMAND_SHUTDOWN = 'admin.commands.shutdown'
+    ADMIN_MESSAGE_JOIN = 'admin.messages.join'
+    ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
+
     try:
         if message == '.help':
             Log(HELP_MESSAGE)
@@ -223,13 +235,22 @@ def sendMessage(message):
             clientSocket.send(str.encode('$-$online'))
 
         elif message == '.fq':
-            clientSocket.send(str.encode('$-$quit'))
+            if hasPermission('admin.commands.forcequit'):
+                clientSocket.send(str.encode('$-$quit'))
+            else:
+                Log(INSUFFICIENT_PERMISSIONS)
 
         elif message == '.ca':
-            clientSocket.send(str.encode('$-$clear'))
+            if hasPermission('admin.commands.clearall'):
+                clientSocket.send(str.encode('$-$clear'))
+            else:
+                Log(INSUFFICIENT_PERMISSIONS)
 
         elif message == '.admin':
-            Log(ADMIN_MESSAGE)
+            if hasPermission('admin.commands.show'):
+                Log(ADMIN_MESSAGE)
+            else:
+                Log(INSUFFICIENT_PERMISSIONS)
 
         elif message == '.restart':
             clientSocket.send(str.encode('$-$restart'))
@@ -303,9 +324,11 @@ def DisableEntry(event):
     entryBox.config(state=DISABLED)
 
 
-def permCheck(permission):
-    QUERY = '---' + permission
-    clientSocket.send(QUERY)
+def hasPermission(permission):
+    if permission in USER_PERMISSIONS:
+        return True
+    else:
+        return False
 
 
 # Config incorporation.
@@ -454,6 +477,7 @@ ADMIN_COMMAND_SHUTDOWN = 'admin.commands.shutdown'
 ADMIN_MESSAGE_JOIN = 'admin.messages.join'
 ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
+INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
 IP = '86.153.124.149'
