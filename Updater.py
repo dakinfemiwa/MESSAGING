@@ -17,6 +17,8 @@ class Update():
         updateInfo.close()
         urllib.request.urlretrieve('https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/master/UI-Chat.py',
                                    'UI-Chat.py')
+
+        os.chdir('..')
         return latestVersion
 
     def Switch(self):
@@ -26,3 +28,4 @@ class Update():
         os.chdir('temp')
         os.rename('UI-Chat.py', '../UI-Chat.py')
         os.rename('version.txt', '../version.txt')
+        os.chdir('..')

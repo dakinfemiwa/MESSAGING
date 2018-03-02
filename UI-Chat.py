@@ -3,7 +3,6 @@ import tkinter.ttk
 import json
 import socket
 import _thread
-import Updater
 
 with open('config.json') as jsonConfig:
     config = json.load(jsonConfig)
@@ -21,16 +20,17 @@ def Notify(type_n, msg, mode=None):
             Notification.destroy()
             UpdaterCore.Two()
         elif mode is 'UPDATE2':
-            UpdaterCore.Three()
+            UpdaterCore.Three('OK')
         elif mode is 'UPDATE3':
             Notification.destroy()
 
     Notification = Tk()
     Notification.configure(bg='#141414')
-    Notification.geometry('520x180+10+10')
+    Notification.geometry('520x180+30+30')
     Notification.title('Notification')
 
     Notification.overrideredirect(1)
+    Notification.attributes('-topmost', True)
 
     title_colour = ''
     title_type = StringVar()
@@ -85,25 +85,50 @@ class Updater:
         Notify('NORMAL', 'SEARCHING FOR UPDATES THROUGH GITHUB\n'
                          'YOU ARE CURRENTLY RUNNING ON VERSION ' + SUBVERSION, 'UPDATE2')
 
-    def Three(self):
+    def Three(self, type='SOCK'):
         global Notification
         currentInfo = open('version.txt', 'r+')
         currentVersion = currentInfo.readlines()[0]
         currentInfo.close()
 
+        try:
+
+            import Updater
+            Main = Updater.Update()
+            latestVersion = Main.Download()
+            Notification.destroy()
+
+        except:
+            pass
 
         Main = Updater.Update()
         latestVersion = Main.Download()
-        print('DONE')
-        Notification.destroy()
+
+        def Log(chat):
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, '\n')
+            line_number = float(ChatLog.index(END)) - 1.0
+            ChatLog.insert(END, chat)
+            num = len(chat)
+            ChatLog.tag_add(chat, line_number, line_number + num)
+            ChatLog.tag_config(chat, foreground=colourTheme, font=("courier new", 11, "bold"))
+            ChatLog.config(state=DISABLED)
+            ChatLog.see(END)
 
         if float(latestVersion) > float(currentVersion):
             # Update is available
-            Notify('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V ' + latestVersion, 'UPDATE3')
-            Main.Switch()
+            if type is 'OK':
+                Notify('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V ' + latestVersion, 'UPDATE3')
+                Main.Switch()
+            else:
+                Log('An update was found, type .update to update the client.')
+
         else:
             # Update is not available
-            Notify('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + currentVersion)
+            if type is 'OK':
+                Notify('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + currentVersion)
+            else:
+                pass
 
 
 UpdaterCore = Updater()
@@ -297,6 +322,7 @@ Window = Tk()
 Window.configure(bg=windowBackground)
 Window.geometry(windowResolution)
 Window.title(windowTitle)
+Window.attributes('-topmost', True)
 
 titleText = StringVar()
 titleText.set('C H A T')
@@ -391,11 +417,11 @@ def Receive():
 
 HELP_MESSAGE = '''.help - prints the help menu
 .quit - exit the server gracefully
-.name - change current username (unavailable)
-.clear - clear chat (client-side)
+.name - change current username
+.clear - clear chat
 .online - view online users
 .colour - change theme colour
-.update - update the client (unavailable)
+.update - update the client
 .about - view information about client
     '''
 
@@ -409,7 +435,7 @@ ADMIN_MESSAGE = '''.kick - kick a client off (unavailable)
 
 CLEAR_MESSAGE_ADMIN = 'Chat was cleared by an admin'
 CLEAR_COMMAND = 'Chat was cleared successfully.'
-NAME_COMMAND = 'This function is unavailable right now.'
+NAME_COMMAND = 'The correct usage for this command is .name <username>'
 SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
 MESSAGE_COMMAND = 'This function is unavailable right now.'
 KICK_COMMAND = 'The correct usage for this command is .kick <user>'
@@ -463,17 +489,21 @@ try:
     clientSocket.connect((IP, PORT))
     print("INFO: Sending client information...")
     clientSocket.send(str.encode(FINAL_NAME))
-    clientSocket.send(str.encode(FINAL_VERSION))
+    # clientSocket.send(str.encode(FINAL_VERSION))
     print("INFO: Connected to ", str(IP) + ':' + str(PORT))
     clientSocket.send(str.encode('\n'))
     clientSocket.send(str.encode(JOIN_MSG))
     # clientSocket.send(str.encode('\n'))
     # clientSocket.send(str.encode(ADMIN_MSG))
+    Main = Updater()
+    _thread.start_new_thread(Main.Three, ())
 
     _thread.start_new_thread(Receive, ())
-    _thread.start_new_thread(Window.mainloop())
+    _thread.start_new_thread(Window.mainloop(), ())
+
 except:
     print('ERROR: Unable to connect to the requested server.')
+    exit(1)
 
 try:
     while True:

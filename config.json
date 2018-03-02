@@ -3,14 +3,14 @@
                 "version": "true"
         },
         "information": {
-                "stage": "P R I V A T E  B E T A",
-                "version": "2"
+                "stage": "beta",
+                "version": "3"
         },
         "window": {
-                "foreground": "#ffffff",
+                "foreground": "#FFFFFF",
                 "background": "#141414",
                 "resolution": "900x400",
-                "theme": "#FF0000",
+                "theme": "#00BFFF",
                 "title": "CHAT-UI"
         },
         "settings": {
