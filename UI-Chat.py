@@ -480,7 +480,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
-IP = '86.153.124.149'
+IP = '81.141.69.130'
 PORT = 6666
 
 print("WELCOME: Ready to connect.")
