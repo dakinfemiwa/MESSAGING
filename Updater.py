@@ -22,6 +22,11 @@ class Update():
         return latestVersion
 
     def Switch(self):
+        try:
+            os.remove('temp/UI-Chat-old.py')
+            print('INFO: Removed previous backup.')
+        except:
+            pass
         os.remove('version.txt')
         os.rename('UI-Chat.py', 'temp/UI-Chat-old.py')
         os.chdir('temp')
