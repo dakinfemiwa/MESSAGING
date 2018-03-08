@@ -22,7 +22,6 @@ class Update():
         return latestVersion
 
     def Switch(self):
-        os.chdir('..')
         os.remove('version.txt')
         os.rename('UI-Chat.py', 'temp/UI-Chat-old.py')
         os.chdir('temp')
