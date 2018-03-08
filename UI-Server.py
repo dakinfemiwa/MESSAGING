@@ -1,6 +1,7 @@
 import socket
 import select
 from datetime import datetime
+from collections import OrderedDict
 
 
 def Broadcast (sock, message, usr):
@@ -105,6 +106,22 @@ if __name__ == "__main__":
                                 Broadcast(sock, str.encode("\nServer is restarting"), 'game')
                             except:
                                 Broadcast(sock, str.encode("\nServer restart failed"), 'game')
+                        elif '$$-' in data.decode():
+                            targetUser = data.decode().strip('$$-')
+                            try:
+                                for key, val in Users.items():
+                                    if val == targetUser:
+                                        targetIP = key
+                                        break
+                                for socket in CLIST:
+                                    if str(targetIP[0]) in str(socket):
+                                        if str(targetIP[1]) in str(socket):
+                                            Broadcast(sock, str.encode(targetUser) + str.encode(' was kicked from the server'), 'SVR')
+                                            socket.send(str.encode('You have been kicked by an admin, connection lost.'))
+                                            CLIST.remove(socket)
+                                            del Users[targetIP]
+                            except:
+                                print('ERROR: Unhandled kick')
                         elif '$-$cpl' in data.decode():
                             Broadcast(sock, str.encode('\nServer is now being being controlled by a control panel'), 'SVR')
                         else:
@@ -114,7 +131,8 @@ if __name__ == "__main__":
                                 Broadcast(sock, data, 'SOLO')
                                 print('ERROR: Broadcast error - perhaps a solo client disconnected?')
 
-    except:
+    except Exception as error:
+        print(error)
         print('Runtime error')
 
     serverSocket.close()    
