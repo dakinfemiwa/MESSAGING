@@ -23,7 +23,7 @@ class Update():
 
     def Switch(self):
         try:
-            os.remove('temp/UI-Chat.py')
+            os.remove('temp/UI-Chat-old.py')
             print('INFO: Removed previous backup.')
         except:
             pass
