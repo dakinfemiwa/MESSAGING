@@ -57,6 +57,7 @@ class Client:
 
         except:
             print('ERROR: Unable to connect to the requested server.')
+            print('INFO: Server is most likely offline, check with control panel.')
             exit(1)
 
         try:
@@ -78,7 +79,7 @@ class Client:
             else:
                 entryBox.delete(0, END)
                 send_msg = username + ': ' + message
-                clientSocket.send(str.encode('\n' + send_msg))
+                clientSocket.send(str.encode(send_msg))
         except TypeError:
             pass
         except IndexError:
@@ -108,6 +109,7 @@ class Client:
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
+
                 else:
                     Window.show(receive_data.decode())
 
@@ -205,6 +207,17 @@ class Client:
                 else:
                     Window.show(INSUFFICIENT_PERMISSIONS)
 
+            elif '.ghost' in command:
+                if has('admin.commands.ghost'):
+                    if len(command) < 8:
+                        Window.show(GHOST_COMMAND)
+                    else:
+                        target_user = command[7:]
+                        final_string = '_-$' + target_user
+                        clientSocket.send(str.encode(final_string))
+                else:
+                    Window.show(INSUFFICIENT_PERMISSIONS)
+
             elif command == '.restart':
                 clientSocket.send(str.encode('$-$restart'))
 
@@ -216,7 +229,6 @@ class Client:
                     Window.show(MESSAGE_COMMAND)
                 else:
                     target_user = command[9:]
-                    print(target_user)
 
             elif '.kick' in command:
                 if len(command) < 7:
@@ -271,6 +283,9 @@ class Window:
         buttonText = StringVar()
         buttonText.set(' ➤ ')
 
+        settingsText = StringVar()
+        settingsText.set('⚙️')
+
         versionText = StringVar()
         versionText.set('V E R S I O N  ' + programVersion)
 
@@ -293,9 +308,13 @@ class Window:
 
         entryBox.insert(END, '.help')
 
-        sendButton = Button(MainWindow, textvariable=buttonText, font='Arial 7 bold', width=13, height=1,
+        sendButton = Button(MainWindow, textvariable=buttonText, font='Arial 7 bold', width=7, height=1,
                             command=lambda: press("<Return>"))
         sendButton.place(relx=.86, rely=.855)
+
+        settingsButton = Button(MainWindow, textvariable=settingsText, font='Arial 7 bold', width=3, height=1,
+                                command=lambda: Window.settings())
+        settingsButton.place(relx=.927, rely=.855)
 
         versionLabel = Label(MainWindow, textvariable=versionText, font='Arial 11 bold', bg=windowBackground,
                              fg=colourTheme)
@@ -303,6 +322,42 @@ class Window:
 
         ChatLog = Text(MainWindow, bd=1, bg="#141414", height="13", width="91", font="Arial")
         ChatLog.place(relx=.043, rely=.23)
+
+    @staticmethod
+    def settings():
+        global Settings
+
+        MainWindow.destroy()
+
+        Settings = Tk()
+        Settings.configure(bg='#141414')
+        Settings.geometry(windowResolution)
+        Settings.title('Settings')
+
+        Settings.attributes('-topmost', True)
+
+        title_type = StringVar()
+        info_message = StringVar()
+        lines = StringVar()
+
+        info_message.set('CHANGE HOW THE GUI LOOKS [FONT / COLOUR / THEME]')
+        lines.set('_' * 75)
+
+        title_colour = '#00FF00'
+        title_type.set('S E T T I N G S')
+
+        title_line = Label(Settings, textvariable=lines, font='Arial 15 bold', fg=title_colour, bg='#141414')
+        title_line.place(relx=.04, rely=.14)
+
+        deep_line = Label(Settings, textvariable=lines, font='Arial 15 bold', fg=title_colour, bg='#141414')
+        deep_line.place(relx=.04, rely=.8)
+
+        main_label = Label(Settings, textvariable=title_type, font='Arial 16 bold', fg='#141414', bg=title_colour)
+        main_label.place(relx=.046, rely=.09)
+
+        info_label = Label(Settings, textvariable=info_message, font='verdana 10 bold italic', fg='#FFFFFF', bg='#141414',
+                        justify=LEFT)
+        info_label.place(relx=.045, rely=.9)
 
     def close(self):
         pass
@@ -391,13 +446,15 @@ class Manager:
         info_file = open('version.txt', 'r+')
         current_version = info_file.readlines()[0]
         info_file.close()
-
-        print(config['settings']['auth'])
-        if config['settings']['auth'] == 'true':
-            if ADMIN_LEVEL > 1:
-                USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_CLEARALL, ADMIN_COMMAND_MESSAGE))
-            if ADMIN_LEVEL > 2:
-                USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN, ADMIN_COMMAND_FORCEQUIT))
+        try:
+            if config['settings']['auth'] == 'true':
+                print('INFO: Permissions support ON')
+                if ADMIN_LEVEL > 1:
+                    USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_CLEARALL, ADMIN_COMMAND_MESSAGE))
+                if ADMIN_LEVEL > 2:
+                    USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN, ADMIN_COMMAND_FORCEQUIT, ADMIN_COMMAND_GHOST))
+        except:
+            pass
 
         latest_version = External.Download()
         # Update is available
@@ -448,6 +505,7 @@ ADMIN_MESSAGE = '''.kick - kick a client off
 CLEAR_MESSAGE_ADMIN = 'Chat was cleared by an admin'
 CLEAR_COMMAND = 'Chat was cleared successfully.'
 NAME_COMMAND = 'The correct usage for this command is .name <username>'
+GHOST_COMMAND = 'The correct usage for this command is .ghost <user>'
 SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
 MESSAGE_COMMAND = 'This function is unavailable right now.'
 KICK_COMMAND = 'The correct usage for this command is .kick <user>'
@@ -463,13 +521,14 @@ ADMIN_COMMAND_FORCEQUIT = 'admin.commands.forcequit'
 ADMIN_COMMAND_NICKNAME = 'admin.commands.nickname'
 ADMIN_COMMAND_RESTART = 'admin.commands.restart'
 ADMIN_COMMAND_SHUTDOWN = 'admin.commands.shutdown'
+ADMIN_COMMAND_GHOST = '.admin.commands.ghost'
 ADMIN_MESSAGE_JOIN = 'admin.messages.join'
 ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
-IP = '81.141.69.130'
+IP = '86.153.126.17'
 PORT = 6666
 ADMIN_LEVEL = 3
 

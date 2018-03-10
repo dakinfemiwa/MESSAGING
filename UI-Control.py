@@ -90,7 +90,7 @@ def start(server):
     check_status()
 
 
-IP = '86.172.96.18'
+IP = '127.0.0.1'
 PORT = 6666
 
 # Config incorporation.

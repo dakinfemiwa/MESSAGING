@@ -122,6 +122,19 @@ if __name__ == "__main__":
                                             del Users[targetIP]
                             except:
                                 print('ERROR: Unhandled kick')
+                        elif '_-$' in data.decode():
+                            targetUser = data.decode().strip('_-$')
+                            try:
+                                for key, val in Users.items():
+                                    if val == targetUser:
+                                        targetIP = key
+                                        break
+                                for socket in CLIST:
+                                    if str(targetIP[0]) in str(socket):
+                                        if str(targetIP[1]) in str(socket):
+                                            socket.send(str.encode('-_$one'))
+                            except:
+                                print('ERROR: Unhandled ghost')
                         elif '$-$cpl' in data.decode():
                             Broadcast(sock, str.encode('\nServer is now being being controlled by a control panel'), 'SVR')
                         else:

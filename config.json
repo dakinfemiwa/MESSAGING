@@ -15,6 +15,6 @@
         },
         "settings": {
                 "auto-update:": "true",
-                "auth": "false"
+                "auth": "true"
         }
 }
