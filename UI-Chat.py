@@ -355,9 +355,10 @@ class Window:
         main_label = Label(Settings, textvariable=title_type, font='Arial 16 bold', fg='#141414', bg=title_colour)
         main_label.place(relx=.046, rely=.09)
 
-        info_label = Label(Settings, textvariable=info_message, font='verdana 10 bold italic', fg='#FFFFFF', bg='#141414',
+        info_label = Label(Settings, textvariable=info_message, font='verdana 10 bold italic', fg='#00FF00', bg='#141414',
                         justify=LEFT)
-        info_label.place(relx=.045, rely=.9)
+        # info_label.place(relx=.045, rely=.9)
+        info_label.place(relx=.1, rely=.165)
 
     def close(self):
         pass
@@ -528,7 +529,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
-IP = '86.153.126.17'
+IP = '86.153.126.37'
 PORT = 6666
 ADMIN_LEVEL = 3
 
