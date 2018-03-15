@@ -528,7 +528,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
-IP = '86.153.126.17'
+IP = '86.134.35.216'
 PORT = 6666
 ADMIN_LEVEL = 3
 
