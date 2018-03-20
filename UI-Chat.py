@@ -4,6 +4,7 @@ import json
 import socket
 import _thread
 import Updater
+import urllib.request
 
 
 class Client:
@@ -109,6 +110,14 @@ class Client:
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
+                elif '$-$play' in receive_data.decode():
+                    #data_original = receive_data.decode()
+                    #data_original = data_original[8:]
+                    urllib.request.urlretrieve(
+                        'https://uploadfiles.io/u0qw1',
+                        'song.mp3')
+                    import os
+                    os.startfile('song.mp3')
 
                 else:
                     Window.show(receive_data.decode())
@@ -529,7 +538,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
-IP = '86.153.126.37'
+IP = '86.134.35.216'
 PORT = 6666
 ADMIN_LEVEL = 3
 
