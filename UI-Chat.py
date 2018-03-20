@@ -114,7 +114,7 @@ class Client:
                     #data_original = receive_data.decode()
                     #data_original = data_original[8:]
                     urllib.request.urlretrieve(
-                        'https://uploadfiles.io/u0qw1',
+                        'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3',
                         'song.mp3')
                     import os
                     os.startfile('song.mp3')
