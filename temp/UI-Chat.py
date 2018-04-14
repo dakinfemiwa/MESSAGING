@@ -4,6 +4,7 @@ import json
 import socket
 import _thread
 import Updater
+import urllib.request
 
 
 class Client:
@@ -109,6 +110,14 @@ class Client:
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
+                elif '$-$play' in receive_data.decode():
+                    #data_original = receive_data.decode()
+                    #data_original = data_original[8:]
+                    urllib.request.urlretrieve(
+                        'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3',
+                        'song.mp3')
+                    import os
+                    os.startfile('song.mp3')
 
                 else:
                     Window.show(receive_data.decode())
@@ -355,9 +364,10 @@ class Window:
         main_label = Label(Settings, textvariable=title_type, font='Arial 16 bold', fg='#141414', bg=title_colour)
         main_label.place(relx=.046, rely=.09)
 
-        info_label = Label(Settings, textvariable=info_message, font='verdana 10 bold italic', fg='#FFFFFF', bg='#141414',
+        info_label = Label(Settings, textvariable=info_message, font='verdana 10 bold italic', fg='#00FF00', bg='#141414',
                         justify=LEFT)
-        info_label.place(relx=.045, rely=.9)
+        # info_label.place(relx=.045, rely=.9)
+        info_label.place(relx=.1, rely=.165)
 
     def close(self):
         pass
@@ -528,7 +538,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 
-IP = '86.134.35.216'
+IP = '86.153.124.99'
 PORT = 6666
 ADMIN_LEVEL = 3
 
