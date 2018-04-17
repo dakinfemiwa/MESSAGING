@@ -5,6 +5,7 @@ import socket
 import _thread
 import Updater
 import urllib.request
+import UI_Chat
 
 
 class Client:
@@ -69,6 +70,39 @@ class Client:
             clientSocket.close()
 
     @staticmethod
+    def external(address, connection_name):
+        global username
+        global MainWindow
+       #global External
+        #global Manager
+        #Manager = UI_Chat.Manager()
+        #External = Updater.Update()
+        # Client.configure()
+        Window.draw()
+        if ADMIN_LEVEL > 0:
+            USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
+
+        username = connection_name
+        join_message = connection_name + ' has joined the server'
+        final_name = '$$$' + connection_name
+
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        if 1:
+            clientSocket.connect((address, PORT))
+            clientSocket.send(str.encode(final_name))
+            clientSocket.send(str.encode(join_message))
+
+            _thread.start_new_thread(Manager.search, ())
+
+            _thread.start_new_thread(Client.receive, ())
+            _thread.start_new_thread(MainWindow.mainloop(), ())
+            return True
+
+        else:
+            return False
+
+    @staticmethod
     def close(self):
         pass
 
@@ -111,8 +145,6 @@ class Client:
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
                 elif '$-$play' in receive_data.decode():
-                    #data_original = receive_data.decode()
-                    #data_original = data_original[8:]
                     urllib.request.urlretrieve(
                         'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3',
                         'song.mp3')
@@ -480,29 +512,17 @@ class Manager:
             if frame is 'FORCED':
                 Window.alert('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + current_version)
 
-
-Manager = Manager()
-External = Updater.Update()
 Client.configure()
-Window.draw()
-
-
-def has(permission):
-    if permission in USER_PERMISSIONS:
-        return True
-    else:
-        return False
-
-
+ADMIN_LEVEL = 3
 HELP_MESSAGE = '''.help - prints the help menu
-.quit - exit the server gracefully
-.name - change current username
-.clear - clear chat
-.online - view online users
-.colour - change theme colour
-.update - update the client
-.about - view information about client
-'''
+    .quit - exit the server gracefully
+    .name - change current username
+    .clear - clear chat
+    .online - view online users
+    .colour - change theme colour
+    .update - update the client
+    .about - view information about client
+    '''
 
 ADMIN_MESSAGE = '''.kick - kick a client off
 .ca - clears messages for everyone
@@ -537,9 +557,25 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
-
-IP = 'warm-harbor-24785.herokuapp.com'
 PORT = 6666
-ADMIN_LEVEL = 3
+Manager = Manager()
+External = Updater.Update()
 
-Client.connect()
+def has(permission):
+    if permission in USER_PERMISSIONS:
+        return True
+    else:
+        return False
+
+
+if __name__ == '__main__':
+
+    Manager = Manager()
+    External = Updater.Update()
+    Client.configure()
+    Window.draw()
+
+    IP = 'chatserver.hopto.org'
+    PORT = 6666
+
+    Client.connect()

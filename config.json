@@ -1,20 +1,20 @@
 {
-        "layout": {
-                "version": "true"
-        },
         "information": {
-                "stage": "beta",
-                "version": "3"
+                "version": "3",
+                "stage": "beta"
         },
         "window": {
                 "foreground": "#FFFFFF",
                 "background": "#141414",
-                "resolution": "900x400",
-                "theme": "#FF0000",
-                "title": "CHAT-UI"
+                "title": "CHAT-UI",
+                "theme": "#7CFC00",
+                "resolution": "900x400"
         },
         "settings": {
-                "auto-update:": "true",
-                "auth": "true"
+                "auth": "true",
+                "auto-update:": "true"
+        },
+        "layout": {
+                "version": "true"
         }
 }
