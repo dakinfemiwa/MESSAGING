@@ -8,7 +8,10 @@ def draw():
     global windowTitle, programVersion, programStage, windowResolution
 
     def auth():
-        UI_Chat.Client.external(entryBox.get(), entryBox2.get())
+        first_ip = entryBox.get()
+        first_user = entryBox2.get()
+        ConnectWindow.destroy()
+        UI_Chat.Client.external(first_ip, first_user)
 
     def press(event):
         entryBox.config(state=NORMAL)

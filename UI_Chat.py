@@ -71,14 +71,9 @@ class Client:
 
     @staticmethod
     def external(address, connection_name):
-        global username
-        global MainWindow
-       #global External
-        #global Manager
-        #Manager = UI_Chat.Manager()
-        #External = Updater.Update()
-        # Client.configure()
+        global username, clientSocket
         Window.draw()
+
         if ADMIN_LEVEL > 0:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
 
@@ -88,7 +83,7 @@ class Client:
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        if 1:
+        try:
             clientSocket.connect((address, PORT))
             clientSocket.send(str.encode(final_name))
             clientSocket.send(str.encode(join_message))
@@ -97,10 +92,9 @@ class Client:
 
             _thread.start_new_thread(Client.receive, ())
             _thread.start_new_thread(MainWindow.mainloop(), ())
-            return True
 
-        else:
-            return False
+        except:
+            print('ERROR: Could not connect.')
 
     @staticmethod
     def close(self):
@@ -512,17 +506,19 @@ class Manager:
             if frame is 'FORCED':
                 Window.alert('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + current_version)
 
+
 Client.configure()
+
 ADMIN_LEVEL = 3
 HELP_MESSAGE = '''.help - prints the help menu
-    .quit - exit the server gracefully
-    .name - change current username
-    .clear - clear chat
-    .online - view online users
-    .colour - change theme colour
-    .update - update the client
-    .about - view information about client
-    '''
+.quit - exit the server gracefully
+.name - change current username
+.clear - clear chat
+.online - view online users
+.colour - change theme colour
+.update - update the client
+.about - view information about client
+'''
 
 ADMIN_MESSAGE = '''.kick - kick a client off
 .ca - clears messages for everyone
@@ -558,8 +554,10 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 PORT = 6666
+
 Manager = Manager()
 External = Updater.Update()
+
 
 def has(permission):
     if permission in USER_PERMISSIONS:
@@ -569,13 +567,8 @@ def has(permission):
 
 
 if __name__ == '__main__':
-
-    Manager = Manager()
-    External = Updater.Update()
     Client.configure()
     Window.draw()
 
     IP = 'chatserver.hopto.org'
-    PORT = 6666
-
     Client.connect()

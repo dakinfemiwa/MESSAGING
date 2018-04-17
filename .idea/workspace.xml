@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="dae76181-6838-47ee-a5c5-54b999c98766" name="Default" comment="V 3. Removed old files">
-      <change beforePath="" afterPath="$PROJECT_DIR$/Connect.py" />
+    <list default="true" id="dae76181-6838-47ee-a5c5-54b999c98766" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/UI-Chat.py" afterPath="$PROJECT_DIR$/UI_Chat.py" />
-      <change beforePath="$PROJECT_DIR$/Updater.py" afterPath="$PROJECT_DIR$/Updater.py" />
-      <change beforePath="$PROJECT_DIR$/config.json" afterPath="$PROJECT_DIR$/config.json" />
-      <change beforePath="$PROJECT_DIR$/temp/UI-Chat.py" afterPath="$PROJECT_DIR$/temp/UI-Chat.py" />
+      <change beforePath="$PROJECT_DIR$/Connect.py" afterPath="$PROJECT_DIR$/Connect.py" />
+      <change beforePath="$PROJECT_DIR$/UI_Chat.py" afterPath="$PROJECT_DIR$/UI_Chat.py" />
       <change beforePath="$PROJECT_DIR$/temp/version.txt" afterPath="$PROJECT_DIR$/temp/version.txt" />
       <change beforePath="$PROJECT_DIR$/version.txt" afterPath="$PROJECT_DIR$/version.txt" />
     </list>
@@ -23,34 +20,31 @@
       <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UI_Chat.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="78" column="34" lean-forward="false" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+            <state relative-caret-position="230">
+              <caret line="83" column="72" lean-forward="true" selection-start-line="83" selection-start-column="72" selection-end-line="83" selection-end-column="72" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#197#842#0" expanded="false" />
-                <element signature="e#890#2226#0" expanded="false" />
-                <element signature="e#3330#3334#0" expanded="false" />
-                <element signature="e#3385#3717#0" expanded="false" />
-                <element signature="e#3765#4984#0" expanded="false" />
-                <element signature="e#5038#10089#0" expanded="false" />
-                <element signature="e#5360#5472#0" expanded="false" />
-                <element signature="e#5527#6117#0" expanded="false" />
-                <element signature="e#6258#7689#0" expanded="false" />
-                <element signature="e#7824#7881#0" expanded="false" />
-                <element signature="e#8033#8209#0" expanded="false" />
-                <element signature="e#8494#8651#0" expanded="false" />
-                <element signature="e#9375#9513#0" expanded="false" />
-                <element signature="e#9568#9821#0" expanded="false" />
-                <element signature="e#9878#9978#0" expanded="false" />
-                <element signature="e#10150#16568#0" expanded="false" />
-                <element signature="e#12782#14023#0" expanded="false" />
-                <element signature="e#14054#14058#0" expanded="false" />
-                <element signature="e#14128#16171#0" expanded="false" />
-                <element signature="e#16222#16568#0" expanded="false" />
-                <element signature="e#16628#16804#0" expanded="false" />
-                <element signature="e#16862#18093#0" expanded="false" />
-                <element signature="e#18145#18424#0" expanded="false" />
-                <element signature="e#18442#18652#0" expanded="false" />
+                <element signature="e#3167#3171#0" expanded="false" />
+                <element signature="e#3222#3554#0" expanded="false" />
+                <element signature="e#3602#4821#0" expanded="false" />
+                <element signature="e#4875#9926#0" expanded="false" />
+                <element signature="e#5197#5309#0" expanded="false" />
+                <element signature="e#5364#5954#0" expanded="false" />
+                <element signature="e#6095#7526#0" expanded="false" />
+                <element signature="e#7661#7718#0" expanded="false" />
+                <element signature="e#7870#8046#0" expanded="false" />
+                <element signature="e#8331#8488#0" expanded="false" />
+                <element signature="e#9212#9350#0" expanded="false" />
+                <element signature="e#9405#9658#0" expanded="false" />
+                <element signature="e#9715#9815#0" expanded="false" />
+                <element signature="e#9987#16405#0" expanded="false" />
+                <element signature="e#12619#13860#0" expanded="false" />
+                <element signature="e#13891#13895#0" expanded="false" />
+                <element signature="e#13965#16008#0" expanded="false" />
+                <element signature="e#16059#16405#0" expanded="false" />
+                <element signature="e#16465#16641#0" expanded="false" />
+                <element signature="e#16699#17930#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -59,8 +53,8 @@
       <file leaf-file-name="Connect.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Connect.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="25" column="25" lean-forward="true" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
+            <state relative-caret-position="-846">
+              <caret line="12" column="29" lean-forward="false" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -125,8 +119,8 @@
         <option value="$PROJECT_DIR$/temp/Connect.py" />
         <option value="$PROJECT_DIR$/UI-Chat.py" />
         <option value="$PROJECT_DIR$/Connect.py" />
-        <option value="$PROJECT_DIR$/version.txt" />
         <option value="$PROJECT_DIR$/UI_Chat.py" />
+        <option value="$PROJECT_DIR$/version.txt" />
       </list>
     </option>
   </component>
@@ -523,7 +517,14 @@
       <option name="project" value="LOCAL" />
       <updated>1523728342122</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="V 3.30 Major update">
+      <created>1523984376024</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1523984376024</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TodoView">
@@ -563,7 +564,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="V 2.98e - More backend permissions work and preparing updater" />
     <MESSAGE value="V 2.98f - Connection fixes and config formatting" />
     <MESSAGE value="V 2.98g - Removed UI-Settings as it is no longer needed" />
     <MESSAGE value="V 2.98h - Improved functionality of the restart command" />
@@ -588,7 +588,8 @@
     <MESSAGE value="V 3.13 - Pushed unstable code" />
     <MESSAGE value="V 3.14 - Pushed unstable code" />
     <MESSAGE value="V 3.25 Removed old files" />
-    <option name="LAST_COMMIT_MESSAGE" value="V 3.25 Removed old files" />
+    <MESSAGE value="V 3.30 Major update" />
+    <option name="LAST_COMMIT_MESSAGE" value="V 3.30 Major update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -815,7 +816,7 @@
         <state relative-caret-position="-543">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -825,7 +826,7 @@
         <state relative-caret-position="582">
           <caret line="107" column="40" lean-forward="false" selection-start-line="107" selection-start-column="40" selection-end-line="107" selection-end-column="40" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -850,8 +851,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Connect.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="25" column="25" lean-forward="true" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
+        <state relative-caret-position="-846">
+          <caret line="12" column="29" lean-forward="false" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
@@ -868,34 +869,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UI_Chat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="78" column="34" lean-forward="false" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+        <state relative-caret-position="230">
+          <caret line="83" column="72" lean-forward="true" selection-start-line="83" selection-start-column="72" selection-end-line="83" selection-end-column="72" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#197#842#0" expanded="false" />
-            <element signature="e#890#2226#0" expanded="false" />
-            <element signature="e#3330#3334#0" expanded="false" />
-            <element signature="e#3385#3717#0" expanded="false" />
-            <element signature="e#3765#4984#0" expanded="false" />
-            <element signature="e#5038#10089#0" expanded="false" />
-            <element signature="e#5360#5472#0" expanded="false" />
-            <element signature="e#5527#6117#0" expanded="false" />
-            <element signature="e#6258#7689#0" expanded="false" />
-            <element signature="e#7824#7881#0" expanded="false" />
-            <element signature="e#8033#8209#0" expanded="false" />
-            <element signature="e#8494#8651#0" expanded="false" />
-            <element signature="e#9375#9513#0" expanded="false" />
-            <element signature="e#9568#9821#0" expanded="false" />
-            <element signature="e#9878#9978#0" expanded="false" />
-            <element signature="e#10150#16568#0" expanded="false" />
-            <element signature="e#12782#14023#0" expanded="false" />
-            <element signature="e#14054#14058#0" expanded="false" />
-            <element signature="e#14128#16171#0" expanded="false" />
-            <element signature="e#16222#16568#0" expanded="false" />
-            <element signature="e#16628#16804#0" expanded="false" />
-            <element signature="e#16862#18093#0" expanded="false" />
-            <element signature="e#18145#18424#0" expanded="false" />
-            <element signature="e#18442#18652#0" expanded="false" />
+            <element signature="e#3167#3171#0" expanded="false" />
+            <element signature="e#3222#3554#0" expanded="false" />
+            <element signature="e#3602#4821#0" expanded="false" />
+            <element signature="e#4875#9926#0" expanded="false" />
+            <element signature="e#5197#5309#0" expanded="false" />
+            <element signature="e#5364#5954#0" expanded="false" />
+            <element signature="e#6095#7526#0" expanded="false" />
+            <element signature="e#7661#7718#0" expanded="false" />
+            <element signature="e#7870#8046#0" expanded="false" />
+            <element signature="e#8331#8488#0" expanded="false" />
+            <element signature="e#9212#9350#0" expanded="false" />
+            <element signature="e#9405#9658#0" expanded="false" />
+            <element signature="e#9715#9815#0" expanded="false" />
+            <element signature="e#9987#16405#0" expanded="false" />
+            <element signature="e#12619#13860#0" expanded="false" />
+            <element signature="e#13891#13895#0" expanded="false" />
+            <element signature="e#13965#16008#0" expanded="false" />
+            <element signature="e#16059#16405#0" expanded="false" />
+            <element signature="e#16465#16641#0" expanded="false" />
+            <element signature="e#16699#17930#0" expanded="false" />
           </folding>
         </state>
       </provider>
