@@ -5,7 +5,6 @@ import socket
 import _thread
 import Updater
 import urllib.request
-import UI_Chat
 
 
 class Client:
@@ -79,6 +78,7 @@ class Client:
 
         username = connection_name
         join_message = connection_name + ' has joined the server'
+        admin_message = ' - with admin access'
         final_name = '$$$' + connection_name
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,6 +87,9 @@ class Client:
             clientSocket.connect((address, PORT))
             clientSocket.send(str.encode(final_name))
             clientSocket.send(str.encode(join_message))
+
+            if ADMIN_LEVEL > 0:
+                clientSocket.send(str.encode(admin_message))
 
             _thread.start_new_thread(Manager.search, ())
 
@@ -369,13 +372,25 @@ class Window:
         Settings.geometry(windowResolution)
         Settings.title('Settings')
 
-        Settings.attributes('-topmost', True)
+        # Settings.attributes('-topmost', True)
 
         title_type = StringVar()
         info_message = StringVar()
         lines = StringVar()
+        subtitleset = StringVar()
+        font_message = StringVar()
+        user_message = StringVar()
+        ip_text = StringVar()
+        configuration_text = StringVar()
+        connection_text = StringVar()
 
         info_message.set('CHANGE HOW THE GUI LOOKS [FONT / COLOUR / THEME]')
+        subtitleset.set('W I N D O W  S E T T I N G S')
+        font_message.set('F O N T')
+        user_message.set('D E F A U L T  U S E R N A M E')
+        ip_text.set('D E F A U L T  I P  A D D R E S S')
+        configuration_text.set('C O N F I G U R A T I O N')
+        connection_text.set('C O N N E C T I O N  S E T T I N G S')
         lines.set('_' * 75)
 
         title_colour = '#00FF00'
@@ -390,10 +405,117 @@ class Window:
         main_label = Label(Settings, textvariable=title_type, font='Arial 16 bold', fg='#141414', bg=title_colour)
         main_label.place(relx=.046, rely=.09)
 
-        info_label = Label(Settings, textvariable=info_message, font='verdana 10 bold italic', fg='#00FF00', bg='#141414',
-                        justify=LEFT)
-        # info_label.place(relx=.045, rely=.9)
-        info_label.place(relx=.1, rely=.165)
+        subtitle = Label(Settings, textvariable=subtitleset, font='Arial 11 bold', fg='#00FF00', bg='#141414',
+                      justify=LEFT)
+        subtitle.place(relx=.046, rely=.26)
+
+        font_label = Label(Settings, textvariable=font_message, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                         justify=LEFT)
+        font_label.place(relx=.046, rely=.34)
+
+        current_default_username = 'NONE'
+        current_default_ip = 'chatserver.hopto.org'
+
+        user_label = Label(Settings, textvariable=user_message, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                           justify=LEFT)
+        user_label.place(relx=.046, rely=.48)
+
+        ip_label = Label(Settings, textvariable=ip_text, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                           justify=LEFT)
+        ip_label.place(relx=.046, rely=.62)
+
+        fonts = [
+            'ARIAL',
+            'SANS-SERIF',
+            'COURIER NEW'
+        ]
+
+        current_default_username = 'NONE'
+
+        current_font = 'ARIAL'
+
+        font_drop = tkinter.ttk.Combobox(Settings, width=29, values=fonts, state='readonly')
+        font_drop.set(current_font)
+        font_drop.place(relx=.049, rely=.4)
+
+        user_entry = Entry(Settings, width=32)
+        user_entry.place(relx=.049, rely=.54)
+
+        user_entry.setvar(current_default_username)
+
+        ip_entry = Entry(Settings, width=32)
+        ip_entry.place(relx=.049, rely=.68)
+
+        ip_entry.setvar(current_default_username)
+
+        ##################################################
+
+        subtitle2 = Label(Settings, textvariable=configuration_text, font='Arial 11 bold', fg='#00FF00', bg='#141414',
+                         justify=LEFT)
+        subtitle2.place(relx=.37, rely=.26)
+
+        colour_label = Label(Settings, text='C O L O U R', font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                           justify=LEFT)
+        colour_label.place(relx=.37, rely=.34)
+
+        """user_label = Label(Settings, textvariable=user_message, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                           justify=LEFT)
+        user_label.place(relx=.046, rely=.48)
+
+        ip_label = Label(Settings, textvariable=ip_text, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                         justify=LEFT)
+        ip_label.place(relx=.046, rely=.62)"""
+
+        colours = [
+            'BLUE', 'GREEN', 'PURPLE', 'YELLOW', 'RED', 'ORANGE', 'WHITE', 'GRAY'
+        ]
+
+        current_colour = 'BLUE'
+
+        current_font = 'ARIAL'
+
+        colour_drop = tkinter.ttk.Combobox(Settings, width=26, values=fonts, state='readonly')
+        colour_drop.set(current_colour)
+        colour_drop.place(relx=.372, rely=.4)
+        """
+        user_entry = Entry(Settings, width=32)
+        user_entry.place(relx=.049, rely=.54)
+
+        user_entry.setvar(current_default_username)
+
+        ip_entry = Entry(Settings, width=32)
+        ip_entry.place(relx=.049, rely=.68)
+
+        ip_entry.setvar(current_default_username)"""
+
+        ###############################################################
+
+        subtitle3 = Label(Settings, textvariable=connection_text, font='Arial 11 bold', fg='#00FF00', bg='#141414',
+                          justify=LEFT)
+        subtitle3.place(relx=.675, rely=.26)
+
+        time_label = Label(Settings, text='C O N N E C T I O N  T I M E O U T', font='Arial 9 bold', fg='#00FF00', bg='#141414',
+                          justify=LEFT)
+        time_label.place(relx=.675, rely=.34)
+
+        time_entry = Entry(Settings, width=41)
+        time_entry.place(relx=.679, rely=.4)
+
+        port_label = Label(Settings, text='P O R T', font='Arial 9 bold', fg='#00FF00',
+                           bg='#141414',
+                           justify=LEFT)
+        port_label.place(relx=.675, rely=.62)
+
+        port_entry = Entry(Settings, width=23)
+        port_entry.place(relx=.679, rely=.68)
+
+        save_label = Label(Settings, text='S A V E', font='Arial 9 bold', fg='#00FF00',
+                           bg='#141414',
+                           justify=LEFT)
+        save_label.place(relx=.86, rely=.62)
+
+        save_button = Button(Settings, text='✓', width=11, height=1)
+        save_button.place(relx=.86, rely=.68)
 
     def close(self):
         pass
