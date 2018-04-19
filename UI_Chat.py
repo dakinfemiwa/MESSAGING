@@ -33,7 +33,8 @@ class Client:
 
         print("WELCOME: Ready to connect.")
         print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
-
+        # t = 'hello my name'
+        # print(t.split()[2])
         username = str(input("INPUT: Enter username: "))
 
         if ADMIN_LEVEL > 0:
@@ -262,11 +263,13 @@ class Client:
             elif command == '.shutdown':
                 clientSocket.send(str.encode('$-$shutdown'))
 
-            elif command == '.message':
+            elif '.message' in command:
                 if len(command) < 10:
                     Window.show(MESSAGE_COMMAND)
                 else:
                     target_user = command[9:]
+                    final_string = '£££ ' + target_user
+                    clientSocket.send(str.encode(final_string))
 
             elif '.kick' in command:
                 if len(command) < 7:

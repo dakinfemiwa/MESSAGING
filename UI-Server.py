@@ -122,6 +122,22 @@ if __name__ == "__main__":
                                             del Users[targetIP]
                             except:
                                 print('ERROR: Unhandled kick')
+                        elif '£££' in data.decode():
+                            targetUser = data.decode().split()[1]
+                            num = len(targetUser) + 2
+                            targetMessage = data.decode().strip('£££')[num:]
+                            try:
+                                for key, val in Users.items():
+                                    if val == targetUser:
+                                        targetIP = key
+                                        break
+                                for socket in CLIST:
+                                    if str(targetIP[0]) in str(socket):
+                                        if str(targetIP[1]) in str(socket):
+                                            final_msg = '* PRIVATE MESSAGE *: ' + targetMessage
+                                            socket.send(str.encode(final_msg))
+                            except:
+                                print('ERROR: Unhandled message')
                         elif '_-$' in data.decode():
                             targetUser = data.decode().strip('_-$')
                             try:
