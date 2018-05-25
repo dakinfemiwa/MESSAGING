@@ -33,14 +33,12 @@ class Client:
 
         print("WELCOME: Ready to connect.")
         print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
-        # t = 'hello my name'
-        # print(t.split()[2])
         username = str(input("INPUT: Enter username: "))
 
         if ADMIN_LEVEL > 0:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
 
-        join_message = username + ' has joined the server'
+        join_message = username + ' has joined the server' + ' [' + str(programVersion) + ']'
         final_name = '$$$' + username
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -78,7 +76,7 @@ class Client:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
 
         username = connection_name
-        join_message = connection_name + ' has joined the server'
+        join_message = connection_name + ' has joined the server' + ' [' + str(programVersion) + ']'
         admin_message = ' - with admin access'
         final_name = '$$$' + connection_name
 
@@ -99,6 +97,10 @@ class Client:
 
         except:
             print('ERROR: Could not connect.')
+            try:
+                Window.show('You have been disconnected from the server.')
+            except:
+                pass
 
     @staticmethod
     def close(self):
@@ -127,10 +129,18 @@ class Client:
             except:
                 # When the server goes down.
                 print("INFO: Server closed connection")
+                try:
+                    Window.show('The server has shutdown or is not responding to requests.')
+                except:
+                    pass
                 _thread.interrupt_main()
                 break
             if not receive_data:
                 print("INFO: Server closed connection")
+                try:
+                    Window.show('The server has shutdown or is not responding to requests.')
+                except:
+                    pass
                 _thread.interrupt_main()
                 break
             else:
@@ -653,7 +663,7 @@ ADMIN_MESSAGE = '''.kick - kick a client off
 .shutdown - shuts down the server
 '''
 
-CLEAR_MESSAGE_ADMIN = 'Chat was cleared by an admin'
+CLEAR_MESSAGE_ADMIN = 'Chat was cleared by an administrator'
 CLEAR_COMMAND = 'Chat was cleared successfully.'
 NAME_COMMAND = 'The correct usage for this command is .name <username>'
 GHOST_COMMAND = 'The correct usage for this command is .ghost <user>'

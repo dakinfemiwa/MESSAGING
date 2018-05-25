@@ -1,10 +1,9 @@
 import socket
 import select
 from datetime import datetime
-from collections import OrderedDict
 
 
-def Broadcast (sock, message, usr):
+def Broadcast(sock, message, usr):
     try:
         for socket in CLIST:
             if socket != serverSocket:
@@ -15,15 +14,8 @@ def Broadcast (sock, message, usr):
         print('ERROR: Broadcast error - perhaps a client disconnected?')
 
 
-def Handler():
-    # Handles permissions
-    pass
-
-
 if __name__ == "__main__":
-
     try:
-
         def startUp():
             global CLIST, People, Users, IP, serverSocket
 
@@ -31,27 +23,24 @@ if __name__ == "__main__":
             People = []
             Users = {}
 
-            print('INFO: Chat server - V2')
+            print('INFO: Chat server - running with version three support.')
             IP = '0.0.0.0'
-
-            # IP = str(input("Enter IP to bind server: "))
 
             serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             serverSocket.bind((IP, 6666))
             serverSocket.listen(10)
 
+            print('SUCCESS: Server has been started; listening for connections.')
+
             CLIST.append(serverSocket)
 
         startUp()
 
-        while 1:
-
+        while True:
             read_sockets, write_sockets, error_sockets = select.select(CLIST, [], [])
 
             for sock in read_sockets:
-
                 if sock == serverSocket:
-
                     sockfd, addr = serverSocket.accept()
                     CLIST.append(sockfd)
                     print("STATUS: Client [%s, %s] connected" % addr)
@@ -89,7 +78,7 @@ if __name__ == "__main__":
                                 for x in range(0, len(CLIST)-1):
                                     client = list(Users.values())[x]
                                     client = str(client)
-                                    Broadcast(sock, str.encode("\n") + str.encode(client), Users[addr])
+                                    Broadcast(sock, str.encode(client) + str.encode("\n"), Users[addr])
                             except:
                                 print('ERROR: Could not print online user list.')
                         elif '$-$shutdown' in data.decode():
@@ -162,6 +151,5 @@ if __name__ == "__main__":
 
     except Exception as error:
         print(error)
-        print('Runtime error')
 
     serverSocket.close()    
