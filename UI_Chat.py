@@ -7,6 +7,7 @@ import _thread
 import os
 import Updater
 import urllib.request
+import random
 
 
 class Client:
@@ -113,21 +114,28 @@ class Client:
         pass
 
     @staticmethod
-    def send(message):
-        try:
-            if message[0] == '.':
-                Client.command(message)
-            else:
-                entryBox.delete(0, END)
-                send_msg = username.strip('%!') + ': ' + message
-                clientSocket.send(str.encode(send_msg))
-        except TypeError:
-            pass
-        except IndexError:
-            pass
+    def send(message, inGame=False):
+        global isTurn
+        if inGame is False:
+            try:
+                if message[0] == '.':
+                    Client.command(message)
+                else:
+                    entryBox.delete(0, END)
+                    send_msg = username.strip('%!') + ': ' + message
+                    clientSocket.send(str.encode(send_msg))
+            except TypeError:
+                pass
+            except IndexError:
+                pass
+        else:
+            isTurn = False
+            clientSocket.send(str.encode(message))
 
     @staticmethod
     def receive():
+        global isTurn, hasStarted, myTeam, theirTeam, boardSection, boardSlotsStatic, boardValues, boardSlots
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
 
         while True:
             try:
@@ -174,6 +182,23 @@ class Client:
                     urllib.request.urlretrieve(
                         'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3', 'song.mp3')
                     os.startfile('song.mp3')
+                elif '/!-:' in receive_data.decode():
+                    if GameToken not in receive_data.decode():
+                        moveRec = receive_data.decode().strip('/!-:')
+                        moveRec = moveRec[:-12]
+                        Window.drawpanel(moveRec, 2)
+                    Window.refresh()
+                elif 'YOUR_TURN_+' in receive_data.decode():
+                    if GameToken not in receive_data.decode():
+                        isTurn = True
+                    Window.refresh()
+
+                elif '+!+:)' in receive_data.decode():
+                    if GameToken not in receive_data.decode():
+                        hasStarted = True
+                        myTeam = 'O'
+                        theirTeam = 'X'
+
                 else:
                     if "$" in receive_data.decode():
                         pass
@@ -311,6 +336,10 @@ class Client:
                 # clientSocket.close()
                 Manager.search('FORCED')
 
+            elif command == '.game':
+                MainWindow.destroy()
+                Window.gamescreen()
+
             else:
                 Window.show('That is an invalid command')
 
@@ -392,13 +421,328 @@ class Window:
         ChatLog.place(relx=.043, rely=.23)
 
     @staticmethod
-    def console():
-        Console = Tk()
-        Console.configure(bg='#7f8C8D')
-        Console.geometry('800x400')
-        Console.title('CONSOLE V-0.1')
+    def gamescreen(GAME=1, START=1):
+        global boardSlots, boardSlotsStatic, boardValues, myTeam, theirTeam, isTurn, hasStarted, oneTimeSetup, GameToken
+        global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
+        global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
 
-        # REMOVED.
+        GameToken = str(random.randint(100000000000, 999999999999))
+
+        Game = Tk()
+        Game.configure(bg=windowBackground)
+        Game.geometry('800x400')
+        Game.title('GAME')
+
+        titleText = StringVar()
+        titleVert = StringVar()
+        titleHorz = StringVar()
+
+        endWin = StringVar()
+        endLose = StringVar()
+
+        boardSlotsStatic = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3']
+        boardSlots = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3']
+
+        A1_VAL = StringVar()
+        A2_VAL = StringVar()
+        A3_VAL = StringVar()
+        B1_VAL = StringVar()
+        B2_VAL = StringVar()
+        B3_VAL = StringVar()
+        C1_VAL = StringVar()
+        C2_VAL = StringVar()
+        C3_VAL = StringVar()
+
+        A1_VAL.set('-')
+        A2_VAL.set('-')
+        A3_VAL.set('-')
+        B1_VAL.set('-')
+        B2_VAL.set('-')
+        B3_VAL.set('-')
+        C1_VAL.set('-')
+        C2_VAL.set('-')
+        C3_VAL.set('-')
+
+        boardValues = [A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL]
+
+        oneTimeSetup = False
+
+        def sendMove(moveSlot):
+            global isTurn, hasStarted, myTeam, theirTeam, oneTimeSetup, boardSection, boardSlotsStatic, boardValues
+            global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
+
+            if oneTimeSetup == False:
+                if hasStarted is False:
+                    myTeam = 'X'
+                    theirTeam = 'O'
+                    hasStarted = True
+                    startGame = '+!+:)' + GameToken
+                    Client.send(startGame, True)
+                    time.sleep(.1)
+                else:
+                    myTeam = 'O'
+                    theirTeam = 'X'
+                oneTimeSetup = True
+
+            Window.drawpanel(moveSlot, 1)
+
+            moveSlot = '/!-:' + moveSlot + GameToken
+            TurnOver = 'YOUR_TURN_+' + GameToken
+            Client.send(moveSlot, True)
+            time.sleep(.1)
+            Client.send(TurnOver, True)
+            refreshBoard()
+
+        if GAME == 1:
+            titleText.set('TIC TAC TOE')
+            titleVert.set('|')
+            titleHorz.set('__________________________________________')
+
+            endWin.set('WINNER')
+            endLose.set('LOSER')
+
+        if START == 1:
+            isTurn = True
+            hasStarted = False
+        else:
+            isTurn = False
+
+        GameTitle = Label(Game, textvariable=titleText, font='Arial 12 bold', bg=windowBackground, fg='white')
+        GameTitle.place(relx=.03, rely=.05)
+
+        GameTile = Label(Game, textvariable=titleVert, font='Arial 30 bold' , fg='white')
+        GameTile.place(relx=.425, rely=.25)
+
+        GameTile2 = Label(Game, textvariable=titleVert, font='Arial 30 bold' , fg='white')
+        GameTile2.place(relx=.520, rely=.25)
+
+        GameTile3 = Label(Game, textvariable=titleVert, font='Arial 30 bold' , fg='white')
+        GameTile3.place(relx=.425, rely=.38)
+
+        GameTile4 = Label(Game, textvariable=titleVert, font='Arial 30 bold' , fg='white')
+        GameTile4.place(relx=.520, rely=.38)
+
+        GameTile5 = Label(Game, textvariable=titleVert, font='Arial 30 bold', fg='white')
+        GameTile5.place(relx=.425, rely=.51)
+
+        GameTile6 = Label(Game, textvariable=titleVert, font='Arial 30 bold', fg='white')
+        GameTile6.place(relx=.520, rely=.51)
+
+        GameTile7 = Label(Game, textvariable=titleVert, font='Arial 30 bold', fg='white')
+        GameTile7.place(relx=.425, rely=.64)
+
+        GameTile8 = Label(Game, textvariable=titleVert, font='Arial 30 bold', fg='white')
+        GameTile8.place(relx=.520, rely=.64)
+
+        #
+
+        GameTile9 = Label(Game, textvariable=titleHorz, font='Arial 7 bold', fg='white')
+        GameTile9.place(relx=.35, rely=.4)
+
+        GameTile10 = Label(Game, textvariable=titleHorz, font='Arial 7 bold', fg='white')
+        GameTile10.place(relx=.35, rely=.6)
+
+        #
+
+        GameInteract = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('A1'))
+
+        GameInteract2 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('A2'))
+
+        GameInteract3 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('A3'))
+
+        GameInteract4 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('B1'))
+
+        GameInteract5 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('B2'))
+
+        GameInteract6 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('B3'))
+
+        GameInteract7 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('C1'))
+
+        GameInteract8 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('C2'))
+
+        GameInteract9 = Button(Game, font='Arial 4 bold', fg='white', width=10, height=5, command=lambda: sendMove('C3'))
+
+        #
+
+        GameButtons = [GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9]
+
+        GameItem = Label(Game, textvariable=A1_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem2 = Label(Game, textvariable=A2_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem3 = Label(Game, textvariable=A3_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem4 = Label(Game, textvariable=B1_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem5 = Label(Game, textvariable=B2_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem6 = Label(Game, textvariable=B3_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem7 = Label(Game, textvariable=C1_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem8 = Label(Game, textvariable=C2_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameItem9 = Label(Game, textvariable=C3_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        GameInteract.place(relx=.36, rely=.28)
+        GameInteract2.place(relx=.36, rely=.48)
+        GameInteract3.place(relx=.36, rely=.68)
+        GameInteract4.place(relx=.459, rely=.28)
+        GameInteract5.place(relx=.459, rely=.48)
+        GameInteract6.place(relx=.459, rely=.68)
+        GameInteract7.place(relx=.56, rely=.28)
+        GameInteract8.place(relx=.56, rely=.48)
+        GameInteract9.place(relx=.56, rely=.68)
+
+        def refreshBoard():
+            global isTurn
+            if 'A1' in boardSlots:
+                GameInteract.place(relx=.36, rely=.28)
+            else:
+                GameItem.place(relx=.362, rely=.26)
+                print('place at a1')
+                GameInteract.place_forget()
+            if 'A2' in boardSlots:
+                GameInteract2.place(relx=.36, rely=.48)
+            else:
+                GameItem2.place(relx=.362, rely=.46)
+                GameInteract2.place_forget()
+            if 'A3' in boardSlots:
+                GameInteract3.place(relx=.36, rely=.68)
+            else:
+                GameItem3.place(relx=.362, rely=.66)
+                GameInteract3.place_forget()
+            if 'B1' in boardSlots:
+                GameInteract4.place(relx=.459, rely=.28)
+            else:
+                GameItem4.place(relx=.462, rely=.26)
+                GameInteract4.place_forget()
+            if 'B2' in boardSlots:
+                GameInteract5.place(relx=.459, rely=.48)
+            else:
+                GameItem5.place(relx=.462, rely=.46)
+                GameInteract5.place_forget()
+            if 'B3' in boardSlots:
+                GameInteract6.place(relx=.459, rely=.68)
+            else:
+                GameItem6.place(relx=.462, rely=.66)
+                GameInteract6.place_forget()
+            if 'C1' in boardSlots:
+                GameInteract7.place(relx=.56, rely=.28)
+            else:
+                GameItem7.place(relx=.562, rely=.26)
+                GameInteract7.place_forget()
+            if 'C2' in boardSlots:
+                GameInteract8.place(relx=.56, rely=.48)
+            else:
+                GameItem8.place(relx=.562, rely=.46)
+                GameInteract8.place_forget()
+            if 'C3' in boardSlots:
+                GameInteract9.place(relx=.56, rely=.68)
+            else:
+                GameItem9.place(relx=.562, rely=.66)
+                GameInteract9.place_forget()
+            if isTurn is False:
+                print('is not turn')
+                for GameButton in GameButtons:
+                    GameButton.configure(state='disabled')
+            else:
+                print('is turn')
+                for GameButton in GameButtons:
+                    GameButton.configure(state='normal')
+
+        refreshBoard()
+
+        GameWinner = Label(Game, textvariable=endWin, font='Arial 20 bold', fg='#2ecc71', bg=windowBackground)
+        GameLoser = Label(Game, textvariable=endLose, font='Arial 20 bold', fg='#e74c3c', bg=windowBackground)
+
+        # GameWinner.place(relx=.41, rely=.8)
+        # GameLoser.place(relx=.42, rely=.8)
+
+
+        Game.mainloop()
+
+    @staticmethod
+    def drawpanel(itemCord, team):
+        global myTeam, theirTeam, boardSlots, boardValues
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
+
+        boardSlotsStatic2 = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3']
+
+        if team == 1:
+            belongs = myTeam
+        else:
+            belongs = theirTeam
+
+        boardSection2 = boardSlotsStatic2.index(itemCord)
+        boardValues[boardSection2].set(belongs)
+        boardSlots.remove(itemCord)
+
+        Window.refresh()
+
+    @staticmethod
+    def refresh():
+        global isTurn
+        global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
+        global boardSlots
+        global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
+
+        if 'A1' in boardSlots:
+            GameInteract.place(relx=.36, rely=.28)
+        else:
+            GameItem.place(relx=.362, rely=.26)
+            print('place at a1')
+            GameInteract.place_forget()
+        if 'A2' in boardSlots:
+            GameInteract2.place(relx=.36, rely=.48)
+        else:
+            GameItem2.place(relx=.362, rely=.46)
+            GameInteract2.place_forget()
+        if 'A3' in boardSlots:
+            GameInteract3.place(relx=.36, rely=.68)
+        else:
+            GameItem3.place(relx=.362, rely=.66)
+            GameInteract3.place_forget()
+        if 'B1' in boardSlots:
+            GameInteract4.place(relx=.459, rely=.28)
+        else:
+            GameItem4.place(relx=.462, rely=.26)
+            GameInteract4.place_forget()
+        if 'B2' in boardSlots:
+            GameInteract5.place(relx=.459, rely=.48)
+        else:
+            GameItem5.place(relx=.462, rely=.46)
+            GameInteract5.place_forget()
+        if 'B3' in boardSlots:
+            GameInteract6.place(relx=.459, rely=.68)
+        else:
+            GameItem6.place(relx=.462, rely=.66)
+            GameInteract6.place_forget()
+        if 'C1' in boardSlots:
+            GameInteract7.place(relx=.56, rely=.28)
+        else:
+            GameItem7.place(relx=.562, rely=.26)
+            GameInteract7.place_forget()
+        if 'C2' in boardSlots:
+            GameInteract8.place(relx=.56, rely=.48)
+        else:
+            GameItem8.place(relx=.562, rely=.46)
+            GameInteract8.place_forget()
+        if 'C3' in boardSlots:
+            GameInteract9.place(relx=.56, rely=.68)
+        else:
+            GameItem9.place(relx=.562, rely=.66)
+            GameInteract9.place_forget()
+        if isTurn is False:
+            print('is not turn')
+            for GameButton in GameButtons:
+                GameButton.configure(state='disabled')
+        else:
+            print('is turn')
+            for GameButton in GameButtons:
+                GameButton.configure(state='normal')
+
 
     @staticmethod
     def settings():
@@ -640,13 +984,16 @@ class Window:
 
     @staticmethod
     def show(message):
-        ChatLog.config(state=NORMAL)
-        message = message.strip('%!')
-        ChatLog.insert(END, '\n' + message)
-        ChatLog.tag_add(message, float(ChatLog.index(END)) - 1.0, (float(ChatLog.index(END)) - 1.0) + len(message))
-        ChatLog.tag_config(message, foreground=colourTheme, font=(windowFont, 11, "bold"))
-        ChatLog.config(state=DISABLED)
-        ChatLog.see(END)
+        try:
+            ChatLog.config(state=NORMAL)
+            message = message.strip('%!')
+            ChatLog.insert(END, '\n' + message)
+            ChatLog.tag_add(message, float(ChatLog.index(END)) - 1.0, (float(ChatLog.index(END)) - 1.0) + len(message))
+            ChatLog.tag_config(message, foreground=colourTheme, font=(windowFont, 11, "bold"))
+            ChatLog.config(state=DISABLED)
+            ChatLog.see(END)
+        except:
+            print('TT: ', message)
 
 
 class Manager:
@@ -738,6 +1085,8 @@ PORT = 6666
 Manager = Manager()
 External = Updater.Update()
 
+# Window.gamescreen()
+
 
 def has(permission):
     if permission in USER_PERMISSIONS:
@@ -749,7 +1098,6 @@ def has(permission):
 if __name__ == '__main__':
     Client.configure()
     Window.draw()
-    Window.console()
 
     IP = '127.0.0.1'
     Client.connect()
