@@ -1,8 +1,10 @@
 from tkinter import *
 import tkinter.ttk
 import json
+import time
 import socket
 import _thread
+import os
 import Updater
 import urllib.request
 
@@ -11,7 +13,7 @@ class Client:
     @staticmethod
     def configure():
         global config, colourTheme, windowBackground, windowForeground
-        global windowTitle, programVersion, programStage, windowResolution
+        global windowTitle, programVersion, programStage, windowResolution, windowFont
 
         with open('config.json') as jsonConfig:
             config = json.load(jsonConfig)
@@ -22,6 +24,7 @@ class Client:
         windowTitle = config['window']['title']
         windowForeground = config['window']['foreground']
         windowBackground = config['window']['background']
+        windowFont = config['window']['font']
 
         programVersion = config['information']['version']
         programStage = config['information']['stage']
@@ -68,7 +71,7 @@ class Client:
             clientSocket.close()
 
     @staticmethod
-    def external(address, connection_name):
+    def external(address, connection_name, connection_pass=None):
         global username, clientSocket
         Window.draw()
 
@@ -76,19 +79,22 @@ class Client:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
 
         username = connection_name
-        join_message = connection_name + ' has joined the server' + ' [' + str(programVersion) + ']'
-        admin_message = ' - with admin access'
+        join_message = connection_name.strip('$').strip('%!') + ' has joined the server'
         final_name = '$$$' + connection_name
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            clientSocket.connect((address, PORT))
+            clientSocket.connect(('127.0.0.1', PORT))
             clientSocket.send(str.encode(final_name))
-            clientSocket.send(str.encode(join_message))
 
-            if ADMIN_LEVEL > 0:
-                clientSocket.send(str.encode(admin_message))
+            time.sleep(.5)
+            if connection_pass != None:
+                final_pass = '#!-' + connection_pass
+                clientSocket.send(str.encode(final_pass))
+            else:
+                time.sleep(.5)
+                clientSocket.send(str.encode(join_message))
 
             _thread.start_new_thread(Manager.search, ())
 
@@ -113,7 +119,7 @@ class Client:
                 Client.command(message)
             else:
                 entryBox.delete(0, END)
-                send_msg = username + ': ' + message
+                send_msg = username.strip('%!') + ': ' + message
                 clientSocket.send(str.encode(send_msg))
         except TypeError:
             pass
@@ -152,15 +158,28 @@ class Client:
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
+                elif '-##-' in receive_data.decode():
+                    adminLvl = receive_data.decode().strip('-##-')
+                    adminLvl = int(adminLvl)
+                    ADMIN_LEVEL = adminLvl
+                    print('ADMIN LEVEL:', adminLvl)
+                    if ADMIN_LEVEL > 0:
+                        USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
+                    if ADMIN_LEVEL > 1:
+                        USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_CLEARALL, ADMIN_COMMAND_MESSAGE))
+                    if ADMIN_LEVEL > 2:
+                        USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN, ADMIN_COMMAND_FORCEQUIT,
+                                                 ADMIN_COMMAND_GHOST))
                 elif '$-$play' in receive_data.decode():
                     urllib.request.urlretrieve(
-                        'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3',
-                        'song.mp3')
-                    import os
+                        'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3', 'song.mp3')
                     os.startfile('song.mp3')
-
                 else:
-                    Window.show(receive_data.decode())
+                    if "$" in receive_data.decode():
+                        pass
+                    else:
+                        new = receive_data.decode().strip("%")
+                        Window.show(new)
 
     @staticmethod
     def command(command):
@@ -187,10 +206,8 @@ class Client:
                 else:
                     new_name = command[6:]
                     updated_name = username + ' has changed their name to ' + new_name
-                    clientSocket.send(str.encode('\n'))
                     clientSocket.send(str.encode(updated_name))
                     MainWindow.after(500)
-                    clientSocket.send(str.encode('\n'))
                     second_name = '$$$' + new_name
                     username = new_name
                     clientSocket.send(str.encode(second_name))
@@ -375,8 +392,53 @@ class Window:
         ChatLog.place(relx=.043, rely=.23)
 
     @staticmethod
+    def console():
+        Console = Tk()
+        Console.configure(bg='#7f8C8D')
+        Console.geometry('800x400')
+        Console.title('CONSOLE V-0.1')
+
+        # REMOVED.
+
+    @staticmethod
     def settings():
         global Settings
+
+        def saveSettings():
+            newColour = colour_drop.get().lower()
+            if newColour == 'white':
+                config['window']['theme'] = '#FFFFFF'
+            elif newColour == 'red':
+                config['window']['theme'] = '#FF0000'
+            elif newColour == 'blue':
+                config['window']['theme'] = '#00BFFF'
+            elif newColour == 'green':
+                config['window']['theme'] = '#7CFC00'
+            elif newColour == 'yellow':
+                config['window']['theme'] = '#FFFF00'
+            elif newColour == 'purple':
+                config['window']['theme'] = '#8A2BE2'
+            elif newColour == 'orange':
+                config['window']['theme'] = '#FF8C00'
+            elif newColour == 'gray':
+                config['window']['theme'] = '#CCCCCC'
+
+            config['window']['font'] = font_drop.get()
+
+            with open('config.json', 'w') as config_file:
+                config_file.write(json.dumps(config, indent=8))
+
+            sec3 = Label(Settings, text='Restarting in three seconds...', fg=colourTheme, bg=windowBackground, font=('courier new', '12'))
+            sec2 = Label(Settings, text='Restarting in two seconds...', fg=colourTheme, bg=windowBackground, font=('courier new', '12'))
+            sec1 = Label(Settings, text='Restarting in one second...', fg=colourTheme, bg=windowBackground, font=('courier new', '12'))
+
+            Settings.after(0000, lambda: sec3.place(relx=0.6740, rely=0.83))
+            Settings.after(1000, lambda: sec3.place_forget())
+            Settings.after(1000, lambda: sec2.place(relx=0.6740, rely=0.83))
+            Settings.after(2000, lambda: sec2.place_forget())
+            Settings.after(2000, lambda: sec1.place(relx=0.6740, rely=0.83))
+
+
 
         MainWindow.destroy()
 
@@ -409,31 +471,31 @@ class Window:
         title_colour = '#00FF00'
         title_type.set('S E T T I N G S')
 
-        title_line = Label(Settings, textvariable=lines, font='Arial 15 bold', fg=title_colour, bg='#141414')
+        title_line = Label(Settings, textvariable=lines, font='Arial 15 bold', fg=colourTheme, bg='#141414')
         title_line.place(relx=.04, rely=.14)
 
-        deep_line = Label(Settings, textvariable=lines, font='Arial 15 bold', fg=title_colour, bg='#141414')
+        deep_line = Label(Settings, textvariable=lines, font='Arial 15 bold', fg=colourTheme, bg='#141414')
         deep_line.place(relx=.04, rely=.8)
 
-        main_label = Label(Settings, textvariable=title_type, font='Arial 16 bold', fg='#141414', bg=title_colour)
+        main_label = Label(Settings, textvariable=title_type, font='Arial 16 bold', fg='#141414', bg=colourTheme)
         main_label.place(relx=.046, rely=.09)
 
-        subtitle = Label(Settings, textvariable=subtitleset, font='Arial 11 bold', fg='#00FF00', bg='#141414',
+        subtitle = Label(Settings, textvariable=subtitleset, font='Arial 11 bold', fg=colourTheme, bg='#141414',
                       justify=LEFT)
         subtitle.place(relx=.046, rely=.26)
 
-        font_label = Label(Settings, textvariable=font_message, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+        font_label = Label(Settings, textvariable=font_message, font='Arial 9 bold', fg=colourTheme, bg='#141414',
                          justify=LEFT)
         font_label.place(relx=.046, rely=.34)
 
         current_default_username = 'NONE'
         current_default_ip = 'chatserver.hopto.org'
 
-        user_label = Label(Settings, textvariable=user_message, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+        user_label = Label(Settings, textvariable=user_message, font='Arial 9 bold', fg=colourTheme, bg='#141414',
                            justify=LEFT)
         user_label.place(relx=.046, rely=.48)
 
-        ip_label = Label(Settings, textvariable=ip_text, font='Arial 9 bold', fg='#00FF00', bg='#141414',
+        ip_label = Label(Settings, textvariable=ip_text, font='Arial 9 bold', fg=colourTheme, bg='#141414',
                            justify=LEFT)
         ip_label.place(relx=.046, rely=.62)
 
@@ -463,21 +525,13 @@ class Window:
 
         ##################################################
 
-        subtitle2 = Label(Settings, textvariable=configuration_text, font='Arial 11 bold', fg='#00FF00', bg='#141414',
+        subtitle2 = Label(Settings, textvariable=configuration_text, font='Arial 11 bold', fg=colourTheme, bg='#141414',
                          justify=LEFT)
         subtitle2.place(relx=.37, rely=.26)
 
-        colour_label = Label(Settings, text='C O L O U R', font='Arial 9 bold', fg='#00FF00', bg='#141414',
+        colour_label = Label(Settings, text='C O L O U R', font='Arial 9 bold', fg=colourTheme, bg='#141414',
                            justify=LEFT)
         colour_label.place(relx=.37, rely=.34)
-
-        """user_label = Label(Settings, textvariable=user_message, font='Arial 9 bold', fg='#00FF00', bg='#141414',
-                           justify=LEFT)
-        user_label.place(relx=.046, rely=.48)
-
-        ip_label = Label(Settings, textvariable=ip_text, font='Arial 9 bold', fg='#00FF00', bg='#141414',
-                         justify=LEFT)
-        ip_label.place(relx=.046, rely=.62)"""
 
         colours = [
             'BLUE', 'GREEN', 'PURPLE', 'YELLOW', 'RED', 'ORANGE', 'WHITE', 'GRAY'
@@ -487,34 +541,24 @@ class Window:
 
         current_font = 'ARIAL'
 
-        colour_drop = tkinter.ttk.Combobox(Settings, width=26, values=fonts, state='readonly')
+        colour_drop = tkinter.ttk.Combobox(Settings, width=26, values=colours, state='readonly')
         colour_drop.set(current_colour)
         colour_drop.place(relx=.372, rely=.4)
-        """
-        user_entry = Entry(Settings, width=32)
-        user_entry.place(relx=.049, rely=.54)
-
-        user_entry.setvar(current_default_username)
-
-        ip_entry = Entry(Settings, width=32)
-        ip_entry.place(relx=.049, rely=.68)
-
-        ip_entry.setvar(current_default_username)"""
 
         ###############################################################
 
-        subtitle3 = Label(Settings, textvariable=connection_text, font='Arial 11 bold', fg='#00FF00', bg='#141414',
+        subtitle3 = Label(Settings, textvariable=connection_text, font='Arial 11 bold', fg=colourTheme, bg='#141414',
                           justify=LEFT)
         subtitle3.place(relx=.675, rely=.26)
 
-        time_label = Label(Settings, text='C O N N E C T I O N  T I M E O U T', font='Arial 9 bold', fg='#00FF00', bg='#141414',
+        time_label = Label(Settings, text='C O N N E C T I O N  T I M E O U T', font='Arial 9 bold', fg=colourTheme, bg='#141414',
                           justify=LEFT)
         time_label.place(relx=.675, rely=.34)
 
         time_entry = Entry(Settings, width=41)
         time_entry.place(relx=.679, rely=.4)
 
-        port_label = Label(Settings, text='P O R T', font='Arial 9 bold', fg='#00FF00',
+        port_label = Label(Settings, text='P O R T', font='Arial 9 bold', fg=colourTheme,
                            bg='#141414',
                            justify=LEFT)
         port_label.place(relx=.675, rely=.62)
@@ -522,12 +566,12 @@ class Window:
         port_entry = Entry(Settings, width=23)
         port_entry.place(relx=.679, rely=.68)
 
-        save_label = Label(Settings, text='S A V E', font='Arial 9 bold', fg='#00FF00',
+        save_label = Label(Settings, text='S A V E', font='Arial 9 bold', fg=colourTheme,
                            bg='#141414',
                            justify=LEFT)
         save_label.place(relx=.86, rely=.62)
 
-        save_button = Button(Settings, text='✓', width=11, height=1)
+        save_button = Button(Settings, text='✓', width=11, height=1, command=lambda:saveSettings())
         save_button.place(relx=.86, rely=.68)
 
     def close(self):
@@ -597,9 +641,10 @@ class Window:
     @staticmethod
     def show(message):
         ChatLog.config(state=NORMAL)
+        message = message.strip('%!')
         ChatLog.insert(END, '\n' + message)
         ChatLog.tag_add(message, float(ChatLog.index(END)) - 1.0, (float(ChatLog.index(END)) - 1.0) + len(message))
-        ChatLog.tag_config(message, foreground=colourTheme, font=("courier new", 11, "bold"))
+        ChatLog.tag_config(message, foreground=colourTheme, font=(windowFont, 11, "bold"))
         ChatLog.config(state=DISABLED)
         ChatLog.see(END)
 
@@ -619,7 +664,7 @@ class Manager:
         info_file.close()
         try:
             if config['settings']['auth'] == 'true':
-                print('INFO: Permissions support ON')
+                # print('INFO: Permissions support ON')
                 if ADMIN_LEVEL > 1:
                     USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_CLEARALL, ADMIN_COMMAND_MESSAGE))
                 if ADMIN_LEVEL > 2:
@@ -644,7 +689,7 @@ class Manager:
 
 Client.configure()
 
-ADMIN_LEVEL = 3
+ADMIN_LEVEL = 0
 HELP_MESSAGE = '''.help - prints the help menu
 .quit - exit the server gracefully
 .name - change current username
@@ -671,7 +716,7 @@ SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
 MESSAGE_COMMAND = 'This function is unavailable right now.'
 KICK_COMMAND = 'The correct usage for this command is .kick <user>'
 UPDATE_COMMAND = 'No updates are available right now.'
-VERSION_MESSAGE = 'Running GUI version of chat client [' + programVersion + ']'
+VERSION_MESSAGE = 'GUI CHAT / Auth support [VERSION: ' + str(programVersion) + ']'
 
 # Admin permissions - to be handled in configuration file.
 ADMIN_COMMAND_SYNTAX = 'admin.commands.show'
@@ -704,6 +749,7 @@ def has(permission):
 if __name__ == '__main__':
     Client.configure()
     Window.draw()
+    Window.console()
 
-    IP = 'chatserver.hopto.org'
+    IP = '127.0.0.1'
     Client.connect()
