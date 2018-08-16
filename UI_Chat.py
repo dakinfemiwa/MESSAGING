@@ -195,6 +195,8 @@ class Client:
 
                 elif '+!+:)' in receive_data.decode():
                     if GameToken not in receive_data.decode():
+                        GameStateWaiting.place_forget()
+                        GameStateInGame.place(relx=.88, rely=.05)
                         hasStarted = True
                         myTeam = 'O'
                         theirTeam = 'X'
@@ -204,9 +206,13 @@ class Client:
                         winNotify = winNotify[:-12]
                         # This user lost:
                         if winNotify == 'W':
+                            GameStateInGame.place_forget()
+                            GameStateGameOver.place(relx=.83, rely=.05)
                             Window.displaywinner(False)
                             isTurn = False
                         else:
+                            GameStateInGame.place_forget()
+                            GameStateGameOver.place(relx=.83, rely=.05)
                             Window.displaywinner(True)
                             isTurn = False
 
@@ -437,7 +443,7 @@ class Window:
         global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
         global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
         global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
-        global GameWinner, GameLoser
+        global GameWinner, GameLoser, GameStateGameOver, GameStateWaiting, GameStateInGame
 
         GameToken = str(random.randint(100000000000, 999999999999))
 
@@ -449,6 +455,9 @@ class Window:
         titleText = StringVar()
         titleVert = StringVar()
         titleHorz = StringVar()
+        titleWait = StringVar()
+        titleGame = StringVar()
+        titleOver = StringVar()
 
         endWin = StringVar()
         endLose = StringVar()
@@ -490,10 +499,14 @@ class Window:
                     myTeam = 'X'
                     theirTeam = 'O'
                     hasStarted = True
+                    GameStateWaiting.place_forget()
+                    GameStateInGame.place(relx=.88, rely=.05)
                     startGame = '+!+:)' + GameToken
                     Client.send(startGame, True)
                     time.sleep(.1)
                 else:
+                    GameStateWaiting.place_forget()
+                    GameStateInGame.place(relx=.88, rely=.05)
                     myTeam = 'O'
                     theirTeam = 'X'
                 oneTimeSetup = True
@@ -512,6 +525,9 @@ class Window:
             titleText.set('TIC TAC TOE')
             titleVert.set('|')
             titleHorz.set('__________________________________________')
+            titleWait.set('WAITING FOR GAME')
+            titleGame.set('IN-GAME')
+            titleOver.set('GAME OVER')
 
             endWin.set('WINNER')
             endLose.set('LOSER')
@@ -524,6 +540,15 @@ class Window:
 
         GameTitle = Label(Game, textvariable=titleText, font='Arial 12 bold', bg=windowBackground, fg='white')
         GameTitle.place(relx=.03, rely=.05)
+
+        GameStateWaiting = Label(Game, textvariable=titleWait, font='Arial 12 bold', bg=windowBackground, fg='#95a5a6')
+        GameStateWaiting.place(relx=.76, rely=.05)
+
+        GameStateInGame = Label(Game, textvariable=titleGame, font='Arial 12 bold', bg=windowBackground, fg='#2ecc71')
+        # GameStateInGame.place(relx=.88, rely=.05)
+
+        GameStateGameOver = Label(Game, textvariable=titleOver, font='Arial 12 bold', bg=windowBackground, fg='#e74c3c')
+        # GameStateGameOver.place(relx=.83, rely=.05)
 
         GameTile = Label(Game, textvariable=titleVert, font='Arial 30 bold' , fg='white')
         GameTile.place(relx=.425, rely=.25)
@@ -675,7 +700,6 @@ class Window:
         # GameWinner.place(relx=.41, rely=.8)
         # GameLoser.place(relx=.42, rely=.8)
 
-
         Game.mainloop()
 
     @staticmethod
@@ -764,11 +788,15 @@ class Window:
         def handleWinner(winBox):
             if winBox != '-':
                 if winBox == myTeam:
+                    GameStateInGame.place_forget()
+                    GameStateGameOver.place(relx=.83, rely=.05)
                     winNotification = '+-+-+!' + 'W' + GameToken
                     Client.send(winNotification, True)
                     Window.displaywinner(True)
                     isTurn = False
                 else:
+                    GameStateInGame.place_forget()
+                    GameStateGameOver.place(relx=.83, rely=.05)
                     winNotification = '+-+-+!' + 'L' + GameToken
                     Client.send(winNotification, True)
                     Window.displaywinner(False)
@@ -1147,8 +1175,6 @@ PORT = 6666
 
 Manager = Manager()
 External = Updater.Update()
-
-# Window.gamescreen()
 
 
 def has(permission):

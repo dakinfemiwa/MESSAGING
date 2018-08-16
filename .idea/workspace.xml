@@ -4,6 +4,7 @@
     <list default="true" id="dae76181-6838-47ee-a5c5-54b999c98766" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/UI_Chat.py" afterPath="$PROJECT_DIR$/UI_Chat.py" />
+      <change beforePath="$PROJECT_DIR$/config.json" afterPath="$PROJECT_DIR$/config.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI_Chat.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
-              <caret line="483" column="86" lean-forward="true" selection-start-line="483" selection-start-column="86" selection-end-line="483" selection-end-column="86" />
+            <state relative-caret-position="2363">
+              <caret line="213" column="28" lean-forward="false" selection-start-line="213" selection-start-column="28" selection-end-line="213" selection-end-column="28" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#969#2339#0" expanded="false" />
@@ -29,22 +30,22 @@
                 <element signature="e#5561#5687#0" expanded="false" />
                 <element signature="e#5762#6490#0" expanded="false" />
                 <element signature="e#6568#6753#0" expanded="false" />
-                <element signature="e#8118#8309#0" expanded="false" />
-                <element signature="e#8363#13533#0" expanded="false" />
-                <element signature="e#8685#8797#0" expanded="false" />
-                <element signature="e#11037#11094#0" expanded="false" />
-                <element signature="e#11246#11422#0" expanded="false" />
-                <element signature="e#11707#11864#0" expanded="false" />
-                <element signature="e#13211#13311#0" expanded="false" />
-                <element signature="e#13569#13573#0" expanded="false" />
-                <element signature="e#13632#16178#0" expanded="false" />
-                <element signature="e#26226#26712#0" expanded="false" />
-                <element signature="e#30867#37790#0" expanded="false" />
-                <element signature="e#37821#37825#0" expanded="false" />
-                <element signature="e#37895#39938#0" expanded="false" />
-                <element signature="e#40522#40698#0" expanded="false" />
-                <element signature="e#42043#42290#0" expanded="false" />
-                <element signature="e#42308#42518#0" expanded="false" />
+                <element signature="e#8502#8693#0" expanded="false" />
+                <element signature="e#8747#13917#0" expanded="false" />
+                <element signature="e#9069#9181#0" expanded="false" />
+                <element signature="e#11421#11478#0" expanded="false" />
+                <element signature="e#11630#11806#0" expanded="false" />
+                <element signature="e#12091#12248#0" expanded="false" />
+                <element signature="e#13595#13695#0" expanded="false" />
+                <element signature="e#13953#13957#0" expanded="false" />
+                <element signature="e#14016#16562#0" expanded="false" />
+                <element signature="e#27629#28115#0" expanded="false" />
+                <element signature="e#32500#39423#0" expanded="false" />
+                <element signature="e#39454#39458#0" expanded="false" />
+                <element signature="e#39528#41571#0" expanded="false" />
+                <element signature="e#42155#42331#0" expanded="false" />
+                <element signature="e#43676#43923#0" expanded="false" />
+                <element signature="e#43941#44151#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -53,8 +54,8 @@
       <file leaf-file-name="UI-Server.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI-Server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="861">
-              <caret line="128" column="0" lean-forward="false" selection-start-line="128" selection-start-column="0" selection-end-line="128" selection-end-column="0" />
+            <state relative-caret-position="2652">
+              <caret line="159" column="91" lean-forward="false" selection-start-line="159" selection-start-column="91" selection-end-line="159" selection-end-column="91" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -65,8 +66,8 @@
       <file leaf-file-name="Connect.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Connect.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="12" column="12" lean-forward="false" selection-start-line="12" selection-start-column="12" selection-end-line="12" selection-end-column="12" />
+            <state relative-caret-position="1972">
+              <caret line="118" column="28" lean-forward="false" selection-start-line="118" selection-start-column="28" selection-end-line="118" selection-end-column="28" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -74,12 +75,36 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UI-Client.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/UI-Client.py">
+      <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/temp/UI_Chat.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
-              <caret line="0" column="13" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="13" />
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="version.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/temp/version.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UI-Client.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/UI-Client.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="748">
+              <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -163,6 +188,7 @@
       <find>boardSlots.remove</find>
       <find>socket.send</find>
       <find>client.send</find>
+      <find>this user lo</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -229,6 +255,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -246,7 +273,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -655,7 +681,14 @@
       <option name="project" value="LOCAL" />
       <updated>1534372375312</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="V 3.96 Final improvements to the game (accessed through .game)">
+      <created>1534381951467</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1534381951467</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TodoView">
@@ -676,7 +709,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2916225" sideWeight="0.54791665" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.48072916" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28844115" sideWeight="0.45208332" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28844115" sideWeight="0.45208332" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -695,7 +728,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="V 2.98l - Improved control panel support (shutdown, restart)" />
     <MESSAGE value="V 2.99 - Major updates (new notifications, status support)" />
     <MESSAGE value="V 2.99b - Updater support" />
     <MESSAGE value="V 2.99c - Updater support" />
@@ -720,7 +752,8 @@
     <MESSAGE value="V 3.70 Final changes with code cleanup" />
     <MESSAGE value="V 3.90 Server-side account authentication with code cleanup" />
     <MESSAGE value="V 3.95 Added a game which can be played with the &quot;.game&quot; command" />
-    <option name="LAST_COMMIT_MESSAGE" value="V 3.95 Added a game which can be played with the &quot;.game&quot; command" />
+    <MESSAGE value="V 3.96 Final improvements to the game (accessed through .game)" />
+    <option name="LAST_COMMIT_MESSAGE" value="V 3.96 Final improvements to the game (accessed through .game)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -729,20 +762,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/UI-Server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="28" column="22" lean-forward="true" selection-start-line="28" selection-start-column="22" selection-end-line="28" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="10" lean-forward="false" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/UI-Chat-outdated.py" />
     <entry file="file://$PROJECT_DIR$/config.json">
       <provider selected="true" editor-type-id="text-editor">
@@ -942,26 +961,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/UI-Client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="13" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/temp/temporary.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/version.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="4" lean-forward="false" selection-start-line="0" selection-start-column="4" selection-end-line="0" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -974,30 +977,56 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/UI-Server.py">
+    <entry file="file://$PROJECT_DIR$/temp/UI_Chat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="861">
-          <caret line="128" column="0" lean-forward="false" selection-start-line="128" selection-start-column="0" selection-end-line="128" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Connect.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="12" column="12" lean-forward="false" selection-start-line="12" selection-start-column="12" selection-end-line="12" selection-end-column="12" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/temp/version.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/version.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="4" lean-forward="false" selection-start-line="0" selection-start-column="4" selection-end-line="0" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Connect.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1972">
+          <caret line="118" column="28" lean-forward="false" selection-start-line="118" selection-start-column="28" selection-end-line="118" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/UI-Server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2652">
+          <caret line="159" column="91" lean-forward="false" selection-start-line="159" selection-start-column="91" selection-end-line="159" selection-end-column="91" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/UI_Chat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="483" column="86" lean-forward="true" selection-start-line="483" selection-start-column="86" selection-end-line="483" selection-end-column="86" />
+        <state relative-caret-position="2363">
+          <caret line="213" column="28" lean-forward="false" selection-start-line="213" selection-start-column="28" selection-end-line="213" selection-end-column="28" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#969#2339#0" expanded="false" />
@@ -1008,22 +1037,32 @@
             <element signature="e#5561#5687#0" expanded="false" />
             <element signature="e#5762#6490#0" expanded="false" />
             <element signature="e#6568#6753#0" expanded="false" />
-            <element signature="e#8118#8309#0" expanded="false" />
-            <element signature="e#8363#13533#0" expanded="false" />
-            <element signature="e#8685#8797#0" expanded="false" />
-            <element signature="e#11037#11094#0" expanded="false" />
-            <element signature="e#11246#11422#0" expanded="false" />
-            <element signature="e#11707#11864#0" expanded="false" />
-            <element signature="e#13211#13311#0" expanded="false" />
-            <element signature="e#13569#13573#0" expanded="false" />
-            <element signature="e#13632#16178#0" expanded="false" />
-            <element signature="e#26226#26712#0" expanded="false" />
-            <element signature="e#30867#37790#0" expanded="false" />
-            <element signature="e#37821#37825#0" expanded="false" />
-            <element signature="e#37895#39938#0" expanded="false" />
-            <element signature="e#40522#40698#0" expanded="false" />
-            <element signature="e#42043#42290#0" expanded="false" />
-            <element signature="e#42308#42518#0" expanded="false" />
+            <element signature="e#8502#8693#0" expanded="false" />
+            <element signature="e#8747#13917#0" expanded="false" />
+            <element signature="e#9069#9181#0" expanded="false" />
+            <element signature="e#11421#11478#0" expanded="false" />
+            <element signature="e#11630#11806#0" expanded="false" />
+            <element signature="e#12091#12248#0" expanded="false" />
+            <element signature="e#13595#13695#0" expanded="false" />
+            <element signature="e#13953#13957#0" expanded="false" />
+            <element signature="e#14016#16562#0" expanded="false" />
+            <element signature="e#27629#28115#0" expanded="false" />
+            <element signature="e#32500#39423#0" expanded="false" />
+            <element signature="e#39454#39458#0" expanded="false" />
+            <element signature="e#39528#41571#0" expanded="false" />
+            <element signature="e#42155#42331#0" expanded="false" />
+            <element signature="e#43676#43923#0" expanded="false" />
+            <element signature="e#43941#44151#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/UI-Client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
