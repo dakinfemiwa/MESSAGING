@@ -198,6 +198,17 @@ class Client:
                         hasStarted = True
                         myTeam = 'O'
                         theirTeam = 'X'
+                elif '+-+-+!' in receive_data.decode():
+                    if GameToken not in receive_data.decode():
+                        winNotify = receive_data.decode().strip('+-+-+!')
+                        winNotify = winNotify[:-12]
+                        # This user lost:
+                        if winNotify == 'W':
+                            Window.displaywinner(False)
+                            isTurn = False
+                        else:
+                            Window.displaywinner(True)
+                            isTurn = False
 
                 else:
                     if "$" in receive_data.decode():
@@ -426,6 +437,7 @@ class Window:
         global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
         global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
         global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
+        global GameWinner, GameLoser
 
         GameToken = str(random.randint(100000000000, 999999999999))
 
@@ -471,6 +483,7 @@ class Window:
         def sendMove(moveSlot):
             global isTurn, hasStarted, myTeam, theirTeam, oneTimeSetup, boardSection, boardSlotsStatic, boardValues
             global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
+            global GameWinner, GameLoser
 
             if oneTimeSetup == False:
                 if hasStarted is False:
@@ -492,6 +505,7 @@ class Window:
             Client.send(moveSlot, True)
             time.sleep(.1)
             Client.send(TurnOver, True)
+            Window.checkwinner()
             refreshBoard()
 
         if GAME == 1:
@@ -601,7 +615,6 @@ class Window:
                 GameInteract.place(relx=.36, rely=.28)
             else:
                 GameItem.place(relx=.362, rely=.26)
-                print('place at a1')
                 GameInteract.place_forget()
             if 'A2' in boardSlots:
                 GameInteract2.place(relx=.36, rely=.48)
@@ -652,6 +665,8 @@ class Window:
                 for GameButton in GameButtons:
                     GameButton.configure(state='normal')
 
+            Window.checkwinner()
+
         refreshBoard()
 
         GameWinner = Label(Game, textvariable=endWin, font='Arial 20 bold', fg='#2ecc71', bg=windowBackground)
@@ -692,7 +707,6 @@ class Window:
             GameInteract.place(relx=.36, rely=.28)
         else:
             GameItem.place(relx=.362, rely=.26)
-            print('place at a1')
             GameInteract.place_forget()
         if 'A2' in boardSlots:
             GameInteract2.place(relx=.36, rely=.48)
@@ -735,13 +749,62 @@ class Window:
             GameItem9.place(relx=.562, rely=.66)
             GameInteract9.place_forget()
         if isTurn is False:
-            print('is not turn')
             for GameButton in GameButtons:
                 GameButton.configure(state='disabled')
         else:
-            print('is turn')
             for GameButton in GameButtons:
                 GameButton.configure(state='normal')
+
+        Window.checkwinner()
+
+    @staticmethod
+    def checkwinner():
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, myTeam, GameToken, isTurn
+
+        def handleWinner(winBox):
+            if winBox != '-':
+                if winBox == myTeam:
+                    winNotification = '+-+-+!' + 'W' + GameToken
+                    Client.send(winNotification, True)
+                    Window.displaywinner(True)
+                    isTurn = False
+                else:
+                    winNotification = '+-+-+!' + 'L' + GameToken
+                    Client.send(winNotification, True)
+                    Window.displaywinner(False)
+                    isTurn = False
+
+        if A1_VAL.get() == A2_VAL.get() and A2_VAL.get() == A3_VAL.get():
+            handleWinner(A1_VAL.get())
+
+        if B1_VAL.get() == B2_VAL.get() and B2_VAL.get() == B3_VAL.get():
+            handleWinner(B1_VAL.get())
+
+        if C1_VAL.get() == C2_VAL.get() and C2_VAL.get() == C3_VAL.get():
+            handleWinner(C1_VAL.get())
+
+        if A1_VAL.get() == B1_VAL.get() and B1_VAL.get() == C1_VAL.get():
+            handleWinner(A1_VAL.get())
+
+        if A2_VAL.get() == B2_VAL.get() and B2_VAL.get() == C2_VAL.get():
+            handleWinner(A2_VAL.get())
+
+        if A3_VAL.get() == B3_VAL.get() and B3_VAL.get() == C3_VAL.get():
+            handleWinner(A3_VAL.get())
+
+        if A1_VAL.get() == B2_VAL.get() and B2_VAL.get() == C3_VAL.get():
+            handleWinner(A1_VAL.get())
+
+        if C1_VAL.get() == B2_VAL.get() and B2_VAL.get() == A3_VAL.get():
+            handleWinner(C1_VAL.get())
+
+    @staticmethod
+    def displaywinner(wonGame):
+        if wonGame is True:
+            GameWinner.place(relx=.41, rely=.8)
+        else:
+            GameLoser.place(relx=.42, rely=.8)
+        pass
 
 
     @staticmethod

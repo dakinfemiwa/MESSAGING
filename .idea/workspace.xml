@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="dae76181-6838-47ee-a5c5-54b999c98766" name="Default" comment="V 3.90 Server-side account authentication with code cleanup">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/Shivam.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/Shivam.xml" />
+    <list default="true" id="dae76181-6838-47ee-a5c5-54b999c98766" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/UI_Chat.py" afterPath="$PROJECT_DIR$/UI_Chat.py" />
     </list>
@@ -18,8 +17,8 @@
       <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UI_Chat.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="349">
-              <caret line="673" column="28" lean-forward="true" selection-start-line="673" selection-start-column="28" selection-end-line="673" selection-end-column="28" />
+            <state relative-caret-position="351">
+              <caret line="483" column="86" lean-forward="true" selection-start-line="483" selection-start-column="86" selection-end-line="483" selection-end-column="86" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#969#2339#0" expanded="false" />
@@ -30,22 +29,22 @@
                 <element signature="e#5561#5687#0" expanded="false" />
                 <element signature="e#5762#6490#0" expanded="false" />
                 <element signature="e#6568#6753#0" expanded="false" />
-                <element signature="e#7559#7750#0" expanded="false" />
-                <element signature="e#7804#12974#0" expanded="false" />
-                <element signature="e#8126#8238#0" expanded="false" />
-                <element signature="e#10478#10535#0" expanded="false" />
-                <element signature="e#10687#10863#0" expanded="false" />
-                <element signature="e#11148#11305#0" expanded="false" />
-                <element signature="e#12652#12752#0" expanded="false" />
-                <element signature="e#13010#13014#0" expanded="false" />
-                <element signature="e#13073#15619#0" expanded="false" />
-                <element signature="e#26092#28419#0" expanded="false" />
-                <element signature="e#28468#35391#0" expanded="false" />
-                <element signature="e#35422#35426#0" expanded="false" />
-                <element signature="e#35496#37539#0" expanded="false" />
-                <element signature="e#38123#38299#0" expanded="false" />
-                <element signature="e#39644#39891#0" expanded="false" />
-                <element signature="e#39909#40119#0" expanded="false" />
+                <element signature="e#8118#8309#0" expanded="false" />
+                <element signature="e#8363#13533#0" expanded="false" />
+                <element signature="e#8685#8797#0" expanded="false" />
+                <element signature="e#11037#11094#0" expanded="false" />
+                <element signature="e#11246#11422#0" expanded="false" />
+                <element signature="e#11707#11864#0" expanded="false" />
+                <element signature="e#13211#13311#0" expanded="false" />
+                <element signature="e#13569#13573#0" expanded="false" />
+                <element signature="e#13632#16178#0" expanded="false" />
+                <element signature="e#26226#26712#0" expanded="false" />
+                <element signature="e#30867#37790#0" expanded="false" />
+                <element signature="e#37821#37825#0" expanded="false" />
+                <element signature="e#37895#39938#0" expanded="false" />
+                <element signature="e#40522#40698#0" expanded="false" />
+                <element signature="e#42043#42290#0" expanded="false" />
+                <element signature="e#42308#42518#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -54,7 +53,7 @@
       <file leaf-file-name="UI-Server.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI-Server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2125">
+            <state relative-caret-position="861">
               <caret line="128" column="0" lean-forward="false" selection-start-line="128" selection-start-column="0" selection-end-line="128" selection-end-column="0" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -246,8 +245,8 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -649,7 +648,14 @@
       <option name="project" value="LOCAL" />
       <updated>1534294946590</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="V 3.95 Added a game which can be played with the &quot;.game&quot; command">
+      <created>1534372375312</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1534372375312</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TodoView">
@@ -670,7 +676,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2916225" sideWeight="0.54791665" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.48072916" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2916225" sideWeight="0.45208332" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28844115" sideWeight="0.45208332" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -689,7 +695,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="V 2.98k - More backend permissions work" />
     <MESSAGE value="V 2.98l - Improved control panel support (shutdown, restart)" />
     <MESSAGE value="V 2.99 - Major updates (new notifications, status support)" />
     <MESSAGE value="V 2.99b - Updater support" />
@@ -714,11 +719,12 @@
     <MESSAGE value="V 3.50 Added private messaging command" />
     <MESSAGE value="V 3.70 Final changes with code cleanup" />
     <MESSAGE value="V 3.90 Server-side account authentication with code cleanup" />
-    <option name="LAST_COMMIT_MESSAGE" value="V 3.90 Server-side account authentication with code cleanup" />
+    <MESSAGE value="V 3.95 Added a game which can be played with the &quot;.game&quot; command" />
+    <option name="LAST_COMMIT_MESSAGE" value="V 3.95 Added a game which can be played with the &quot;.game&quot; command" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="29" />
+      <option name="time" value="31" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -970,7 +976,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UI-Server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2125">
+        <state relative-caret-position="861">
           <caret line="128" column="0" lean-forward="false" selection-start-line="128" selection-start-column="0" selection-end-line="128" selection-end-column="0" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
@@ -990,8 +996,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UI_Chat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="673" column="28" lean-forward="true" selection-start-line="673" selection-start-column="28" selection-end-line="673" selection-end-column="28" />
+        <state relative-caret-position="351">
+          <caret line="483" column="86" lean-forward="true" selection-start-line="483" selection-start-column="86" selection-end-line="483" selection-end-column="86" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#969#2339#0" expanded="false" />
@@ -1002,22 +1008,22 @@
             <element signature="e#5561#5687#0" expanded="false" />
             <element signature="e#5762#6490#0" expanded="false" />
             <element signature="e#6568#6753#0" expanded="false" />
-            <element signature="e#7559#7750#0" expanded="false" />
-            <element signature="e#7804#12974#0" expanded="false" />
-            <element signature="e#8126#8238#0" expanded="false" />
-            <element signature="e#10478#10535#0" expanded="false" />
-            <element signature="e#10687#10863#0" expanded="false" />
-            <element signature="e#11148#11305#0" expanded="false" />
-            <element signature="e#12652#12752#0" expanded="false" />
-            <element signature="e#13010#13014#0" expanded="false" />
-            <element signature="e#13073#15619#0" expanded="false" />
-            <element signature="e#26092#28419#0" expanded="false" />
-            <element signature="e#28468#35391#0" expanded="false" />
-            <element signature="e#35422#35426#0" expanded="false" />
-            <element signature="e#35496#37539#0" expanded="false" />
-            <element signature="e#38123#38299#0" expanded="false" />
-            <element signature="e#39644#39891#0" expanded="false" />
-            <element signature="e#39909#40119#0" expanded="false" />
+            <element signature="e#8118#8309#0" expanded="false" />
+            <element signature="e#8363#13533#0" expanded="false" />
+            <element signature="e#8685#8797#0" expanded="false" />
+            <element signature="e#11037#11094#0" expanded="false" />
+            <element signature="e#11246#11422#0" expanded="false" />
+            <element signature="e#11707#11864#0" expanded="false" />
+            <element signature="e#13211#13311#0" expanded="false" />
+            <element signature="e#13569#13573#0" expanded="false" />
+            <element signature="e#13632#16178#0" expanded="false" />
+            <element signature="e#26226#26712#0" expanded="false" />
+            <element signature="e#30867#37790#0" expanded="false" />
+            <element signature="e#37821#37825#0" expanded="false" />
+            <element signature="e#37895#39938#0" expanded="false" />
+            <element signature="e#40522#40698#0" expanded="false" />
+            <element signature="e#42043#42290#0" expanded="false" />
+            <element signature="e#42308#42518#0" expanded="false" />
           </folding>
         </state>
       </provider>
