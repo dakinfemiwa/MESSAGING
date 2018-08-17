@@ -4,7 +4,6 @@
     <list default="true" id="dae76181-6838-47ee-a5c5-54b999c98766" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/UI_Chat.py" afterPath="$PROJECT_DIR$/UI_Chat.py" />
-      <change beforePath="$PROJECT_DIR$/config.json" afterPath="$PROJECT_DIR$/config.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UI_Chat.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2363">
-              <caret line="213" column="28" lean-forward="false" selection-start-line="213" selection-start-column="28" selection-end-line="213" selection-end-column="28" />
+            <state relative-caret-position="629">
+              <caret line="1098" column="14" lean-forward="false" selection-start-line="1098" selection-start-column="14" selection-end-line="1098" selection-end-column="14" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#969#2339#0" expanded="false" />
@@ -39,13 +38,15 @@
                 <element signature="e#13595#13695#0" expanded="false" />
                 <element signature="e#13953#13957#0" expanded="false" />
                 <element signature="e#14016#16562#0" expanded="false" />
-                <element signature="e#27629#28115#0" expanded="false" />
-                <element signature="e#32500#39423#0" expanded="false" />
-                <element signature="e#39454#39458#0" expanded="false" />
-                <element signature="e#39528#41571#0" expanded="false" />
-                <element signature="e#42155#42331#0" expanded="false" />
-                <element signature="e#43676#43923#0" expanded="false" />
-                <element signature="e#43941#44151#0" expanded="false" />
+                <element signature="e#27843#28329#0" expanded="false" />
+                <element signature="e#28376#30638#0" expanded="false" />
+                <element signature="e#30689#32464#0" expanded="false" />
+                <element signature="e#32851#39774#0" expanded="false" />
+                <element signature="e#39805#39809#0" expanded="false" />
+                <element signature="e#39879#41922#0" expanded="false" />
+                <element signature="e#42506#42682#0" expanded="false" />
+                <element signature="e#44027#44274#0" expanded="false" />
+                <element signature="e#44292#44502#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -82,6 +83,7 @@
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
+                <marker date="1534463411731" expanded="true" signature="7396:7421" ph="..." />
               </folding>
             </state>
           </provider>
@@ -97,11 +99,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UI-Client.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="UI-Client.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI-Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
-              <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+            <state relative-caret-position="731">
+              <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -160,9 +162,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>inter</find>
-      <find>ADMIN_LEVEL</find>
-      <find>current</find>
       <find>courier</find>
       <find>lines</find>
       <find>tempus</find>
@@ -189,6 +188,10 @@
       <find>socket.send</find>
       <find>client.send</find>
       <find>this user lo</find>
+      <find>thread</find>
+      <find>exitgame</find>
+      <find>thre</find>
+      <find>def exit</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -256,6 +259,7 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -272,7 +276,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -688,7 +691,14 @@
       <option name="project" value="LOCAL" />
       <updated>1534381951467</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="V 3.97 Added game states in the '.game' window">
+      <created>1534437639168</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1534437639168</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TodoView">
@@ -728,7 +738,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="V 2.99 - Major updates (new notifications, status support)" />
     <MESSAGE value="V 2.99b - Updater support" />
     <MESSAGE value="V 2.99c - Updater support" />
     <MESSAGE value="V 2.99d - Updater support" />
@@ -753,7 +762,8 @@
     <MESSAGE value="V 3.90 Server-side account authentication with code cleanup" />
     <MESSAGE value="V 3.95 Added a game which can be played with the &quot;.game&quot; command" />
     <MESSAGE value="V 3.96 Final improvements to the game (accessed through .game)" />
-    <option name="LAST_COMMIT_MESSAGE" value="V 3.96 Final improvements to the game (accessed through .game)" />
+    <MESSAGE value="V 3.97 Added game states in the '.game' window" />
+    <option name="LAST_COMMIT_MESSAGE" value="V 3.97 Added game states in the '.game' window" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -983,6 +993,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
+            <marker date="1534463411731" expanded="true" signature="7396:7421" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1023,10 +1034,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/UI-Client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/UI_Chat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2363">
-          <caret line="213" column="28" lean-forward="false" selection-start-line="213" selection-start-column="28" selection-end-line="213" selection-end-column="28" />
+        <state relative-caret-position="629">
+          <caret line="1098" column="14" lean-forward="false" selection-start-line="1098" selection-start-column="14" selection-end-line="1098" selection-end-column="14" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#969#2339#0" expanded="false" />
@@ -1046,23 +1067,15 @@
             <element signature="e#13595#13695#0" expanded="false" />
             <element signature="e#13953#13957#0" expanded="false" />
             <element signature="e#14016#16562#0" expanded="false" />
-            <element signature="e#27629#28115#0" expanded="false" />
-            <element signature="e#32500#39423#0" expanded="false" />
-            <element signature="e#39454#39458#0" expanded="false" />
-            <element signature="e#39528#41571#0" expanded="false" />
-            <element signature="e#42155#42331#0" expanded="false" />
-            <element signature="e#43676#43923#0" expanded="false" />
-            <element signature="e#43941#44151#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/UI-Client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#27843#28329#0" expanded="false" />
+            <element signature="e#28376#30638#0" expanded="false" />
+            <element signature="e#30689#32464#0" expanded="false" />
+            <element signature="e#32851#39774#0" expanded="false" />
+            <element signature="e#39805#39809#0" expanded="false" />
+            <element signature="e#39879#41922#0" expanded="false" />
+            <element signature="e#42506#42682#0" expanded="false" />
+            <element signature="e#44027#44274#0" expanded="false" />
+            <element signature="e#44292#44502#0" expanded="false" />
           </folding>
         </state>
       </provider>

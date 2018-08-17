@@ -439,7 +439,7 @@ class Window:
 
     @staticmethod
     def gamescreen(GAME=1, START=1):
-        global boardSlots, boardSlotsStatic, boardValues, myTeam, theirTeam, isTurn, hasStarted, oneTimeSetup, GameToken
+        global boardSlots, boardSlotsStatic, boardValues, myTeam, theirTeam, isTurn, hasStarted, oneTimeSetup, GameToken, Game
         global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
         global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
         global GameItem, GameItem2, GameItem3, GameItem4, GameItem5, GameItem6, GameItem7, GameItem8, GameItem9
@@ -623,6 +623,9 @@ class Window:
         GameItem8 = Label(Game, textvariable=C2_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
 
         GameItem9 = Label(Game, textvariable=C3_VAL, font='Arial 30 bold', fg='white', bg=windowBackground)
+
+        BackButton = Button(Game, text='⇽ EXIT GAME', font='Arial 12 bold', bg=windowBackground, borderwidth=0, fg='#e74c3c', command=lambda: Window.exitgame())
+        BackButton.place(relx=.03, rely=.885)
 
         GameInteract.place(relx=.36, rely=.28)
         GameInteract2.place(relx=.36, rely=.48)
@@ -825,6 +828,12 @@ class Window:
 
         if C1_VAL.get() == B2_VAL.get() and B2_VAL.get() == A3_VAL.get():
             handleWinner(C1_VAL.get())
+
+    @staticmethod
+    def exitgame():
+        Game.destroy()
+        _thread.start_new_thread(Client.receive, ())
+        Window.draw()
 
     @staticmethod
     def displaywinner(wonGame):
