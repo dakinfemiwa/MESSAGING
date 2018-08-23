@@ -866,7 +866,7 @@ class Window:
         barTop = Label(Notification2, text='                                            ', font='Arial 35 bold', fg=colour, bg=colour)
         barTop.place(relx=0, rely=0)
 
-        title = Label(Notification2, textvariable=titleText, font=('courier new', 20, 'bold'),
+        title = Label(Notification2, textvariable=titleText, font=('Hurme Geometric Sans 4', 20, 'bold'),
                        fg='#141414', bg=colour)
         title.place(relx=.05, rely=.05)
 
@@ -879,16 +879,14 @@ class Window:
 
         ChatLog.config(state=NORMAL)
 
-        #ChatLog.tag_
-
         ChatLog.insert(END, subtext)
         ChatLog.tag_add(subtext, 1.0, 99999999999999.0)
-        ChatLog.tag_config(subtext, foreground='white', font=('courier new', 10, "bold"))
+        ChatLog.tag_config(subtext, foreground='white', font=('Segoe UI Light', 10, "bold"))
 
         ChatLog.config(state=DISABLED)
 
-        confirmButton = Button(Notification2, text='CONFIRM', font=('courier new', 20, 'bold'), fg=colour, bg='#141414', borderwidth=0, command=lambda: Notification2.destroy())
-        confirmButton.place(relx=.705, rely=.72)
+        confirmButton = Button(Notification2, text='CONFIRM', font=('Hurme Geometric Sans 4', 20, 'bold'), fg=colour, bg='#141414', borderwidth=0, command=lambda: Notification2.destroy())
+        confirmButton.place(relx=.695, rely=.71)
 
 
     @staticmethod
@@ -1229,7 +1227,7 @@ INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this comma
 USER_PERMISSIONS = []
 PORT = 6666
 
-# Window.notif('Game Start', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
+Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
 
 Manager = Manager()
 External = Updater.Update()
