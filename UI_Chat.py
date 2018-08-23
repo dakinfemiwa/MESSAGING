@@ -33,7 +33,9 @@ class Client:
     @staticmethod
     def connect():
 
-        global clientSocket, username
+        global clientSocket, username, GameToken
+
+        GameToken = 'NULL'
 
         print("WELCOME: Ready to connect.")
         print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
@@ -73,8 +75,9 @@ class Client:
 
     @staticmethod
     def external(address, connection_name, connection_pass=None):
-        global username, clientSocket
+        global username, clientSocket, GameToken
         Window.draw()
+        GameToken = 'NULL'
 
         if ADMIN_LEVEL > 0:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
@@ -183,25 +186,25 @@ class Client:
                         'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3', 'song.mp3')
                     os.startfile('song.mp3')
                 elif '/!-:' in receive_data.decode():
-                    if GameToken not in receive_data.decode():
+                    if GameToken not in receive_data.decode() and GameToken != 'NULL':
                         moveRec = receive_data.decode().strip('/!-:')
                         moveRec = moveRec[:-12]
                         Window.drawpanel(moveRec, 2)
                     Window.refresh()
                 elif 'YOUR_TURN_+' in receive_data.decode():
-                    if GameToken not in receive_data.decode():
+                    if GameToken not in receive_data.decode() and GameToken != 'NULL':
                         isTurn = True
                     Window.refresh()
 
                 elif '+!+:)' in receive_data.decode():
-                    if GameToken not in receive_data.decode():
+                    if GameToken not in receive_data.decode() and GameToken != 'NULL':
                         GameStateWaiting.place_forget()
                         GameStateInGame.place(relx=.88, rely=.05)
                         hasStarted = True
                         myTeam = 'O'
                         theirTeam = 'X'
                 elif '+-+-+!' in receive_data.decode():
-                    if GameToken not in receive_data.decode():
+                    if GameToken not in receive_data.decode() and GameToken != 'NULL':
                         winNotify = receive_data.decode().strip('+-+-+!')
                         winNotify = winNotify[:-12]
                         # This user lost:
@@ -832,8 +835,9 @@ class Window:
     @staticmethod
     def exitgame():
         Game.destroy()
-        _thread.start_new_thread(Client.receive, ())
         Window.draw()
+
+        Client.connect()
 
     @staticmethod
     def displaywinner(wonGame):
@@ -842,6 +846,49 @@ class Window:
         else:
             GameLoser.place(relx=.42, rely=.8)
         pass
+
+    @staticmethod
+    def notif(title="Title Placeholder", subtext='Default text', colour='#e74c3c'):
+
+        Notification2 = Tk()
+        Notification2.configure(bg='#141414')
+        Notification2.geometry('540x220+810+540')
+        Notification2.title('Notification')
+
+        Notification2.overrideredirect(1)
+
+        titleText = StringVar()
+        subText = StringVar()
+
+        titleText.set(title)
+        subText.set(subtext)
+
+        barTop = Label(Notification2, text='                                            ', font='Arial 35 bold', fg=colour, bg=colour)
+        barTop.place(relx=0, rely=0)
+
+        title = Label(Notification2, textvariable=titleText, font=('courier new', 20, 'bold'),
+                       fg='#141414', bg=colour)
+        title.place(relx=.05, rely=.05)
+
+        """text = Label(Notification2, textvariable=subText, font=('courier new', 10, 'bold'),
+                      fg='white', bg='#141414')
+        text.place(relx=.05, rely=.33)"""
+
+        ChatLog = Text(Notification2, bg="#141414", height="4", width="54", font="Arial", borderwidth=0)
+        ChatLog.place(relx=.05, rely=.33)
+
+        ChatLog.config(state=NORMAL)
+
+        #ChatLog.tag_
+
+        ChatLog.insert(END, subtext)
+        ChatLog.tag_add(subtext, 1.0, 99999999999999.0)
+        ChatLog.tag_config(subtext, foreground='white', font=('courier new', 10, "bold"))
+
+        ChatLog.config(state=DISABLED)
+
+        confirmButton = Button(Notification2, text='CONFIRM', font=('courier new', 20, 'bold'), fg=colour, bg='#141414', borderwidth=0, command=lambda: Notification2.destroy())
+        confirmButton.place(relx=.705, rely=.72)
 
 
     @staticmethod
@@ -1084,7 +1131,7 @@ class Window:
 
     @staticmethod
     def show(message):
-        try:
+        if 1:
             ChatLog.config(state=NORMAL)
             message = message.strip('%!')
             ChatLog.insert(END, '\n' + message)
@@ -1092,7 +1139,7 @@ class Window:
             ChatLog.tag_config(message, foreground=colourTheme, font=(windowFont, 11, "bold"))
             ChatLog.config(state=DISABLED)
             ChatLog.see(END)
-        except:
+        if 0:
             print('TT: ', message)
 
 
@@ -1182,6 +1229,8 @@ INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this comma
 USER_PERMISSIONS = []
 PORT = 6666
 
+# Window.notif('Game Start', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
+
 Manager = Manager()
 External = Updater.Update()
 
@@ -1192,6 +1241,8 @@ def has(permission):
     else:
         return False
 
+
+IP = '127.0.0.1'
 
 if __name__ == '__main__':
     Client.configure()
