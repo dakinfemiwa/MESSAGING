@@ -17,8 +17,8 @@
       <file leaf-file-name="UI_Chat.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UI_Chat.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="606">
-              <caret line="1239" column="20" lean-forward="false" selection-start-line="1239" selection-start-column="20" selection-end-line="1239" selection-end-column="20" />
+            <state relative-caret-position="538">
+              <caret line="1229" column="2" lean-forward="false" selection-start-line="1229" selection-start-column="2" selection-end-line="1229" selection-end-column="2" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#218#921#0" expanded="false" />
@@ -697,7 +697,14 @@
       <option name="project" value="LOCAL" />
       <updated>1535060243288</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="V 3.99 - Minor font changes to new notification window">
+      <created>1535063157082</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1535063157082</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TodoView">
@@ -737,7 +744,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="V 2.99c - Updater support" />
     <MESSAGE value="V 2.99d - Updater support" />
     <MESSAGE value="V 3.00 - Introduced updater with notification support" />
     <MESSAGE value="V 3.01 - Updated IP Address" />
@@ -762,7 +768,8 @@
     <MESSAGE value="V 3.96 Final improvements to the game (accessed through .game)" />
     <MESSAGE value="V 3.97 Added game states in the '.game' window" />
     <MESSAGE value="V 3.98 Added exit button to the '.game' window" />
-    <option name="LAST_COMMIT_MESSAGE" value="V 3.98 Added exit button to the '.game' window" />
+    <MESSAGE value="V 3.99 - Minor font changes to new notification window" />
+    <option name="LAST_COMMIT_MESSAGE" value="V 3.99 - Minor font changes to new notification window" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1040,8 +1047,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UI_Chat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="606">
-          <caret line="1239" column="20" lean-forward="false" selection-start-line="1239" selection-start-column="20" selection-end-line="1239" selection-end-column="20" />
+        <state relative-caret-position="538">
+          <caret line="1229" column="2" lean-forward="false" selection-start-line="1229" selection-start-column="2" selection-end-line="1229" selection-end-column="2" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#218#921#0" expanded="false" />

@@ -1227,7 +1227,7 @@ INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this comma
 USER_PERMISSIONS = []
 PORT = 6666
 
-Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
+# Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
 
 Manager = Manager()
 External = Updater.Update()
