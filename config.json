@@ -8,7 +8,8 @@
                 "background": "#141414",
                 "title": "CHAT-UI",
                 "theme": "#7CFC00",
-                "resolution": "900x400"
+                "resolution": "900x400",
+                "font": "COURIER NEW"
         },
         "settings": {
                 "auth": "true",

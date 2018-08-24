@@ -1,20 +1,27 @@
 import socket
 import select
+import time
 from datetime import datetime
 
 
 def Broadcast(sock, message, usr):
-    try:
+    global oldMessage
+    if 1:
         for socket in CLIST:
             if socket != serverSocket:
                 if message.decode() != '\n':
-                    print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + message.decode())
-                socket.send(message)
-    except:
-        print('ERROR: Broadcast error - perhaps a client disconnected?')
+                    if message.decode() != oldMessage:
+                        print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] MESSAGE: ' + message.decode().lstrip().rstrip())
+                    oldMessage = message.decode()
+                    socket.send(message)
+    if 0:
+        print('[' + str(datetime.now().strftime(
+            "%H:%M:%S")) + '] ' + 'ERROR: Unable to broadcast message - hard disconnect')
 
 
 if __name__ == "__main__":
+    global oldMessage
+    oldMessage = ''
     try:
         def startUp():
             global CLIST, People, Users, IP, serverSocket
@@ -23,14 +30,16 @@ if __name__ == "__main__":
             People = []
             Users = {}
 
-            print('INFO: Chat server - running with version three support.')
+            print('[' + str(datetime.now().strftime(
+                "%H:%M:%S")) + '] ' + 'STATUS: Chat server initialized with version three support')
             IP = '0.0.0.0'
 
             serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             serverSocket.bind((IP, 6666))
             serverSocket.listen(10)
 
-            print('SUCCESS: Server has been started; listening for connections.')
+            print('[' + str(datetime.now().strftime(
+                "%H:%M:%S")) + '] ' + 'STATUS: Listening for incoming connections')
 
             CLIST.append(serverSocket)
 
@@ -43,19 +52,21 @@ if __name__ == "__main__":
                 if sock == serverSocket:
                     sockfd, addr = serverSocket.accept()
                     CLIST.append(sockfd)
-                    print("STATUS: Client [%s, %s] connected" % addr)
+                    print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'CONNECT: Client [%s, %s] connected' % addr)
 
                 else:
                     try:
                         data = sock.recv(4096, )
                     except:
                         try:
-                            Broadcast(sock, str.encode("\n") + str.encode(str(Users[addr]) + " has left the server"), addr)
+                            Broadcast(sock, str.encode(str(Users[addr]) + " has left the server"), addr)
                         except:
-                            print('ERROR: Unable to notify clients of disconnect.')
+                            print('[' + str(datetime.now().strftime(
+                                "%H:%M:%S")) + '] ' + 'WARNING: A disconnect message may have failed to send')
                         try:
                             del Users[addr]
-                            print("STATUS: Client [%s, %s] is offline" % addr)
+                            print('[' + str(datetime.now().strftime(
+                                "%H:%M:%S")) + '] ' + 'DISCONNECT: Client [%s, %s] disconnected' % addr)
                         except:
                             pass
                         sock.close()
@@ -65,7 +76,56 @@ if __name__ == "__main__":
                     if data:
                         if '$$$' in data.decode():
                             USERNAME = data.decode().strip('$$$')
-                            Users[addr] = USERNAME
+                            if '%!' in USERNAME:
+                                tempUsername = USERNAME.strip('%!')
+                            else:
+                                admins = ['Test']
+                                Users[addr] = USERNAME
+
+                        if '#!-' in data.decode():
+                            tempPassword = data.decode().strip('#!-')
+                            for line in open("accounts.txt", "r").readlines():
+                                login_info = line.split()
+                                if tempUsername == login_info[0] and tempPassword == login_info[1]:
+                                    print('[' + str(datetime.now().strftime(
+                                        "%H:%M:%S")) + '] ' + 'STATUS: An administrator connected to the server')
+                                    joinStr = tempUsername + ' has joined the server [admin]'
+                                    Broadcast(sock, str.encode(joinStr),
+                                              'ANC')
+                                    Users[addr] = tempUsername
+                                    time.sleep(.1)
+                                    try:
+                                        for key, val in Users.items():
+                                            if val == tempUsername:
+                                                targetIP = key
+                                                break
+                                        for socket in CLIST:
+                                            if str(targetIP[0]) in str(socket):
+                                                if str(targetIP[1]) in str(socket):
+                                                    time.sleep(.1)
+                                                    socket.send(str.encode('-##-3'))
+                                    except:
+                                        print('[' + str(datetime.now().strftime(
+                                            "%H:%M:%S")) + '] ' + 'ERROR: Unable to authenticate user')
+                                else:
+                                    Users[addr] = tempUsername
+                                    try:
+                                        for key, val in Users.items():
+                                            if val == tempUsername:
+                                                targetIP = key
+                                                break
+                                        for socket in CLIST:
+                                            if str(targetIP[0]) in str(socket):
+                                                if str(targetIP[1]) in str(socket):
+                                                    time.sleep(.1)
+                                                    socket.send(str.encode('Incorrect details!'))
+                                                    socket.send(str.encode('\n'))
+                                                    socket.send(str.encode('You have been disconnected from the server.'))
+                                                    CLIST.remove(socket)
+                                                    del Users[targetIP]
+                                    except:
+                                        print('[' + str(datetime.now().strftime(
+                                            "%H:%M:%S")) + '] ' + 'ERROR: Unable to authenticate user')
 
                         elif '-$$' in data.decode():
                             VERSION = data.decode().strip('-$$')
@@ -80,11 +140,16 @@ if __name__ == "__main__":
                                     client = str(client)
                                     Broadcast(sock, str.encode(client) + str.encode("\n"), Users[addr])
                             except:
-                                print('ERROR: Could not print online user list.')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + 'ERROR: Could not display online users list')
                         elif '$-$shutdown' in data.decode():
                             try:
                                 serverSocket.close()
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + 'STATUS: Received shutdown command')
                                 Broadcast(sock, str.encode("\nServer is shutting down"), 'game')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + 'STATUS: Closing all connections')
                                 serverSocket.close()
                             except:
                                 Broadcast(sock, str.encode("\nServer shutdown failed"), 'game')
@@ -110,7 +175,8 @@ if __name__ == "__main__":
                                             CLIST.remove(socket)
                                             del Users[targetIP]
                             except:
-                                print('ERROR: Unhandled kick')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + 'ERROR: Unable to handle a kick')
                         elif '£££' in data.decode():
                             targetUser = data.decode().split()[1]
                             num = len(targetUser) + 2
@@ -126,7 +192,8 @@ if __name__ == "__main__":
                                             final_msg = '* PRIVATE MESSAGE *: ' + targetMessage
                                             socket.send(str.encode(final_msg))
                             except:
-                                print('ERROR: Unhandled message')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + 'ERROR: Unable to send a private message')
                         elif '_-$' in data.decode():
                             targetUser = data.decode().strip('_-$')
                             try:
@@ -143,11 +210,16 @@ if __name__ == "__main__":
                         elif '$-$cpl' in data.decode():
                             Broadcast(sock, str.encode('\nServer is now being being controlled by a control panel'), 'SVR')
                         else:
-                            try:
-                                Broadcast(sock, data, Users[addr])
-                            except:
-                                Broadcast(sock, data, 'SOLO')
-                                print('ERROR: Broadcast error - perhaps a solo client disconnected?')
+                            if "$" in data.decode():
+                                if "%!" in data.decode():
+                                    pass
+                            else:
+                                try:
+                                    Broadcast(sock, data, Users[addr])
+                                except:
+                                    Broadcast(sock, data, 'SOLO')
+                                    print('[' + str(datetime.now().strftime(
+                                        "%H:%M:%S")) + '] ' + 'ERROR: Unable to broadcast message - hard disconnect')
 
     except Exception as error:
         print(error)
