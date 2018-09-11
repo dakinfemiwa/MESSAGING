@@ -161,11 +161,12 @@ class Client:
                 _thread.interrupt_main()
                 break
             else:
-                if receive_data.decode() == '$-$quit':
+                if '(.)=(.)quit' in receive_data.decode():
                     MainWindow.destroy()
                     clientSocket.close()
                     _thread.interrupt_main()
-                elif receive_data.decode() == '$-$clear':
+                elif '(.)=(.)clear' in receive_data.decode():
+                    print('TTTT')
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
@@ -302,13 +303,13 @@ class Client:
 
             elif command == '.fq':
                 if has('admin.commands.forcequit'):
-                    clientSocket.send(str.encode('$-$quit'))
+                    clientSocket.send(str.encode('(.)=(.)quit'))
                 else:
                     Window.show(INSUFFICIENT_PERMISSIONS)
 
             elif command == '.ca':
                 if has('admin.commands.clearall'):
-                    clientSocket.send(str.encode('$-$clear'))
+                    clientSocket.send(str.encode('(.)=(.)clear'))
                 else:
                     Window.show(INSUFFICIENT_PERMISSIONS)
 

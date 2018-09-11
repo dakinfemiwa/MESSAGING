@@ -89,7 +89,7 @@ class Client:
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            clientSocket.connect(('127.0.0.1', PORT))
+            clientSocket.connect((address, PORT))
             clientSocket.send(str.encode(final_name))
 
             time.sleep(.5)
@@ -1436,11 +1436,11 @@ def has(permission):
         return False
 
 
-IP = '127.0.0.1'
+IP = 'chat-sv.ddns.net'
 
 if __name__ == '__main__':
     Client.configure()
     Window.draw()
 
-    IP = '127.0.0.1'
+    IP = 'chat-sv.ddns.net'
     Client.connect()
