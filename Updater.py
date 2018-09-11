@@ -1,6 +1,8 @@
 import os
 import urllib.request
 
+# Replace by SM_UPDATER
+
 
 class Update():
     def Download(self):
