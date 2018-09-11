@@ -31,7 +31,7 @@ if __name__ == "__main__":
             Users = {}
 
             print('[' + str(datetime.now().strftime(
-                "%H:%M:%S")) + '] ' + 'STATUS: Chat server initialized with version three support')
+                "%H:%M:%S")) + '] ' + 'STATUS: Chat server initialized with version four support')
             IP = '0.0.0.0'
 
             serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
