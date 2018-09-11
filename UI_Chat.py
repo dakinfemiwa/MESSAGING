@@ -441,6 +441,194 @@ class Window:
         ChatLog.place(relx=.043, rely=.23)
 
     @staticmethod
+    def gamescreen2(GAME=1, START=1):
+        global GameToken, GameStateGameOver2, GameStateWaiting2, GameStateInGame2, oneTimeSetup2, hasStarted2
+
+        GameToken = str(random.randint(100000000000, 999999999999))
+
+        Game2 = Tk()
+        Game2.configure(bg=windowBackground)
+        Game2.geometry('800x400')
+        Game2.title('GAME')
+
+        titleText = StringVar()
+        titleWait = StringVar()
+        titleGame = StringVar()
+        titleOver = StringVar()
+
+        titleText.set('HANGMAN')
+        titleWait.set('WAITING FOR GAME')
+        titleGame.set('IN-GAME')
+        titleOver.set('GAME OVER')
+
+        oneTimeSetup2 = False
+        hasStarted2 = False
+
+        def sendMove(moveSlot):
+            global oneTimeSetup2, hasStarted2
+
+            if oneTimeSetup2 is False:
+                if hasStarted2 is False:
+                    hasStarted2 = True
+                    GameStateWaiting2.place_forget()
+                    GameStateInGame2.place(relx=.88, rely=.05)
+                    # startGame = '+!+:)' + GameToken
+                    # Client.send(startGame, True)
+                    time.sleep(.1)
+                else:
+                    GameStateWaiting2.place_forget()
+                    GameStateInGame2.place(relx=.88, rely=.05)
+                oneTimeSetup2 = True
+
+            Window.refresh2(moveSlot)
+
+        GameTitle = Label(Game2, textvariable=titleText, font='Arial 12 bold', bg=windowBackground, fg='white')
+        GameTitle.place(relx=.03, rely=.05)
+
+        GameStateWaiting2 = Label(Game2, textvariable=titleWait, font='Arial 12 bold', bg=windowBackground, fg='#95a5a6')
+        GameStateWaiting2.place(relx=.76, rely=.05)
+
+        GameStateInGame2 = Label(Game2, textvariable=titleGame, font='Arial 12 bold', bg=windowBackground, fg='#2ecc71')
+
+        GameStateGameOver2 = Label(Game2, textvariable=titleOver, font='Arial 12 bold', bg=windowBackground, fg='#e74c3c')
+
+        LetterBox = Text(Game2, bg="#141414", height="4", width="57", font="Arial", borderwidth=2)
+        LetterBox.place(relx=.03, rely=.22)
+
+        LetterBox.config(state=NORMAL)
+
+        GameInteractB = Button(Game2, text='A', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('A'), borderwidth=1)
+
+        GameInteract2B = Button(Game2, text='B', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('B'), borderwidth=1)
+
+        GameInteract3B = Button(Game2, text='C', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('C'), borderwidth=1)
+
+        GameInteract4B = Button(Game2, text='D', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('D'), borderwidth=1)
+
+        GameInteract5B = Button(Game2, text='E', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('E'), borderwidth=1)
+
+        GameInteract6B = Button(Game2, text='F', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('F'), borderwidth=1)
+
+        GameInteract7B = Button(Game2, text='G', font='Arial 5 bold', fg='white', bg='#141414',  width=8, height=4,
+                               command=lambda: sendMove('G'), borderwidth=1)
+
+        GameInteract8B = Button(Game2, text='H', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                               command=lambda: sendMove('H'), borderwidth=1)
+
+        GameInteract9B = Button(Game2, text='I', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                command=lambda: sendMove('I'), borderwidth=1)
+
+        GameInteract10B = Button(Game2, text='J', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('J'), borderwidth=1)
+
+        GameInteract11B = Button(Game2, text='K', font='Arial 5 bold', fg='white', bg='#141414',  width=8, height=4,
+                                 command=lambda: sendMove('K'), borderwidth=1)
+
+        GameInteract12B = Button(Game2, text='L', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('L'), borderwidth=1)
+
+        GameInteract13B = Button(Game2, text='M', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('M'), borderwidth=1)
+
+        GameInteract14B = Button(Game2, text='N', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('N'), borderwidth=1)
+
+        GameInteract15B = Button(Game2, text='O', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('O'), borderwidth=1)
+
+        GameInteract16B = Button(Game2, text='P', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('P'), borderwidth=1)
+
+        GameInteract17B = Button(Game2, text='Q', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('Q'), borderwidth=1)
+
+        GameInteract18B = Button(Game2, text='R', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('R'), borderwidth=1)
+
+        GameInteract19B = Button(Game2, text='S', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('S'), borderwidth=1)
+
+        GameInteract20B = Button(Game2, text='T', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('T'), borderwidth=1)
+
+        GameInteract21B = Button(Game2, text='U', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('U'), borderwidth=1)
+
+        GameInteract22B = Button(Game2, text='V', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('V'), borderwidth=1)
+
+        GameInteract23B = Button(Game2, text='W', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('W'), borderwidth=1)
+
+        GameInteract24B = Button(Game2, text='X', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('X'), borderwidth=1)
+
+        GameInteract25B = Button(Game2, text='Y', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('Y'), borderwidth=1)
+
+        GameInteract26B = Button(Game2, text='Z', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
+                                 command=lambda: sendMove('Z'), borderwidth=1)
+
+        global GameLetterButtons
+
+        GameInteractB.place(relx=.03, rely=.5)
+        GameInteract2B.place(relx=.08, rely=.5)
+        GameInteract3B.place(relx=.13, rely=.5)
+        GameInteract4B.place(relx=.18, rely=.5)
+        GameInteract5B.place(relx=.23, rely=.5)
+        GameInteract6B.place(relx=.28, rely=.5)
+        GameInteract7B.place(relx=.33, rely=.5)
+        GameInteract8B.place(relx=.38, rely=.5)
+        GameInteract9B.place(relx=.43, rely=.5)
+        GameInteract10B.place(relx=.48, rely=.5)
+        GameInteract11B.place(relx=.53, rely=.5)
+        GameInteract12B.place(relx=.58, rely=.5)
+        GameInteract13B.place(relx=.63, rely=.5)
+
+        GameInteract14B.place(relx=.03, rely=.6)
+        GameInteract15B.place(relx=.08, rely=.6)
+        GameInteract16B.place(relx=.13, rely=.6)
+        GameInteract17B.place(relx=.18, rely=.6)
+        GameInteract18B.place(relx=.23, rely=.6)
+        GameInteract19B.place(relx=.28, rely=.6)
+        GameInteract20B.place(relx=.33, rely=.6)
+        GameInteract21B.place(relx=.38, rely=.6)
+        GameInteract22B.place(relx=.43, rely=.6)
+        GameInteract23B.place(relx=.48, rely=.6)
+        GameInteract24B.place(relx=.53, rely=.6)
+        GameInteract25B.place(relx=.58, rely=.6)
+        GameInteract26B.place(relx=.63, rely=.6)
+
+        global GameLetters
+        global GameLettersStatic
+
+        GameLetterButtons = [GameInteractB, GameInteract2B, GameInteract3B, GameInteract4B, GameInteract5B, GameInteract6B, GameInteract7B,
+                             GameInteract8B, GameInteract9B, GameInteract10B, GameInteract11B, GameInteract12B, GameInteract13B, GameInteract14B,
+                             GameInteract15B, GameInteract16B, GameInteract17B, GameInteract18B, GameInteract19B, GameInteract20B, GameInteract21B,
+                             GameInteract22B, GameInteract23B, GameInteract24B, GameInteract25B, GameInteract26B]
+        GameLettersStatic = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+                       'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        GameLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+        fnsize = 35
+        text = "_ _ _ _ _ _"
+
+        for x in range(0, int(len(text)/2)):
+            fnsize -= 1
+
+        LetterBox.insert(END, text)
+        LetterBox.tag_add("!", 1.0, 99999999999999.0)
+        LetterBox.tag_config("!", foreground='white', font=('Segoe UI Light', fnsize, "bold"))
+
+        LetterBox.config(state=DISABLED)
+
+    @staticmethod
     def gamescreen(GAME=1, START=1):
         global boardSlots, boardSlotsStatic, boardValues, myTeam, theirTeam, isTurn, hasStarted, oneTimeSetup, GameToken, Game
         global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
@@ -727,6 +915,13 @@ class Window:
         Window.refresh()
 
     @staticmethod
+    def refresh2(itemLet):
+
+        itemIndex = GameLettersStatic.index(itemLet)
+        GameLetterButtons[itemIndex].place_forget()
+        GameLetters.remove(itemLet)
+
+    @staticmethod
     def refresh():
         global isTurn
         global GameInteract, GameInteract2, GameInteract3, GameInteract4, GameInteract5, GameInteract6, GameInteract7, GameInteract8, GameInteract9, GameButtons
@@ -887,7 +1082,6 @@ class Window:
 
         confirmButton = Button(Notification2, text='CONFIRM', font=('Hurme Geometric Sans 4', 20, 'bold'), fg=colour, bg='#141414', borderwidth=0, command=lambda: Notification2.destroy())
         confirmButton.place(relx=.695, rely=.71)
-
 
     @staticmethod
     def settings():
@@ -1226,6 +1420,8 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
 PORT = 6666
+
+# Window.gamescreen2()
 
 # Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
 
