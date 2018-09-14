@@ -28,6 +28,8 @@ def Send():
 
 if __name__ == "__main__":
 
+    print('WARNING: No longer supported.')
+
     IP = '192.168.1.66'
     PORT = 6666
 

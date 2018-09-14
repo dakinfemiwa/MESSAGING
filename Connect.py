@@ -86,7 +86,7 @@ def displayWindow(usernameSet=None):
     entryBox = Entry(ConnectWindow, width=67)
     entryBox.place(relx=.047, rely=.47)
 
-    entryBox.insert(END, 'chatserver.hopto.org')
+    entryBox.insert(END, 'chat-sv.ddns.net')
 
     enterUsernameLabel = Label(ConnectWindow, textvariable=usernameText, font='Arial 10 bold', bg=windowBackground,
                                fg=windowForeground)

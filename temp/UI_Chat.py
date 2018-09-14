@@ -19,7 +19,7 @@ class Client:
         with open('config.json') as jsonConfig:
             config = json.load(jsonConfig)
 
-        # Config incorporation
+        # Config incorporation.
         colourTheme = config['window']['theme']
         windowResolution = config['window']['resolution']
         windowTitle = config['window']['title']
@@ -161,12 +161,11 @@ class Client:
                 _thread.interrupt_main()
                 break
             else:
-                if '(.)=(.)quit' in receive_data.decode():
+                if receive_data.decode() == '$-$quit':
                     MainWindow.destroy()
                     clientSocket.close()
                     _thread.interrupt_main()
-                elif '(.)=(.)clear' in receive_data.decode():
-                    print('TTTT')
+                elif receive_data.decode() == '$-$clear':
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
@@ -303,13 +302,13 @@ class Client:
 
             elif command == '.fq':
                 if has('admin.commands.forcequit'):
-                    clientSocket.send(str.encode('(.)=(.)quit'))
+                    clientSocket.send(str.encode('$-$quit'))
                 else:
                     Window.show(INSUFFICIENT_PERMISSIONS)
 
             elif command == '.ca':
                 if has('admin.commands.clearall'):
-                    clientSocket.send(str.encode('(.)=(.)clear'))
+                    clientSocket.send(str.encode('$-$clear'))
                 else:
                     Window.show(INSUFFICIENT_PERMISSIONS)
 
@@ -1324,7 +1323,7 @@ class Window:
 
     @staticmethod
     def show(message):
-        try:
+        if 1:
             ChatLog.config(state=NORMAL)
             message = message.strip('%!')
             ChatLog.insert(END, '\n' + message)
@@ -1332,7 +1331,7 @@ class Window:
             ChatLog.tag_config(message, foreground=colourTheme, font=(windowFont, 11, "bold"))
             ChatLog.config(state=DISABLED)
             ChatLog.see(END)
-        except:
+        if 0:
             print('TT: ', message)
 
 
@@ -1403,7 +1402,7 @@ SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
 MESSAGE_COMMAND = 'This function is unavailable right now.'
 KICK_COMMAND = 'The correct usage for this command is .kick <user>'
 UPDATE_COMMAND = 'No updates are available right now.'
-VERSION_MESSAGE = 'GUI CHAT / Auth support with games [VERSION: ' + str(programVersion) + ']'
+VERSION_MESSAGE = 'GUI CHAT / Auth support [VERSION: ' + str(programVersion) + ']'
 
 # Admin permissions - to be handled in configuration file.
 ADMIN_COMMAND_SYNTAX = 'admin.commands.show'
