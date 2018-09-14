@@ -1403,7 +1403,7 @@ SPAM_MESSAGE = 'Your message was not sent due to potential spam.'
 MESSAGE_COMMAND = 'This function is unavailable right now.'
 KICK_COMMAND = 'The correct usage for this command is .kick <user>'
 UPDATE_COMMAND = 'No updates are available right now.'
-VERSION_MESSAGE = 'GUI CHAT / Auth support [VERSION: ' + str(programVersion) + ']'
+VERSION_MESSAGE = 'GUI CHAT / Auth support with games [VERSION: ' + str(programVersion) + ']'
 
 # Admin permissions - to be handled in configuration file.
 ADMIN_COMMAND_SYNTAX = 'admin.commands.show'
