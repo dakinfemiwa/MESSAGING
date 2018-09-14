@@ -19,7 +19,7 @@ class Client:
         with open('config.json') as jsonConfig:
             config = json.load(jsonConfig)
 
-        # Config incorporation.
+        # Config incorporation
         colourTheme = config['window']['theme']
         windowResolution = config['window']['resolution']
         windowTitle = config['window']['title']
