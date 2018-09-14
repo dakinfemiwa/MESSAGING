@@ -1324,7 +1324,7 @@ class Window:
 
     @staticmethod
     def show(message):
-        if 1:
+        try:
             ChatLog.config(state=NORMAL)
             message = message.strip('%!')
             ChatLog.insert(END, '\n' + message)
@@ -1332,7 +1332,7 @@ class Window:
             ChatLog.tag_config(message, foreground=colourTheme, font=(windowFont, 11, "bold"))
             ChatLog.config(state=DISABLED)
             ChatLog.see(END)
-        if 0:
+        except:
             print('TT: ', message)
 
 
