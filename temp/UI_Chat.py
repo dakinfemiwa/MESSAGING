@@ -33,7 +33,9 @@ class Client:
     @staticmethod
     def connect():
 
-        global clientSocket, username, GameToken, GameToken2, doneHere
+        global clientSocket, username, GameToken, GameToken2, doneHere, ishost
+
+        ishost = False
 
         GameToken = 'NULL'
         doneHere = False
@@ -142,7 +144,7 @@ class Client:
     @staticmethod
     def receive():
         global isTurn, hasStarted, myTeam, theirTeam, boardSection, boardSlotsStatic, boardValues, boardSlots, GameWord
-        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, hwsplit, ishost
 
         while True:
             try:
@@ -230,6 +232,14 @@ class Client:
                         word = word[:-12]
                         GameWord = word
                         Window.joinmatch(GameWord)
+
+                elif '{-=*=-}' in receive_data.decode():
+                    if ishost is False:
+                        if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
+                            recentword = receive_data.decode().strip('{-=*=-}')
+                            recentword = list(recentword)
+                            hwsplit = recentword
+                            Window.refreshLayout()
 
                 else:
                     if "$" in receive_data.decode():
@@ -480,7 +490,7 @@ class Window:
 
     @staticmethod
     def handleLetter(letter):
-        global hiddenWord, GameWord2, doneHere, gwsplit, hwsplit, GameWord2
+        global hiddenWord, GameWord2, doneHere, gwsplit, hwsplit, GameWord2, GameStateInGame, GameStateOver, totalLives
 
         if doneHere is False:
             hwsplit = list(hiddenWord.lower())
@@ -493,39 +503,16 @@ class Window:
             gwsplit = list(GameWord2.lower())
             doneHere=True
 
-        if 1:
-
-            print(gwsplit)
-            print(hwsplit)
-
-            """for item in gwsplit:
-                print(item.lower())
-                if item.lower() == letter.lower():
-                    print('same')
-                    indy = gwsplit.index(item.lower())
-                    print('index:',indy)
-                    hwsplit[indy] = letter.lower()
-                    endl = "".join(hwsplit)
-
-                    gwsplit = list(GameWord2.lower())"""
+        try:
 
             for x in range(0, len(gwsplit)):
                 if gwsplit[x] == letter.lower():
                     hwsplit[x] = letter.lower()
                     endl = "".join(hwsplit)
 
-
-            """if letter.lower() in gwsplit:
-                indy = gwsplit.index(letter.lower())
-                hwsplit[indy] = letter.lower()
-                endl = "".join(hwsplit)
-
-                gwsplit = list(GameWord2.lower())"""
-
-            print(endl)
-
             text = endl.upper()
             fnsize = 35
+
             for x in range(0, int(len(text) / 2)):
                 fnsize -= 1
 
@@ -534,33 +521,61 @@ class Window:
             LetterBox.insert(END, text)
             LetterBox.tag_add("!", 1.0, 99999999999999.0)
             LetterBox.tag_config("!", foreground='white', font=('Hurme Geometric Sans 4', fnsize, "bold"))
-
             LetterBox.config(state=DISABLED)
 
-        if 0:
-            print('WARNING: handleError')
+            print(endl)
 
-        """if wordLetter.lower() == letter.lower():
-                ind = list(GameWord).index(wordLetter.lower())
-                hiddenWord2 = list(hiddenWord.strip(' '))
-                hiddenWord2[ind] = wordLetter
-                hiddenWord3 = "".join(hiddenWord2)
-                print(hiddenWord3)
-                for x in range(0, len(hiddenWord3)):
-                    if x is not len(hiddenWord3):
-                        hiddenWord4 = hiddenWord3 + ' '
+            Client.send('{-=*=-}' + endl, True)
 
-                print(hiddenWord4)"""
+        # Letter not in word
+        except UnboundLocalError:
+            totalLives -= 1
+        except:
+            pass
 
+        if '_' not in hwsplit:
+            GameStateInGame2.place_forget()
+            GameStateGameOver2.place(relx=.83, rely=.05)
+            Window.gameover()
 
     @staticmethod
-    def refreshLayout(word=None, lives=6):
+    def gameover():
         pass
+
+    @staticmethod
+    def refreshLayout():
+        global hwsplit
+        endl2 = "".join(hwsplit)
+        text = endl2.upper()
+        fnsize = 35
+
+        for x in range(0, int(len(text) / 2)):
+            fnsize -= 1
+
+        LetterBox.config(state=NORMAL)
+        LetterBox.delete('1.0', END)
+        LetterBox.insert(END, text)
+        LetterBox.tag_add("!", 1.0, 99999999999999.0)
+        LetterBox.tag_config("!", foreground='white', font=('Hurme Geometric Sans 4', fnsize, "bold"))
+        LetterBox.config(state=DISABLED)
+
+        if '_' not in hwsplit:
+            GameStateInGame2.place_forget()
+            GameStateGameOver2.place(relx=.83, rely=.05)
+            Window.gameover()
+
+    @staticmethod
+    def handleLives():
+        global totalLives
+        head = Label(Game)
 
     @staticmethod
     def gamescreen2(GAME=1, START=1):
         global GameToken2, GameStateGameOver2, GameStateWaiting2, GameStateInGame2, oneTimeSetup2, hasStarted2, hiddenWord
-        global LetterBox, GameWord2
+        global LetterBox, GameWord2, ishost, totalLives, Game2, MainWindow
+
+        ishost = False
+        totalLives = 6
 
         GameWord2 = ''
 
@@ -585,6 +600,20 @@ class Window:
 
         oneTimeSetup2 = False
         hasStarted2 = False
+        """
+        head = Label(Game2, text='OO', font='Arial 30 bold', bg='white', fg='white')
+        head.place(relx=.8, rely=.25)
+
+        eye1 = Label(Game2, text='.', font='Arial 26 bold', bg='white', fg='black')
+        eye1.place(relx=.82, rely=.25)
+        eye2 = Label(Game2, text='.', font='Arial 14 bold', bg='white', fg='black')
+
+        body = Label(Game2, text='|', font='Arial 45 bold', bg='white', fg='white')
+        body.place(relx=.828, rely=.378)
+
+        body2 = Label(Game2, text='|', font='Arial 45 bold', bg='white', fg='white')
+        body2.place(relx=.828, rely=.46)"""
+
 
         def restartMatch():
             pass
@@ -612,8 +641,6 @@ class Window:
                     hasStarted2 = True
                     GameStateWaiting2.place_forget()
                     GameStateInGame2.place(relx=.88, rely=.05)
-                    # startGame = '+!+:)' + GameToken
-                    # Client.send(startGame, True)
                     time.sleep(.1)
                 else:
                     GameStateWaiting2.place_forget()
@@ -627,12 +654,8 @@ class Window:
         hiddenWord = ''
 
         def hostMatch():
-            global enterWordLabel, enterWordBox
+            global enterWordLabel, enterWordBox, ishost, Game2
             delay = 300
-            """for button in GameLetterButtons:
-                Game2.after(delay, lambda: button.config(state="disabled"))
-                delay+=300
-                print(delay)"""
 
             Game2.after(delay, lambda: GameLetterButtons[0].config(state="disabled"))
             delay += 50
@@ -702,9 +725,6 @@ class Window:
 
             StartButton.place(relx=.786, rely=.885)
 
-
-            #button.config(state="disabled")
-
             LetterBox.config(state=NORMAL)
             LetterBox.delete('1.0', END)
             LetterBox.insert(END, 'HOSTING MATCH')
@@ -713,6 +733,8 @@ class Window:
             LetterBox.tag_config("!2", foreground='#3498db', font=('Hurme Geometric Sans 4', 30, "bold"))
 
             LetterBox.config(state=DISABLED)
+
+            ishost = True
 
         GameTitle = Label(Game2, textvariable=titleText, font='Arial 12 bold', bg=windowBackground, fg='white')
         GameTitle.place(relx=.03, rely=.05)
@@ -840,6 +862,7 @@ class Window:
         global GameLetters
         global GameLettersStatic
 
+
         GameLetterButtons = [GameInteractB, GameInteract2B, GameInteract3B, GameInteract4B, GameInteract5B, GameInteract6B, GameInteract7B,
                              GameInteract8B, GameInteract9B, GameInteract10B, GameInteract11B, GameInteract12B, GameInteract13B, GameInteract14B,
                              GameInteract15B, GameInteract16B, GameInteract17B, GameInteract18B, GameInteract19B, GameInteract20B, GameInteract21B,
@@ -847,17 +870,6 @@ class Window:
         GameLettersStatic = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
                        'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         GameLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
-        # fnsize = 35
-        #text = "_ _ _ _ _ _ _ _ _ _"
-
-
-        """for x in range(0, int(len(text)/2)):
-            fnsize -= 1
-
-        LetterBox.insert(END, text)
-        LetterBox.tag_add("!", 1.0, 99999999999999.0)
-        LetterBox.tag_config("!", foreground='white', font=('Segoe UI Light', fnsize, "bold"))"""
 
         LetterBox.config(state=DISABLED)
 

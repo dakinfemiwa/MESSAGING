@@ -144,7 +144,7 @@ class Client:
     @staticmethod
     def receive():
         global isTurn, hasStarted, myTeam, theirTeam, boardSection, boardSlotsStatic, boardValues, boardSlots, GameWord
-        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, hwsplit, ishost
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, hwsplit, ishost, totalLives
 
         while True:
             try:
@@ -240,6 +240,13 @@ class Client:
                             recentword = list(recentword)
                             hwsplit = recentword
                             Window.refreshLayout()
+
+                elif '[]-=!=-[]' in receive_data.decode():
+                    if ishost is False:
+                        if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
+                            templives = receive_data.decode().strip('[]-=!=-[]')
+                            totalLives = int(templives)
+                            Window.handleLives()
 
                 else:
                     if "$" in receive_data.decode():
@@ -464,7 +471,9 @@ class Window:
 
     @staticmethod
     def joinmatch(word):
-        global hiddenWord, word2
+        global hiddenWord, word2, LivesCounter, GameStateInGame2, GameStateWaiting2
+        GameStateWaiting2.place_forget()
+        GameStateInGame2.place(relx=.88, rely=.05)
         try:
             LetterBox.config(state=NORMAL)
             LetterBox.delete('1.0', END)
@@ -489,8 +498,19 @@ class Window:
         LetterBox.config(state=DISABLED)
 
     @staticmethod
+    def handleLetterExt(letter):
+        pass
+        # use to handle disabling of buttons
+        # + send letter through socket
+        # pass to here
+
+    @staticmethod
     def handleLetter(letter):
-        global hiddenWord, GameWord2, doneHere, gwsplit, hwsplit, GameWord2, GameStateInGame, GameStateOver, totalLives
+        global hiddenWord, GameWord2, doneHere, gwsplit, hwsplit, GameWord2, GameStateInGame, GameStateOver, totalLives, GameLettersStatic, GameLetterButtons
+
+        indx1 = GameLettersStatic.index(letter.upper())
+        print(indx1)
+        GameLetterButtons[indx1].config(state="disabled")
 
         if doneHere is False:
             hwsplit = list(hiddenWord.lower())
@@ -523,24 +543,33 @@ class Window:
             LetterBox.tag_config("!", foreground='white', font=('Hurme Geometric Sans 4', fnsize, "bold"))
             LetterBox.config(state=DISABLED)
 
-            print(endl)
-
             Client.send('{-=*=-}' + endl, True)
 
         # Letter not in word
         except UnboundLocalError:
             totalLives -= 1
+            Client.send('[]-=!=-[]' + str(totalLives), True)
+            Window.handleLives()
         except:
             pass
 
         if '_' not in hwsplit:
             GameStateInGame2.place_forget()
             GameStateGameOver2.place(relx=.83, rely=.05)
-            Window.gameover()
+            Window.gameover(2)
 
     @staticmethod
-    def gameover():
-        pass
+    def gameover(type):
+        global GameLetterButtons
+        for button in GameLetterButtons:
+            button.config(state="disabled")
+        if type == 1:
+            GameLoser2 = Label(Game2, text='LOSER', font='Arial 20 bold', fg='#e74c3c', bg=windowBackground)
+            GameLoser2.place(relx=.42, rely=.8)
+        elif type == 2:
+            GameWinner2 = Label(Game2, text='WINNER', font='Arial 20 bold', fg='#2ecc71', bg=windowBackground)
+            GameWinner2.place(relx=.41, rely=.8)
+
 
     @staticmethod
     def refreshLayout():
@@ -562,17 +591,19 @@ class Window:
         if '_' not in hwsplit:
             GameStateInGame2.place_forget()
             GameStateGameOver2.place(relx=.83, rely=.05)
-            Window.gameover()
+            Window.gameover(2)
 
     @staticmethod
     def handleLives():
         global totalLives
-        head = Label(Game)
+        LivesNum.set(str(totalLives))
+        if totalLives < 1:
+            Window.gameover(1)
 
     @staticmethod
     def gamescreen2(GAME=1, START=1):
         global GameToken2, GameStateGameOver2, GameStateWaiting2, GameStateInGame2, oneTimeSetup2, hasStarted2, hiddenWord
-        global LetterBox, GameWord2, ishost, totalLives, Game2, MainWindow
+        global LetterBox, GameWord2, ishost, totalLives, Game2, MainWindow, LivesCounter, LivesNum, GameLetterButtons, GameLettersStatic
 
         ishost = False
         totalLives = 6
@@ -592,11 +623,13 @@ class Window:
         titleWait = StringVar()
         titleGame = StringVar()
         titleOver = StringVar()
+        LivesNum = StringVar()
 
         titleText.set('HANGMAN')
         titleWait.set('WAITING FOR GAME')
         titleGame.set('IN-GAME')
         titleOver.set('GAME OVER')
+        LivesNum.set('6')
 
         oneTimeSetup2 = False
         hasStarted2 = False
@@ -655,6 +688,9 @@ class Window:
 
         def hostMatch():
             global enterWordLabel, enterWordBox, ishost, Game2
+
+            LivesCounter.place_forget()
+            LivesText.place_forget()
             delay = 300
 
             Game2.after(delay, lambda: GameLetterButtons[0].config(state="disabled"))
@@ -881,6 +917,14 @@ class Window:
                             fg='#3498db', command=lambda: hostMatch())
         HostButton.place(relx=.8, rely=.885)
         #
+
+        LivesCounter = Label(Game2, textvariable=LivesNum, font='Arial 80 bold', bg=windowBackground, fg="#7f8c8d")
+        LivesCounter.place(relx=.8, rely=.33)
+
+        LivesText = Label(Game2, text='LIVES', font='Arial 20 bold', bg=windowBackground, fg="#7f8c8d")
+        LivesText.place(relx=.79, rely=.60)
+
+
         Game2.mainloop()
 
     @staticmethod
