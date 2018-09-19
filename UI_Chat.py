@@ -387,7 +387,7 @@ class Client:
 
             elif command == '.game':
                 MainWindow.destroy()
-                Window.gamescreen()
+                Window.gameselect()
 
             else:
                 Window.show('That is an invalid command')
@@ -452,7 +452,7 @@ class Window:
         entryBox.bind("<Return>", disable)
         entryBox.bind("<KeyRelease-Return>", press)
 
-        entryBox.insert(END, '.help')
+        entryBox.insert(END, '.game')
 
         sendButton = Button(MainWindow, textvariable=buttonText, font='Arial 7 bold', width=7, height=1,
                             command=lambda: press("<Return>"))
@@ -468,6 +468,68 @@ class Window:
 
         ChatLog = Text(MainWindow, bd=1, bg="#141414", height="13", width="91", font="Arial")
         ChatLog.place(relx=.043, rely=.23)
+
+    @staticmethod
+    def gameselect():
+        global GameSelButton1, GameSelButton2, selected
+
+        selected = 0
+
+        Selector = Tk()
+        Selector.configure(bg='#141414')
+        Selector.geometry('600x250')
+        Selector.title('Game Selector')
+
+        GameSelButton1 = Button(Selector, text='TIC TAC TOE', font='Arial 15 bold', bg=windowBackground, fg='white', bd=0, height="4", width="16", command=lambda: selectGame(1))
+        GameSelButton1.place(relx=.128, rely=.2)
+
+        GameSelButton2 = Button(Selector, text='HANGMAN', font='Arial 15 bold', bg=windowBackground, fg='white', bd=0, height="4", width="16", command=lambda: selectGame(2))
+        GameSelButton2.place(relx=.55, rely=.2)
+
+        BackButton = Button(Selector, text='⇽ EXIT', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
+                            fg='#e74c3c', command=lambda: Selector.destroy())
+        BackButton.place(relx=.03, rely=.84)
+
+        LaunchButton = Button(Selector, text='LAUNCH GAME →', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
+                            fg='#2ecc71', command=lambda: launchGame())
+        LaunchButton.place(relx=.72, rely=.84)
+
+        def selectGame(GameT=1):
+            global GameSelButton1, GameSelButton2, selected
+            if GameT == 1:
+                GameSelButton1.place_forget()
+                GameSelButton1 = Button(Selector, text='TIC TAC TOE', font='Arial 15 bold', fg=windowBackground,
+                                        bg='white', bd=0, height="4", width="16", command=lambda: selectGame(1))
+                GameSelButton1.place(relx=.128, rely=.2)
+                GameSelButton2.place_forget()
+                GameSelButton2 = Button(Selector, text='HANGMAN', font='Arial 15 bold', bg=windowBackground, fg='white',
+                                        bd=0, height="4", width="16", command=lambda: selectGame(2))
+                GameSelButton2.place(relx=.55, rely=.2)
+                selected = 1
+            elif GameT == 2:
+                GameSelButton2.place_forget()
+                GameSelButton1 = Button(Selector, text='TIC TAC TOE', font='Arial 15 bold', bg=windowBackground,
+                                        fg='white', bd=0, height="4", width="16", command=lambda: selectGame(1))
+                GameSelButton1.place(relx=.128, rely=.2)
+                GameSelButton2 = Button(Selector, text='HANGMAN', font='Arial 15 bold', fg=windowBackground, bg='white',
+                                        bd=0, height="4", width="16", command=lambda: selectGame(2))
+                GameSelButton2.place(relx=.55, rely=.2)
+                selected = 2
+
+        def launchGame():
+            global selected
+            if selected == 1:
+                Selector.destroy()
+                Window.gamescreen()
+            elif selected == 2:
+                Selector.destroy()
+                Window.gamescreen2()
+            elif selected == 0:
+                pass
+
+
+        Selector.mainloop()
+
 
     @staticmethod
     def joinmatch(word):
@@ -610,8 +672,6 @@ class Window:
 
         GameWord2 = ''
 
-        Client.external('127.0.0.1', 'TESTING')
-
         GameToken2 = str(random.randint(100000000000, 999999999999))
 
         Game2 = Tk()
@@ -633,20 +693,6 @@ class Window:
 
         oneTimeSetup2 = False
         hasStarted2 = False
-        """
-        head = Label(Game2, text='OO', font='Arial 30 bold', bg='white', fg='white')
-        head.place(relx=.8, rely=.25)
-
-        eye1 = Label(Game2, text='.', font='Arial 26 bold', bg='white', fg='black')
-        eye1.place(relx=.82, rely=.25)
-        eye2 = Label(Game2, text='.', font='Arial 14 bold', bg='white', fg='black')
-
-        body = Label(Game2, text='|', font='Arial 45 bold', bg='white', fg='white')
-        body.place(relx=.828, rely=.378)
-
-        body2 = Label(Game2, text='|', font='Arial 45 bold', bg='white', fg='white')
-        body2.place(relx=.828, rely=.46)"""
-
 
         def restartMatch():
             pass
@@ -923,7 +969,6 @@ class Window:
 
         LivesText = Label(Game2, text='LIVES', font='Arial 20 bold', bg=windowBackground, fg="#7f8c8d")
         LivesText.place(relx=.79, rely=.60)
-
 
         Game2.mainloop()
 
@@ -1724,9 +1769,6 @@ PORT = 6666
 
 Manager = Manager()
 External = Updater.Update()
-
-Client.configure()
-Window.gamescreen2()
 
 
 def has(permission):

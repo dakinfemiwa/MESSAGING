@@ -1,2 +1,5 @@
 **/.idea
 **/__pycache__
+**/temp/UI_Chat.py
+**/temp/version.txt
+**/UI_Client.py
