@@ -40,11 +40,10 @@ class Client:
 
         GameToken = 'NULL'
         doneHere = False
-        # Remember to set back to NULL
-        # GameToken2 = 'NULL'
+        GameToken2 = 'NULL'
 
-        print("WELCOME: Ready to connect.")
-        print("INFO: Connecting to ", str(IP) + ":" + str(PORT))
+        print("INFO: Settings configured - ready to connect")
+        print("INFO: Connecting to:", str(IP) + ":" + str(PORT))
         username = str(input("INPUT: Enter username: "))
 
         if ADMIN_LEVEL > 0:
@@ -57,9 +56,9 @@ class Client:
 
         try:
             clientSocket.connect((IP, PORT))
-            print("INFO: Sending client information...")
+            print("INFO: Sending client information")
             clientSocket.send(str.encode(final_name))
-            print("INFO: Connected to ", str(IP) + ':' + str(PORT))
+            print("INFO: Connected to:", str(IP) + ':' + str(PORT))
             clientSocket.send(str.encode(join_message))
 
             _thread.start_new_thread(Manager.search, ())
@@ -81,9 +80,11 @@ class Client:
 
     @staticmethod
     def external(address, connection_name, connection_pass=None):
-        global username, clientSocket, GameToken, doneHere
+        global username, clientSocket, GameToken, doneHere, ig, GameToken2
         Window.draw()
         GameToken = 'NULL'
+        GameToken = 'NULL'
+        ig = False
         doneHere = False
 
         if ADMIN_LEVEL > 0:
@@ -146,7 +147,7 @@ class Client:
     def receive():
         global isTurn, hasStarted, myTeam, theirTeam, boardSection, boardSlotsStatic, boardValues, boardSlots, GameWord
         global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, hwsplit, ishost, totalLives
-        global GameStateGameOver2, GameStateInGame
+        global GameStateGameOver2, GameStateInGame, LetterBox
 
         while True:
             try:
@@ -174,7 +175,6 @@ class Client:
                     clientSocket.close()
                     _thread.interrupt_main()
                 elif '(.)=(.)clear' in receive_data.decode():
-                    print('TTTT')
                     ChatLog.config(state=NORMAL)
                     ChatLog.delete(1.0, END)
                     Window.show(CLEAR_MESSAGE_ADMIN)
@@ -182,7 +182,6 @@ class Client:
                     adminLvl = receive_data.decode().strip('-##-')
                     adminLvl = int(adminLvl)
                     ADMIN_LEVEL = adminLvl
-                    print('ADMIN LEVEL:', adminLvl)
                     if ADMIN_LEVEL > 0:
                         USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
                     if ADMIN_LEVEL > 1:
@@ -268,9 +267,50 @@ class Client:
 
                 elif '-=;/;' in receive_data.decode():
                     if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
-                        strnew = receive_data.decode().strip('-=;/;')
+                        strnew = receive_data.decode().strip('-'
+                                                             '=;/;')
                         Window.handleLetterExt(strnew)
+                elif 'WORD_GUESSED69' in receive_data.decode():
+                    if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
+                        if ishost == True:
+                            fn = ''
+                            gwsplit2 = list(wordGlobal)
+                            for letter in gwsplit2:
+                                fn = fn + letter + ' '
+                            fnsize2 = 35
 
+                            for x in range(0, int(len(gwsplit2) / 2)):
+                                fnsize2 -= 1
+
+                            tempsize = fnsize2
+                            fn = fn.upper()
+                            LetterBox.config(state=NORMAL)
+                            LetterBox.delete('1.0', END)
+                            LetterBox.insert(END, fn)
+                            LetterBox.tag_add("!", 1.0, 99999999999999.0)
+                            LetterBox.tag_config("!", foreground='#e74c3c', font=('Hurme Geometric Sans 4', tempsize, "bold"))
+                            LetterBox.config(state=DISABLED)
+                            Window.gameover(1)
+                        else:
+                            fn = ''
+                            gwsplit2 = list(GameWord)
+
+                            for letter in gwsplit2:
+                                fn = fn + letter + ' '
+                            fnsize2 = 35
+
+                            for x in range(0, int(len(gwsplit2) / 2)):
+                                fnsize2 -= 1
+
+                            tempsize = fnsize2
+                            fn = fn.upper()
+                            LetterBox.config(state=NORMAL)
+                            LetterBox.delete('1.0', END)
+                            LetterBox.insert(END, fn)
+                            LetterBox.tag_add("!", 1.0, 99999999999999.0)
+                            LetterBox.tag_config("!", foreground='#2ecc71', font=('Hurme Geometric Sans 4', tempsize, "bold"))
+                            LetterBox.config(state=DISABLED)
+                            Window.gameover(2)
 
                 else:
                     if "$" in receive_data.decode():
@@ -830,10 +870,11 @@ class Window:
             Room.mainloop()
 
         def startMatch(word):
-            global LivesText, LivesCounter, wordtemp
+            global LivesText, LivesCounter, wordtemp, wordGlobal
             if ' ' not in list(word):
                 moveSlot = ':-!=!' + word + GameToken2
                 wordtemp = moveSlot
+                wordGlobal = word
                 Client.send(moveSlot, True)
                 GameStateWaiting2.place_forget()
                 GameStateInGame2.place(relx=.88, rely=.05)
@@ -1012,14 +1053,41 @@ class Window:
             Client.send('%^%-', True)
 
         def guessWord(guess_word):
-            global totalLives
+            global totalLives, gwsplit
             if guess_word.lower() == GameWord.lower():
-                Client.send('[]_@', True)  # Word guessed.
-                GameStateInGame2.place_forget()
-                GameStateGameOver2.place(relx=.83, rely=.05)
-                time.sleep(.1)
-                Client.send('[]/./LOST', True)
-                Window.gameover(2)
+                try:
+                    if ishost == False:
+                        fn = ''
+                    for letter in gwsplit:
+                        fn = fn + letter
+
+                    Client.send('[]_@', True)  # Word guessed.
+                    GameStateInGame2.place_forget()
+                    GameStateGameOver2.place(relx=.83, rely=.05)
+                    time.sleep(.1)
+                    Client.send('[]/./LOST', True)
+                    time.sleep(.1)
+                    Client.send('WORD_GUESSED69', True)
+                    Window.gameover(2)
+                    if ishost == False:
+                        fn = ''
+                    for letter in gwsplit:
+                        fn = fn + letter
+
+                    fn = fn.upper()
+                    LetterBox.config(state=NORMAL)
+                    LetterBox.delete('1.0', END)
+                    LetterBox.insert(END, fn)
+                    LetterBox.tag_add("!", 1.0, 99999999999999.0)
+                    LetterBox.tag_config("!", foreground='#2ecc71', font=('Hurme Geometric Sans 4', tempsize, "bold"))
+                    LetterBox.config(state=DISABLED)
+                    time.sleep(.05)
+                except NameError:
+                    CantGuess = Label(Game2, text='You cannot guess this early in the game.', font=('Hurme Geometric Sans 1', 8, ''), fg='#7f8c8d', bg='#141414')
+                    Game2.after(0, lambda: GuessWarning.place_forget())
+                    Game2.after(0, lambda: CantGuess.place(relx=.028, rely=.81))
+                    Game2.after(2500, lambda: CantGuess.place_forget())
+                    Game2.after(2500, lambda: GuessWarning.place(relx=.028, rely=.81))
 
             else:
                 totalLives -= 2

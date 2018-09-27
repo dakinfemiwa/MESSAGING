@@ -146,6 +146,7 @@ class Client:
     def receive():
         global isTurn, hasStarted, myTeam, theirTeam, boardSection, boardSlotsStatic, boardValues, boardSlots, GameWord
         global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, hwsplit, ishost, totalLives
+        global GameStateGameOver2, GameStateInGame
 
         while True:
             try:
@@ -257,6 +258,18 @@ class Client:
                     if ishost == True:
                         if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
                             Window.gameover(1)
+
+                elif '[]_@' in receive_data.decode():
+                    if ishost == False:
+                        if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
+                            GameStateInGame2.place_forget()
+                            GameStateGameOver2.place(relx=.83, rely=.05)
+                            Window.gameover(2)
+
+                elif '-=;/;' in receive_data.decode():
+                    if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
+                        strnew = receive_data.decode().strip('-=;/;')
+                        Window.handleLetterExt(strnew)
 
 
                 else:
@@ -571,19 +584,25 @@ class Window:
 
         LetterBox.config(state=DISABLED)
 
+        enterGuessBox.place(relx=.03, rely=.71)
+        GuessWordButton.place(relx=.50, rely=.71)
+        GuessWarning.place(relx=.028, rely=.81)
+
         ig = True
 
     @staticmethod
     def handleLetterExt(letter):
-        pass
+        indx1 = GameLettersStatic.index(letter.upper())
+        GameLetterButtons[indx1].config(state="disabled")
         # use to handle disabling of buttons
         # + send letter through socket
         # pass to here
 
     @staticmethod
     def handleLetter(letter):
-        global hiddenWord, GameWord2, doneHere, gwsplit, hwsplit, GameStateInGame, GameStateOver, totalLives, GameLettersStatic, GameLetterButtons, ig
-
+        global hiddenWord, GameWord2, doneHere, gwsplit, hwsplit, GameStateInGame, GameStateOver, totalLives, GameLettersStatic, GameLetterButtons, ig, tempsize
+        Client.send('-=;/;' + letter, True)
+        time.sleep(.05)
         indx1 = GameLettersStatic.index(letter.upper())
         GameLetterButtons[indx1].config(state="disabled")
 
@@ -611,11 +630,17 @@ class Window:
                     hwsplit[x] = letter.lower()
                     endl = "".join(hwsplit)
 
-            text = endl.upper()
+            try:
+                text = endl.upper()
+            except:
+                pass
             fnsize = 35
+            tempsize = fnsize
 
             for x in range(0, int(len(text) / 2)):
                 fnsize -= 1
+
+            tempsize = fnsize
 
             LetterBox.config(state=NORMAL)
             LetterBox.delete('1.0', END)
@@ -632,9 +657,9 @@ class Window:
             Client.send('[]-=!=-[]' + str(totalLives), True)
             Window.handleLives()
         except:
-            pass
+            print('An error occured.')
 
-        if ig == True:
+        if ig is True:
             if '_' not in hwsplit:
                 GameStateInGame2.place_forget()
                 GameStateGameOver2.place(relx=.83, rely=.05)
@@ -643,15 +668,27 @@ class Window:
 
     @staticmethod
     def gameover(type):
-        global GameLetterButtons, GameWinner2, GameLoser2
+        global GameLetterButtons, GameWinner2, GameLoser2, ChatBox
         for button in GameLetterButtons:
             button.config(state="disabled")
         if type == 1:
             GameLoser2 = Label(Game2, text='LOSER', font='Arial 20 bold', fg='#e74c3c', bg=windowBackground)
-            GameLoser2.place(relx=.42, rely=.8)
+            GameLoser2.place(relx=.42, rely=.86)
+            if ishost == False:
+                fn = ''
+                for letter in gwsplit:
+                    fn = fn + letter
+
+                fn = fn.upper()
+                LetterBox.config(state=NORMAL)
+                LetterBox.delete('1.0', END)
+                LetterBox.insert(END, fn)
+                LetterBox.tag_add("!", 1.0, 99999999999999.0)
+                LetterBox.tag_config("!", foreground='#e74c3c', font=('Hurme Geometric Sans 4', tempsize, "bold"))
+                LetterBox.config(state=DISABLED)
         elif type == 2:
             GameWinner2 = Label(Game2, text='WINNER', font='Arial 20 bold', fg='#2ecc71', bg=windowBackground)
-            GameWinner2.place(relx=.41, rely=.8)
+            GameWinner2.place(relx=.41, rely=.86)
 
 
     @staticmethod
@@ -974,6 +1011,22 @@ class Window:
             time.sleep(.2)
             Client.send('%^%-', True)
 
+        def guessWord(guess_word):
+            global totalLives
+            if guess_word.lower() == GameWord.lower():
+                Client.send('[]_@', True)  # Word guessed.
+                GameStateInGame2.place_forget()
+                GameStateGameOver2.place(relx=.83, rely=.05)
+                time.sleep(.1)
+                Client.send('[]/./LOST', True)
+                Window.gameover(2)
+
+            else:
+                totalLives -= 2
+                Client.send('[]-=!=-[]' + str(totalLives), True)
+                Window.handleLives()
+                Client.send('', True)
+
         GameTitle = Label(Game2, textvariable=titleText, font='Arial 12 bold', bg=windowBackground, fg='white')
         GameTitle.place(relx=.03, rely=.05)
 
@@ -1100,7 +1153,6 @@ class Window:
         global GameLetters
         global GameLettersStatic
 
-
         GameLetterButtons = [GameInteractB, GameInteract2B, GameInteract3B, GameInteract4B, GameInteract5B, GameInteract6B, GameInteract7B,
                              GameInteract8B, GameInteract9B, GameInteract10B, GameInteract11B, GameInteract12B, GameInteract13B, GameInteract14B,
                              GameInteract15B, GameInteract16B, GameInteract17B, GameInteract18B, GameInteract19B, GameInteract20B, GameInteract21B,
@@ -1113,12 +1165,22 @@ class Window:
 
         BackButton = Button(Game2, text='⇽ EXIT GAME', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
                             fg='#e74c3c', command=lambda: Window.exitgame2())
-        BackButton.place(relx=.03, rely=.885)
+        BackButton.place(relx=.0285, rely=.885)
 
         HostButton = Button(Game2, text='HOST MATCH →', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
                             fg='#3498db', command=lambda: hostMatch())
         HostButton.place(relx=.8, rely=.885)
-        #
+
+        global enterGuessBox, GuessWordButton, GuessWarning
+
+        enterGuessBox = Entry(Game2, font=('Hurme Geometric Sans 1', 10, 'bold'), fg='white', bg='#141414', bd=2, highlightthickness=2, width=51)
+
+        enterGuessBox.config(highlightbackground='#FFFFFF')
+
+        GuessWordButton = Button(Game2, text='GUESS WORD →', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
+                           fg='#3498db', command=lambda: guessWord(enterGuessBox.get()))
+
+        GuessWarning = Label(Game2, text='Guessing incorrectly will cost two lives for the whole team.', font=('Hurme Geometric Sans 1', 8, ''), bg=windowBackground, fg="#7f8c8d")
 
         LivesCounter = Label(Game2, textvariable=LivesNum, font='Arial 80 bold', bg=windowBackground, fg="#7f8c8d")
         LivesCounter.place(relx=.8, rely=.33)
@@ -1484,7 +1546,7 @@ class Window:
 
     @staticmethod
     def checkwinner():
-        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, myTeam, GameToken, isTurn
+        global A1_VAL, A2_VAL, A3_VAL, B1_VAL, B2_VAL, B3_VAL, C1_VAL, C2_VAL, C3_VAL, myTeam, GameToken, isTurn, ChatBox
 
         def handleWinner(winBox):
             if winBox != '-':
@@ -1950,3 +2012,4 @@ if __name__ == '__main__':
     IP = 'chat-sv.ddns.net'
 
     Client.connect()
+
