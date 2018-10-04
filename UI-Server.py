@@ -62,16 +62,20 @@ if __name__ == "__main__":
                             data = sock.recv(4096, )
                         except:
                             try:
-                                Broadcast(sock, str.encode(str(Users[addr]) + " has left the server"), addr)
+                                tempstore = str(Users[addr])
                             except:
+                                pass
+                            try:
+                                Broadcast(sock, str.encode((tempstore) + " has left the server"), 'SEN')
+                            except Exception as details:
                                 print('[' + str(datetime.now().strftime(
                                     "%H:%M:%S")) + '] ' + 'WARNING: A disconnect message may have failed to send')
                             try:
                                 del Users[addr]
                                 print('[' + str(datetime.now().strftime(
                                     "%H:%M:%S")) + '] ' + 'DISCONNECT: Client [%s, %s] disconnected' % addr)
-                            except:
-                                pass
+                            except Exception as details:
+                                print('ERROR OCCURED')
                             sock.close()
                             CLIST.remove(sock)
                             continue

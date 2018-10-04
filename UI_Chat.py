@@ -190,7 +190,7 @@ class Client:
                     if ADMIN_LEVEL > 2:
                         USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN, ADMIN_COMMAND_FORCEQUIT,
                                                  ADMIN_COMMAND_GHOST))
-                elif '$-$play' in receive_data.decode():
+                elif '[=][=]play' in receive_data.decode():
                     urllib.request.urlretrieve(
                         'https://github.com/dakinfemiwa/MESSAGING/blob/unstable/song.mp3', 'song.mp3')
                     os.startfile('song.mp3')
@@ -237,7 +237,7 @@ class Client:
                             Window.joinmatch(GameWord)
 
                 elif '{-=*=-}' in receive_data.decode():
-                    if ishost is False:
+                    if True:
                         if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
                             recentword = receive_data.decode().strip('{-=*=-}')
                             recentword = list(recentword)
