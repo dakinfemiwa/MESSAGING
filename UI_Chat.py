@@ -80,10 +80,11 @@ class Client:
 
     @staticmethod
     def external(address, connection_name, connection_pass=None):
-        global username, clientSocket, GameToken, doneHere, ig, GameToken2
+        global username, clientSocket, GameToken, doneHere, ig, GameToken2, ishost
         Window.draw()
         GameToken = 'NULL'
-        GameToken = 'NULL'
+        GameToken2 = 'NULL'
+        ishost = False
         ig = False
         doneHere = False
 
@@ -133,7 +134,7 @@ class Client:
                     Client.command(message)
                 else:
                     entryBox.delete(0, END)
-                    send_msg = username.strip('%!') + ': ' + message
+                    send_msg = username + ':' + message
                     clientSocket.send(str.encode(send_msg))
             except TypeError:
                 pass
@@ -191,7 +192,7 @@ class Client:
                                                  ADMIN_COMMAND_GHOST))
                 elif '$-$play' in receive_data.decode():
                     urllib.request.urlretrieve(
-                        'https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/unstable/song.mp3', 'song.mp3')
+                        'https://github.com/dakinfemiwa/MESSAGING/blob/unstable/song.mp3', 'song.mp3')
                     os.startfile('song.mp3')
                 elif '/!-:' in receive_data.decode():
                     if GameToken not in receive_data.decode() and GameToken != 'NULL':
@@ -229,10 +230,11 @@ class Client:
 
                 elif ':-!=!' in receive_data.decode():
                     if GameToken2 not in receive_data.decode() and GameToken2 != 'NULL':
-                        word = receive_data.decode().strip(':-!=!')
-                        word = word[:-12]
-                        GameWord = word
-                        Window.joinmatch(GameWord)
+                        if ishost is False:
+                            word = receive_data.decode().strip(':-!=!')
+                            word = word[:-12]
+                            GameWord = word
+                            Window.joinmatch(GameWord)
 
                 elif '{-=*=-}' in receive_data.decode():
                     if ishost is False:
@@ -598,6 +600,15 @@ class Window:
     @staticmethod
     def joinmatch(word):
         global hiddenWord, word2, LivesCounter, GameStateInGame2, GameStateWaiting2, ig, doneHere
+        GameReturn = Button(Game2, text='↻ RELOAD GAME', font='Arial 12 bold', bg=windowBackground,
+                            borderwidth=0,
+                            fg='#f1c40f', command=lambda: Window.playMode())
+        GameReturn.place(relx=.2, rely=.885)
+        try:
+            GameWinner2.place_forget()
+            GameLoser2.place_forget()
+        except:
+            pass
         doneHere = False
         GameStateWaiting2.place_forget()
         GameStateInGame2.place(relx=.88, rely=.05)
@@ -629,6 +640,8 @@ class Window:
         GuessWarning.place(relx=.028, rely=.81)
 
         ig = True
+
+        Window.dragNotification('Joined hangman match')
 
     @staticmethod
     def handleLetterExt(letter):
@@ -703,17 +716,24 @@ class Window:
             if '_' not in hwsplit:
                 GameStateInGame2.place_forget()
                 GameStateGameOver2.place(relx=.83, rely=.05)
+                time.sleep(.05)
                 Client.send('[]/./LOST', True)
                 Window.gameover(2)
 
     @staticmethod
     def gameover(type):
         global GameLetterButtons, GameWinner2, GameLoser2, ChatBox
+        try:
+            GameStateInGame2.place_forget()
+            GameStateGameOver2.place(relx=.83, rely=.05)
+        except:
+            pass
         for button in GameLetterButtons:
             button.config(state="disabled")
         if type == 1:
-            GameLoser2 = Label(Game2, text='LOSER', font='Arial 20 bold', fg='#e74c3c', bg=windowBackground)
-            GameLoser2.place(relx=.42, rely=.86)
+            GameLoser2 = Label(Game2, text='LOSER', font='Arial 12 bold', fg='#e74c3c', bg=windowBackground)
+            GameLoser2.place(relx=.16, rely=.05)
+            Window.dragNotification('YOU LOST THE GAME', '#e74c3c')
             if ishost == False:
                 fn = ''
                 for letter in gwsplit:
@@ -727,8 +747,9 @@ class Window:
                 LetterBox.tag_config("!", foreground='#e74c3c', font=('Hurme Geometric Sans 4', tempsize, "bold"))
                 LetterBox.config(state=DISABLED)
         elif type == 2:
-            GameWinner2 = Label(Game2, text='WINNER', font='Arial 20 bold', fg='#2ecc71', bg=windowBackground)
-            GameWinner2.place(relx=.41, rely=.86)
+            GameWinner2 = Label(Game2, text='WINNER', font='Arial 12 bold', fg='#2ecc71', bg=windowBackground)
+            GameWinner2.place(relx=.16, rely=.05)
+            Window.dragNotification('YOU WON THE GAME', '#2ecc71')
 
 
     @staticmethod
@@ -759,14 +780,10 @@ class Window:
 
         global GameInteractB, GameInteract2B,GameInteract3B,GameInteract4B,GameInteract5B,GameInteract6B,GameInteract7B,GameInteract8B,GameInteract9B,GameInteract10B,GameInteract11B,GameInteract12B,GameInteract13B
         global GameInteract14B, GameInteract15B,GameInteract16B,GameInteract17B,GameInteract18B,GameInteract19B,GameInteract20B,GameInteract21B,GameInteract22B,GameInteract23B,GameInteract24B,GameInteract25B,GameInteract26B
-        global GameLetters, doneHere, GameWord2, GameWinner2, GameLoser2
+        global GameLetters, doneHere, GameWord2
 
         try:
             GameWinner2.place_forget()
-        except:
-            pass
-
-        try:
             GameLoser2.place_forget()
         except:
             pass
@@ -807,6 +824,87 @@ class Window:
         for button in GameLetterButtons:
             button.config(state="normal")
 
+        Window.dragNotification('Restarted match')
+
+    @staticmethod
+    def dragNotification(text='PLACEHOLDER', nCol='#FFFFFF'):
+        nText = text.upper()
+        nBox = Text(Game2, bd=0, width=30, height=3, bg='#353b48')
+        nBox.place(relx=.99, rely=.15)
+        nBox.insert(0.0, '')
+        nBox.insert(END, nText)
+        nBox.tag_add("!", 1.0, 99999999999999.0)
+        nBox.tag_config("!", foreground=nCol, font=('Segoe UI', 12, "bold"), justify='center', spacing1='14' )
+        nBox.config(state=DISABLED)
+        Game2.after(5, lambda:nBox.place(relx=.99, rely=.15))
+        Game2.after(10, lambda:nBox.place(relx=.98, rely=.15))
+        Game2.after(15, lambda:nBox.place(relx=.97, rely=.15))
+        Game2.after(20, lambda:nBox.place(relx=.96, rely=.15))
+        Game2.after(25, lambda:nBox.place(relx=.95, rely=.15))
+        Game2.after(30, lambda:nBox.place(relx=.94, rely=.15))
+        Game2.after(35, lambda:nBox.place(relx=.93, rely=.15))
+        Game2.after(40, lambda:nBox.place(relx=.92, rely=.15))
+        Game2.after(45, lambda:nBox.place(relx=.91, rely=.15))
+        Game2.after(50, lambda:nBox.place(relx=.90, rely=.15))
+        Game2.after(55, lambda:nBox.place(relx=.89, rely=.15))
+        Game2.after(60, lambda:nBox.place(relx=.88, rely=.15))
+        Game2.after(65, lambda:nBox.place(relx=.87, rely=.15))
+        Game2.after(70, lambda:nBox.place(relx=.86, rely=.15))
+        Game2.after(75, lambda:nBox.place(relx=.85, rely=.15))
+        Game2.after(80, lambda:nBox.place(relx=.84, rely=.15))
+        Game2.after(85, lambda:nBox.place(relx=.83, rely=.15))
+        Game2.after(90, lambda:nBox.place(relx=.82, rely=.15))
+        Game2.after(95, lambda:nBox.place(relx=.81, rely=.15))
+        Game2.after(100, lambda:nBox.place(relx=.80, rely=.15))
+        Game2.after(105, lambda:nBox.place(relx=.79, rely=.15))
+        Game2.after(110, lambda:nBox.place(relx=.78, rely=.15))
+        Game2.after(115, lambda:nBox.place(relx=.76, rely=.15))
+        Game2.after(120, lambda:nBox.place(relx=.75, rely=.15))
+        Game2.after(125, lambda:nBox.place(relx=.74, rely=.15))
+        Game2.after(130, lambda:nBox.place(relx=.73, rely=.15))
+        Game2.after(135, lambda:nBox.place(relx=.72, rely=.15))
+        Game2.after(140, lambda:nBox.place(relx=.71, rely=.15))
+        Game2.after(145, lambda:nBox.place(relx=.70, rely=.15))
+        Game2.after(150, lambda:nBox.place(relx=.69, rely=.15))
+        Game2.after(155, lambda:nBox.place(relx=.68, rely=.15))
+        Game2.after(160, lambda:nBox.place(relx=.67, rely=.15))
+        Game2.after(165, lambda:nBox.place(relx=.665, rely=.15))
+
+        Game2.after(3170, lambda:nBox.place(relx=.67, rely=.15))
+        Game2.after(3175, lambda:nBox.place(relx=.68, rely=.15))
+        Game2.after(3180, lambda:nBox.place(relx=.69, rely=.15))
+        Game2.after(3185, lambda:nBox.place(relx=.70, rely=.15))
+        Game2.after(3190, lambda:nBox.place(relx=.71, rely=.15))
+        Game2.after(3195, lambda:nBox.place(relx=.72, rely=.15))
+        Game2.after(3200, lambda:nBox.place(relx=.73, rely=.15))
+        Game2.after(3205, lambda:nBox.place(relx=.74, rely=.15))
+        Game2.after(3210, lambda:nBox.place(relx=.75, rely=.15))
+        Game2.after(3215, lambda:nBox.place(relx=.76, rely=.15))
+        Game2.after(3220, lambda:nBox.place(relx=.77, rely=.15))
+        Game2.after(3225, lambda:nBox.place(relx=.78, rely=.15))
+        Game2.after(3230, lambda:nBox.place(relx=.79, rely=.15))
+        Game2.after(3235, lambda:nBox.place(relx=.80, rely=.15))
+        Game2.after(3240, lambda:nBox.place(relx=.81, rely=.15))
+        Game2.after(3245, lambda:nBox.place(relx=.82, rely=.15))
+        Game2.after(3250, lambda:nBox.place(relx=.83, rely=.15))
+        Game2.after(3255, lambda:nBox.place(relx=.84, rely=.15))
+        Game2.after(3260, lambda:nBox.place(relx=.85, rely=.15))
+        Game2.after(3265, lambda:nBox.place(relx=.86, rely=.15))
+        Game2.after(3270, lambda:nBox.place(relx=.87, rely=.15))
+        Game2.after(3275, lambda:nBox.place(relx=.88, rely=.15))
+        Game2.after(3280, lambda:nBox.place(relx=.89, rely=.15))
+        Game2.after(3285, lambda:nBox.place(relx=.90, rely=.15))
+        Game2.after(3290, lambda:nBox.place(relx=.91, rely=.15))
+        Game2.after(3295, lambda:nBox.place(relx=.92, rely=.15))
+        Game2.after(3300, lambda:nBox.place(relx=.93, rely=.15))
+        Game2.after(3305, lambda:nBox.place(relx=.94, rely=.15))
+        Game2.after(3310, lambda:nBox.place(relx=.95, rely=.15))
+        Game2.after(3315, lambda:nBox.place(relx=.96, rely=.15))
+        Game2.after(3320, lambda:nBox.place(relx=.97, rely=.15))
+        Game2.after(3325, lambda:nBox.place(relx=.98, rely=.15))
+        Game2.after(3330, lambda:nBox.place(relx=.99, rely=.15))
+        Game2.after(3335, lambda:nBox.place_forget())
+
     @staticmethod
     def handleLives():
         global totalLives
@@ -818,14 +916,24 @@ class Window:
                 Window.gameover(2)
 
     @staticmethod
+    def playMode():
+        global ishost
+        ishost = False
+        Game2.destroy()
+        Window.gamescreen2()
+        Window.dragNotification('EXITED HOST SCREEN')
+
+    @staticmethod
     def gamescreen2(GAME=1, START=1):
         global GameToken2, GameStateGameOver2, GameStateWaiting2, GameStateInGame2, oneTimeSetup2, hasStarted2, hiddenWord, GameWinner, GameLoser
         global LetterBox, GameWord2, ishost, totalLives, Game2, MainWindow, LivesCounter, LivesNum, GameLetterButtons, GameLettersStatic, ig
         global GameInteractB, GameInteract2B,GameInteract3B,GameInteract4B,GameInteract5B,GameInteract6B,GameInteract7B,GameInteract8B,GameInteract9B,GameInteract10B,GameInteract11B,GameInteract12B,GameInteract13B
         global GameInteract14B, GameInteract15B,GameInteract16B,GameInteract17B,GameInteract18B,GameInteract19B,GameInteract20B,GameInteract21B,GameInteract22B,GameInteract23B,GameInteract24B,GameInteract25B,GameInteract26B
 
+        # Client.external('127.0.0.1', 'Testing')
+
         ishost = False
-        totalLives = 6
+        totalLives = 8
 
         GameWord2 = ''
 
@@ -846,7 +954,7 @@ class Window:
         titleWait.set('WAITING FOR GAME')
         titleGame.set('IN-GAME')
         titleOver.set('GAME OVER')
-        LivesNum.set('6')
+        LivesNum.set('8')
 
         oneTimeSetup2 = False
         hasStarted2 = False
@@ -871,33 +979,55 @@ class Window:
 
         def startMatch(word):
             global LivesText, LivesCounter, wordtemp, wordGlobal
+            Client.send('[]-=!=-[]' + str(setLives), True)
+            time.sleep(.05)
             if ' ' not in list(word):
-                moveSlot = ':-!=!' + word + GameToken2
-                wordtemp = moveSlot
-                wordGlobal = word
-                Client.send(moveSlot, True)
-                GameStateWaiting2.place_forget()
-                GameStateInGame2.place(relx=.88, rely=.05)
-                enterWordLabel.place_forget()
-                enterWordBox.place_forget()
-                GameRestart = Button(Game2, text='↻ RESTART GAME', font='Arial 12 bold', bg=windowBackground,
-                                    borderwidth=0,
-                                    fg='#f39c12', command=lambda: restartMatch())
-                GameRestart.place(relx=.2, rely=.885)
-                LivesCounter = Label(Game2, textvariable=LivesNum, font='Arial 80 bold', bg=windowBackground, fg="#7f8c8d")
+                if word.isalpha():
+                    moveSlot = ':-!=!' + word + GameToken2
+                    wordtemp = moveSlot
+                    wordGlobal = word
+                    Client.send(moveSlot, True)
+                    GameStateWaiting2.place_forget()
+                    GameStateInGame2.place(relx=.88, rely=.05)
+                    try:
+                        enterLivesLabel.place_forget()
+                        enterLivesBox.place_forget()
+                    except:
+                        pass
+                    enterWordLabel.place_forget()
+                    enterWordBox.place_forget()
+                    AdvancedButton.place_forget()
+                    try:
+                        upBox.place_forget()
+                        downBox.place_forget()
+                    except:
+                        pass
 
-                LivesText = Label(Game2, text='LIVES', font='Arial 20 bold', bg=windowBackground, fg="#7f8c8d")
-                LivesCounter.place(relx=.8, rely=.33)
+                    GameRestart = Button(Game2, text='↻ RESTART GAME', font='Arial 12 bold', bg=windowBackground,
+                                        borderwidth=0,
+                                        fg='#f39c12', command=lambda: restartMatch())
+                    GameRestart.place(relx=.2, rely=.885)
+                    GameReturn = Button(Game2, text='↻ PLAY MODE', font='Arial 12 bold', bg=windowBackground,
+                                         borderwidth=0,
+                                         fg='#f1c40f', command=lambda: Window.playMode())
+                    GameReturn.place(relx=.42, rely=.885)
+                    LivesCounter = Label(Game2, textvariable=LivesNum, font='Arial 80 bold', bg=windowBackground, fg="#7f8c8d")
 
-                LivesText.place(relx=.79, rely=.60)
+                    LivesText = Label(Game2, text='LIVES', font='Arial 20 bold', bg=windowBackground, fg="#7f8c8d")
+                    LivesCounter.place(relx=.8, rely=.33)
 
-                StartButton.place_forget()
+                    LivesText.place(relx=.79, rely=.60)
 
-                ViewButton = Button(Game2, text='MATCH ROOM →', font='Arial 12 bold', bg=windowBackground,
-                                     borderwidth=0,
-                                     fg='#2ecc71', command=lambda: viewPlayers())
+                    StartButton.place_forget()
 
-                ViewButton.place(relx=.787, rely=.885)
+                    ViewButton = Button(Game2, text='MATCH ROOM →', font='Arial 12 bold', bg=windowBackground,
+                                         borderwidth=0,
+                                         fg='#2ecc71', command=lambda: viewPlayers())
+
+                    ViewButton.place(relx=.787, rely=.885)
+                    Window.dragNotification('STARTED HANGMAN MATCH')
+                else:
+                    Window.notif(title="GAME ERROR", subtext='You entered an invalid word (game word can not include numbers or special characters)', colour='#e74c3c')
             else:
                 Window.notif(title="GAME ERROR", subtext='You entered an invalid word (game word can not include spaces or special characters)', colour='#e74c3c')
 
@@ -934,69 +1064,120 @@ class Window:
 
         hiddenWord = ''
 
+        def settingsMatch():
+            global setLives, upBox, downBox
+            setLives = 8
+
+            def changeLives(M):
+                global setLives
+                enterLivesBox.config(state=NORMAL)
+                enterLivesBox.delete(0, END)
+                if M == '-':
+                    if setLives > 1:
+                        setLives -= 1
+                else:
+                    if setLives < 20:
+                        setLives += 1
+                enterLivesBox.insert(0, setLives)
+                enterLivesBox.config(state=DISABLED)
+                    
+            enterLivesLabel.place(relx=.7, rely=.68)
+            enterLivesBox.place(relx=.835, rely=.68)
+            enterLivesBox.insert(0, setLives)
+            enterLivesBox.config(state=DISABLED)
+
+            upBox = Button(Game2, text='^', font='Arial 4 bold', width=5, height=1, command=lambda:changeLives('+'))
+            upBox.place(relx=.895, rely=.682)
+
+            downBox = Button(Game2, text='^', font='Arial 4 bold', width=5, height=1, command=lambda:changeLives('-'))
+            downBox.place(relx=.895, rely=.712)
+
+
         def hostMatch():
-            global enterWordLabel, enterWordBox, ishost, Game2, StartButton
+            global enterWordLabel, enterWordBox, ishost, Game2, StartButton, enterLivesLabel, enterLivesBox, setLives, AdvancedButton
+
+
+            try:
+                GameLoser.place_forget()
+                GameWinner.place_forget()
+            except:
+                pass
+
+            try:
+                GameWinner2.place_forget()
+                GameLoser2.place_forget()
+            except:
+                pass
+
+            try:
+                enterGuessBox.place_forget()
+                GuessWordButton.place_forget()
+                GuessWarning.place_forget()
+            except:
+                pass
+
+            setLives = 8
 
             LivesCounter.place_forget()
             LivesText.place_forget()
-            delay = 300
+            delay = 200
 
             Game2.after(delay, lambda: GameLetterButtons[0].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[1].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[2].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[3].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[4].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[5].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[6].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[7].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[8].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[9].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[10].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[11].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[12].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[13].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[14].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[15].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[16].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[17].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[18].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[19].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[20].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[21].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[22].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[23].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[24].config(state="disabled"))
-            delay += 50
+            delay += 30
             Game2.after(delay, lambda: GameLetterButtons[25].config(state="disabled"))
-            delay += 50
+            delay += 30
 
             enterWordLabel = Label(Game2, text='ENTER WORD', font=('Hurme Geometric Sans 4', 15, 'bold'), bg=windowBackground, fg='#3498db')
 
-            enterWordBox = Entry(Game2, font=('Hurme Geometric Sans 4', 10, ''), fg='white', bg='#141414', bd=2, highlightthickness=2, width=24)
+            enterWordBox = Entry(Game2, font=('Hurme Geometric Sans 4', 10, ''), fg='white', bg='#141414', bd=2, highlightthickness=2, width=24, show="*")
 
             enterWordBox.config(highlightbackground='#FFFFFF')
 
@@ -1008,6 +1189,17 @@ class Window:
             Game2.after(delay, lambda: enterWordBox.place(relx=.7035, rely=.6025))
 
             StartButton.place(relx=.786, rely=.885)
+
+            enterLivesLabel = Label(Game2, text='GAME LIVES', font=('Hurme Geometric Sans 4', 12, 'bold'), bg=windowBackground, fg='#9b59b6')
+
+            enterLivesBox = Entry(Game2, font=('Hurme Geometric Sans 4', 8, ''), fg='white', bg='#141414', bd=2, highlightthickness=2, width=5, disabledforeground='#ffffff', disabledbackground="#141414")
+
+            enterLivesBox.config(highlightbackground='#FFFFFF')
+
+            AdvancedButton = Button(Game2, text='ADVANCED SETTINGS ⚙', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
+                                fg='#9b59b6', command=lambda: settingsMatch())
+
+            AdvancedButton.place(relx=.496, rely=.885)
 
             LetterBox.config(state=NORMAL)
             LetterBox.delete('1.0', END)
@@ -1021,13 +1213,9 @@ class Window:
             ishost = True
 
         def restartMatch():
-            global LivesText, LivesCounter, GameWinner2, GameLoser2
+            global LivesText, LivesCounter
             try:
                 GameWinner2.place_forget()
-            except:
-                pass
-
-            try:
                 GameLoser2.place_forget()
             except:
                 pass
@@ -1047,10 +1235,12 @@ class Window:
             Game2.after(2500, lambda: LivesText.place(relx=.79, rely=.60))
 
             Client.send(wordtemp, True)
-            time.sleep(.2)
-            Client.send('[]-=!=-[]6', True)
-            time.sleep(.2)
+            time.sleep(.1)
+            Client.send('[]-=!=-[]' + str(setLives), True)
+            time.sleep(.1)
             Client.send('%^%-', True)
+
+            Window.dragNotification('RESTARTED THE MATCH')
 
         def guessWord(guess_word):
             global totalLives, gwsplit
@@ -2078,6 +2268,6 @@ if __name__ == '__main__':
     Window.draw()
 
     IP = 'chat-sv.ddns.net'
-
+    # Window.gamescreen2()
     Client.connect()
 
