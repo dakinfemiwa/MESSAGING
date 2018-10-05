@@ -631,6 +631,7 @@ class Window:
             if x is not len(word):
                 hiddenWord = hiddenWord + ' '
         text = hiddenWord
+        print('HIDDEN WORD', hiddenWord)
         fnsize = 35
         for x in range(0, int(len(text)/2)):
             fnsize -= 1
@@ -716,10 +717,10 @@ class Window:
         # Letter not in word
         except UnboundLocalError:
             totalLives -= 1
+            time.sleep(.04)
             Client.send('[]-=!=-[]' + str(totalLives), True)
             Window.handleLives()
-        except:
-            print('An error occured.')
+
 
         if ig is True:
             if '_' not in hwsplit:
@@ -778,18 +779,26 @@ class Window:
         LetterBox.tag_config("!", foreground='white', font=('Hurme Geometric Sans 4', fnsize, "bold"))
         LetterBox.config(state=DISABLED)
 
-        if '_' not in hwsplit:
-            GameStateInGame2.place_forget()
-            GameStateGameOver2.place(relx=.83, rely=.05)
-            Client.send('[]/./LOST', True)
-            Window.gameover(2)
+        if ishost is False:
+            if '_' not in hwsplit:
+                GameStateInGame2.place_forget()
+                GameStateGameOver2.place(relx=.83, rely=.05)
+                Client.send('[]/./LOST', True)
+                Window.gameover(2)
 
     @staticmethod
     def handleRestart():
 
         global GameInteractB, GameInteract2B,GameInteract3B,GameInteract4B,GameInteract5B,GameInteract6B,GameInteract7B,GameInteract8B,GameInteract9B,GameInteract10B,GameInteract11B,GameInteract12B,GameInteract13B
         global GameInteract14B, GameInteract15B,GameInteract16B,GameInteract17B,GameInteract18B,GameInteract19B,GameInteract20B,GameInteract21B,GameInteract22B,GameInteract23B,GameInteract24B,GameInteract25B,GameInteract26B
-        global GameLetters, doneHere, GameWord2
+        global GameLetters, doneHere, GameWord2, ig, gwsplit, hwsplit, hiddenWord
+
+        hiddenWord = ''
+        GameWord2 = ''
+        #ig = False
+        gwsplit = ''
+        hwsplit = ''
+
 
         try:
             GameWinner2.place_forget()
@@ -930,7 +939,16 @@ class Window:
     @staticmethod
     def playMode():
         global ishost
+        global GameWord2, ig, gwsplit, hwsplit, hiddenWord, doneHere
+
         ishost = False
+        hiddenWord = ''
+        GameWord2 = ''
+        ig = False
+        gwsplit = ''
+        hwsplit = ''
+
+        doneHere = False
         Game2.destroy()
         Window.gamescreen2()
         Window.dragNotification('EXITED HOST SCREEN')
@@ -1107,6 +1125,20 @@ class Window:
             downBox = Button(Game2, text='^', font='Arial 4 bold', width=5, height=1, command=lambda:changeLives('-'))
             downBox.place(relx=.895, rely=.712)
 
+            #allowGuessLabel.place()
+
+            yesBox = Button(Game2, text='✔', font='Arial 10', command=lambda:changeLives('-'), bd=0, bg='#141414', fg='#ffffff')
+            yesBox.place(relx=.895, rely=.732)
+
+            noBox = Button(Game2, text='✖', font='Arial 10', command=lambda:changeLives('-'), bd=0, bg='#141414', fg='#ffffff')
+            noBox.place(relx=.925, rely=.732)
+
+        def gameSettings():
+            Sting = Tk()
+            Sting.geometry('700x500')
+            Sting.configure(bg='#141414')
+
+        gameSettings()
 
         def hostMatch():
             global enterWordLabel, enterWordBox, ishost, Game2, StartButton, enterLivesLabel, enterLivesBox, setLives, AdvancedButton
@@ -1249,11 +1281,12 @@ class Window:
 
             Game2.after(2500, lambda: LivesText.place(relx=.79, rely=.60))
 
-            Client.send(wordtemp, True)
             time.sleep(.1)
             Client.send('[]-=!=-[]' + str(setLives), True)
             time.sleep(.1)
             Client.send('%^%-', True)
+            time.sleep(.1)
+            Client.send(wordtemp, True)
 
             Window.dragNotification('RESTARTED THE MATCH')
 

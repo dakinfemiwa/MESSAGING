@@ -221,7 +221,7 @@ if __name__ == "__main__":
                                 word = data.decode().strip(':-!=!')
                                 word = word[:-12]
                                 print('[' + str(datetime.now().strftime(
-                                        "%H:%M:%S")) + '] ' + 'GAME: Started Hangman game with word: ' + str(word))
+                                        "%H:%M:%S")) + '] ' + 'GAME: Started hangman game with word: ' + str(word))
                                 Broadcast(sock, data, Users[addr], True)
 
                             elif '{-=*=-}' in data.decode():
@@ -235,7 +235,7 @@ if __name__ == "__main__":
                             elif '%^%-' in data.decode():
                                 Broadcast(sock, data, Users[addr], True)
                                 print('[' + str(datetime.now().strftime(
-                                        "%H:%M:%S")) + '] ' + 'GAME: Restarted ongoing Hangman game')
+                                        "%H:%M:%S")) + '] ' + 'GAME: Restarted ongoing hangman game')
                             elif '[]/./LOST' in data.decode():
                                 Broadcast(sock, data, Users[addr], True)
                                 print('[' + str(datetime.now().strftime(
@@ -244,6 +244,16 @@ if __name__ == "__main__":
                                 Broadcast(sock, data, Users[addr], True)
                                 print('[' + str(datetime.now().strftime(
                                         "%H:%M:%S")) + '] ' + 'GAME: Ongoing hangman game ended')
+                            elif '-=;/;' in data.decode():
+                                Broadcast(sock, data, Users[addr], True)
+                                lettersent = data.decode.strip('-=;/;')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + "GAME: Guessed letter '{0}' in hangman".format(lettersent))
+                            elif '*@;#-' in data.decode():
+                                Broadcast(sock, data, Users[addr], True)
+                                playername = data.decode.strip('*@;#-')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + "GAME: {0} joined hangman game".format(playername))
                             elif 'WORD_GUESSED69' in data.decode():
                                 Broadcast(sock, data, Users[addr], True)
                                 print('[' + str(datetime.now().strftime(
