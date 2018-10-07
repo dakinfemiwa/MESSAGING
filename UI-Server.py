@@ -67,6 +67,8 @@ if __name__ == "__main__":
                                 pass
                             try:
                                 Broadcast(sock, str.encode((tempstore) + " has left the server"), 'SEN')
+                                time.sleep(.03)
+                                Broadcast(sock, str.encode('.;/~' + tempstore), 'SEN')
                             except Exception as details:
                                 print('[' + str(datetime.now().strftime(
                                     "%H:%M:%S")) + '] ' + 'WARNING: A disconnect message may have failed to send')
