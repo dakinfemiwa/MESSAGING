@@ -2,16 +2,22 @@ import socket
 import select
 import time
 from datetime import datetime
+import json
 
 
 def Broadcast(sock, message, usr, hidden=False):
     global oldMessage
+    print('s0')
     if 1:
         for socket in CLIST:
+            print('s1')
             if socket != serverSocket:
+                print('s2')
                 if message.decode() != '\n':
+                    print('s3')
                     if message.decode() != oldMessage:
                         if hidden==False:
+                            print('s4')
                             print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] MESSAGE: ' + message.decode().lstrip().rstrip())
                     oldMessage = message.decode()
                     socket.send(message)
@@ -55,6 +61,7 @@ if __name__ == "__main__":
                     if sock == serverSocket:
                         sockfd, addr = serverSocket.accept()
                         CLIST.append(sockfd)
+                        print(CLIST)
                         print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'CONNECT: Client [%s, %s] connected' % addr)
 
                     else:
@@ -261,6 +268,40 @@ if __name__ == "__main__":
                                 print('[' + str(datetime.now().strftime(
                                         "%H:%M:%S")) + '] ' + 'GAME: Hangman word was guessed correctly')
 
+                            elif '~' == str(data.decode())[0]:
+
+                                with open('GSAccounts.txt') as myFile:
+                                    for num, line in enumerate(myFile, 1):
+                                        if str(data.decode()).strip('~') in line:
+                                            permnum = num - 1
+
+                                filef = open('GSAccounts.txt', 'r')
+                                filer = filef.readlines()
+                                cred = str(filer[permnum])
+                                credentials = cred.split(',')
+                                recUser = data.decode().strip('~')
+
+                            elif '>' == str(data.decode())[0]:
+                                time.sleep(.08)
+                                if str(data.decode()).strip('>') == credentials[1]:
+                                    sock.send(str.encode('True'))
+                                    time.sleep(.08)
+                                    try:
+                                        print('[' + str(datetime.now().strftime(
+                                            "%H:%M:%S")) + '] ' + 'GAME: User {0} logged in successfully'.format(recUser))
+                                    except:
+                                        pass
+                                    with open('data-{0}.json'.format(recUser)) as jsonConfig:
+                                        config = json.load(jsonConfig)
+                                        sock.send(str.encode(str(config)))
+                                else:
+                                    try:
+                                        print('[' + str(datetime.now().strftime(
+                                            "%H:%M:%S")) + '] ' + 'GAME: User {0} attempted to login (failed)'.format(recUser))
+                                    except:
+                                        pass
+                                    sock.send(str.encode('False'))
+                                    
                             else:
                                 if "$" in data.decode():
                                     if "%!" in data.decode():
@@ -272,8 +313,8 @@ if __name__ == "__main__":
                                         Broadcast(sock, data, 'SOLO')
                                         print('[' + str(datetime.now().strftime(
                                             "%H:%M:%S")) + '] ' + 'ERROR: Unable to broadcast message - hard disconnect')
-            except:
-                pass
+            except Exception as error:
+                print(error)
 
     except Exception as error:
         print(error)

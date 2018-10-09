@@ -2721,7 +2721,7 @@ if __name__ == '__main__':
     Client.configure()
     Window.draw()
 
-    IP = 'chat-sv.ddns.net'
+    IP = '127.0.0.1'
     # Window.gamescreen2()
     Client.connect()
 
