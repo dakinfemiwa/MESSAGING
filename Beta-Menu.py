@@ -43,6 +43,29 @@ class GameMenu:
         titleLabel = Label(Dashboard, text=GH_USERNAME.upper(), font=('Segoe UI', 15, 'bold'), fg='#FFFFFF', bg='#141414')
         titleLabel.place(relx=.05, rely=.08)
 
+        statsPhoto = PhotoImage(file="assets/images/stats-icon.gif")
+        statsPhoto = statsPhoto.zoom(10)
+        statsPhoto = statsPhoto.subsample(128)
+
+        settingsPhoto = PhotoImage(file="assets/images/settings-icon.gif")
+        settingsPhoto = settingsPhoto.subsample(31)
+
+        gamePhoto = PhotoImage(file="assets/images/game-icon.gif")
+        gamePhoto = gamePhoto.subsample(12)
+
+        gameButton = Button(Dashboard, image=gamePhoto, bg='#141414', bd=0)
+        gameButton.place(relx=.05, rely=.22)
+
+        statsButton = Button(Dashboard, image=statsPhoto, bg='#141414', bd=0)
+        statsButton.place(relx=.05, rely=.42)
+
+        settingsButton = Button(Dashboard, image=settingsPhoto, bg='#141414', bd=0)
+        settingsButton.place(relx=.05, rely=.62)
+
+
+
+        """
+
         statsBorder = Text(Dashboard, bd=2, width=34, height=9, bg='#141414')
         statsBorder.place(relx=.353, rely=.39)
         statsBorder.config(state=DISABLED)
@@ -112,7 +135,7 @@ class GameMenu:
 
         StoreButton = Button(Dashboard, text='SPEND CREDITS', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
                               fg='#f1c40f', command=lambda: Dashboard.destroy())
-        StoreButton.place(relx=.76, rely=.84)
+        StoreButton.place(relx=.76, rely=.84)"""
 
         def selectGame(GameT=1):
             global tttButton, hangmanButton, selected

@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
                             if '#!-' in data.decode():
                                 tempPassword = data.decode().strip('#!-')
-                                for line in open("accounts.txt", "r").readlines():
+                                for line in open("data/accounts.txt", "r").readlines():
                                     login_info = line.split()
                                     if tempUsername == login_info[0] and tempPassword == login_info[1]:
                                         print('[' + str(datetime.now().strftime(
@@ -270,12 +270,12 @@ if __name__ == "__main__":
 
                             elif '~' == str(data.decode())[0]:
 
-                                with open('GSAccounts.txt') as myFile:
+                                with open('data/GSAccounts.txt') as myFile:
                                     for num, line in enumerate(myFile, 1):
                                         if str(data.decode()).strip('~') in line:
                                             permnum = num - 1
 
-                                filef = open('GSAccounts.txt', 'r')
+                                filef = open('data/GSAccounts.txt', 'r')
                                 filer = filef.readlines()
                                 cred = str(filer[permnum])
                                 credentials = cred.split(',')
@@ -291,7 +291,7 @@ if __name__ == "__main__":
                                             "%H:%M:%S")) + '] ' + 'GAME: User {0} logged in successfully'.format(recUser))
                                     except:
                                         pass
-                                    with open('data-{0}.json'.format(recUser)) as jsonConfig:
+                                    with open('data/data-{0}.json'.format(recUser)) as jsonConfig:
                                         config = json.load(jsonConfig)
                                         sock.send(str.encode(str(config)))
                                 else:

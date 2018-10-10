@@ -2,7 +2,7 @@ from tkinter import *
 import socket
 import _thread
 import ast
-from time import sleep
+import time
 
 
 class GameHub:
@@ -93,7 +93,7 @@ class GameHub:
                 clientSocket.settimeout(3)
                 clientSocket.connect((self.IP, self.PORT))
                 clientSocket.send(str.encode('~' + str(username)))
-                sleep(.08)
+                time.sleep(.08)
                 clientSocket.send(str.encode('>' + str(password)))
                 while True:
                     serverResponse = clientSocket.recv(4096, ).decode()
@@ -103,12 +103,12 @@ class GameHub:
                         errorText.set(self.AUTH_MESSAGE_2)
                         userLabel.config(fg=self.WINDOW_ERROR)
                         passLabel.config(fg=self.WINDOW_ERROR)
-                        # _thread.exit_thread()
                     elif 'information' in serverResponse:
                         if checked is True:
                             playerData = ast.literal_eval(serverResponse)
                             clientSocket.close()
                             Window.destroy()
+                            _thread.interrupt_main()
                             break
             except:
                 errorText.set(self.AUTH_MESSAGE_1)
@@ -120,14 +120,16 @@ class GameHub:
 
     @staticmethod
     def logged():
-        if checked:
-            return True
-        else:
-            return False
+        return checked
 
     @staticmethod
     def get():
         return playerData
+
+    @staticmethod
+    def close():
+        # _thread.interrupt_main()
+        Window.destroy()
 
 
 if __name__ == '__main__':
