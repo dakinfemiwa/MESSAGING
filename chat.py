@@ -5,7 +5,7 @@ import time
 import socket
 import _thread
 import os
-import Updater
+import updater
 import urllib.request
 import random
 
@@ -16,7 +16,7 @@ class Client:
         global config, colourTheme, windowBackground, windowForeground
         global windowTitle, programVersion, programStage, windowResolution, windowFont
 
-        with open('config.json') as jsonConfig:
+        with open('data/config.json') as jsonConfig:
             config = json.load(jsonConfig)
 
         # Config incorporation
@@ -385,7 +385,7 @@ class Client:
                         elif colour == 'gray':
                             config['window']['theme'] = '#CCCCCC'
 
-                        with open('config.json', 'w') as config_file:
+                        with open('data/config.json', 'w') as config_file:
                             config_file.write(json.dumps(config, indent=8))
 
                         Window.show('Theme colour was changed; restart client')
@@ -1132,13 +1132,6 @@ class Window:
 
             noBox = Button(Game2, text='✖', font='Arial 10', command=lambda:changeLives('-'), bd=0, bg='#141414', fg='#ffffff')
             noBox.place(relx=.925, rely=.732)
-
-        def gameSettings():
-            Sting = Tk()
-            Sting.geometry('700x500')
-            Sting.configure(bg='#141414')
-
-        gameSettings()
 
         def hostMatch():
             global enterWordLabel, enterWordBox, ishost, Game2, StartButton, enterLivesLabel, enterLivesBox, setLives, AdvancedButton
@@ -1983,7 +1976,7 @@ class Window:
 
             config['window']['font'] = font_drop.get()
 
-            with open('config.json', 'w') as config_file:
+            with open('data/config.json', 'w') as config_file:
                 config_file.write(json.dumps(config, indent=8))
 
             sec3 = Label(Settings, text='Restarting in three seconds...', fg=colourTheme, bg=windowBackground, font=('courier new', '12'))
@@ -2299,7 +2292,7 @@ PORT = 6666
 # Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
 
 Manager = Manager()
-External = Updater.Update()
+External = updater.Update()
 
 
 def has(permission):

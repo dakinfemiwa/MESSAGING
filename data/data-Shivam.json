@@ -1,17 +1,28 @@
 {
         "information": {
                 "name": "Shivam",
-                "username": "Shivam1"
+                "username": "Shivam1",
+                "level": "19",
+                "xp": "300",
+                "date": "10/10/2018"
         },
         "game": {
                 "credits": "1",
+                "points": "4000",
                 "wins": "4",
                 "ties": "1",
                 "losses": "2"
         },
         "hangman": {
-		"tracking": "true",
+                "tracking": "Yes",
+                "wins": "3",
+                "ties": "1",
+                "losses": "2"
+        },
+	  "tictactoe": {
+                "tracking": "Yes",
                 "wins": "3",
                 "losses": "2"
         }
+
 }

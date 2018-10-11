@@ -17,8 +17,8 @@ class Update():
         updateInfo = open('version.txt', 'r+')
         latestVersion = updateInfo.readlines()[0]
         updateInfo.close()
-        urllib.request.urlretrieve('https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/master/UI_Chat.py',
-                                   'UI_Chat.py')
+        urllib.request.urlretrieve('https://raw.githubusercontent.com/dakinfemiwa/MESSAGING/master/chat.py',
+                                   'chat.py')
 
         os.chdir('..')
         return latestVersion
@@ -30,8 +30,8 @@ class Update():
         except:
             pass
         os.remove('version.txt')
-        os.rename('UI_Chat.py', 'temp/UI-Chat-old.py')
+        os.rename('chat.py', 'temp/UI-Chat-old.py')
         os.chdir('temp')
-        os.rename('UI_Chat.py', '../UI_Chat.py')
+        os.rename('chat.py', '../chat.py')
         os.rename('version.txt', '../version.txt')
         os.chdir('..')

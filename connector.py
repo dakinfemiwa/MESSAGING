@@ -1,6 +1,6 @@
 from tkinter import *
 import json
-import UI_Chat
+import chat
 
 
 def displayWindow(usernameSet=None):
@@ -16,7 +16,7 @@ def displayWindow(usernameSet=None):
                 displayWindow(inputUN.strip('*'))
             else:
                 ConnectWindow.destroy()
-                UI_Chat.Client.external(inputIP, inputUN)
+                chat.Client.external(inputIP, inputUN)
         except:
             print('ERROR: Invalid username entered.')
             exit(69)
@@ -28,7 +28,7 @@ def displayWindow(usernameSet=None):
         inputUN = inputUN + '%!'
 
         ConnectWindow.destroy()
-        UI_Chat.Client.external(inputIP, inputUN, inputPW)
+        chat.Client.external(inputIP, inputUN, inputPW)
 
     def basicSubmit(event):
         basicAuth()

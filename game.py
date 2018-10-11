@@ -108,7 +108,6 @@ class GameHub:
                             playerData = ast.literal_eval(serverResponse)
                             clientSocket.close()
                             Window.destroy()
-                            _thread.interrupt_main()
                             break
             except:
                 errorText.set(self.AUTH_MESSAGE_1)

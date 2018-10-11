@@ -7,17 +7,12 @@ import json
 
 def Broadcast(sock, message, usr, hidden=False):
     global oldMessage
-    print('s0')
     if 1:
         for socket in CLIST:
-            print('s1')
             if socket != serverSocket:
-                print('s2')
                 if message.decode() != '\n':
-                    print('s3')
                     if message.decode() != oldMessage:
                         if hidden==False:
-                            print('s4')
                             print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] MESSAGE: ' + message.decode().lstrip().rstrip())
                     oldMessage = message.decode()
                     socket.send(message)
@@ -270,12 +265,12 @@ if __name__ == "__main__":
 
                             elif '~' == str(data.decode())[0]:
 
-                                with open('data/GSAccounts.txt') as myFile:
+                                with open('data/game-accounts.txt') as myFile:
                                     for num, line in enumerate(myFile, 1):
                                         if str(data.decode()).strip('~') in line:
                                             permnum = num - 1
 
-                                filef = open('data/GSAccounts.txt', 'r')
+                                filef = open('data/game-accounts.txt', 'r')
                                 filer = filef.readlines()
                                 cred = str(filer[permnum])
                                 credentials = cred.split(',')
@@ -283,7 +278,8 @@ if __name__ == "__main__":
 
                             elif '>' == str(data.decode())[0]:
                                 time.sleep(.08)
-                                if str(data.decode()).strip('>') == credentials[1]:
+                                print(credentials[1])
+                                if str(data.decode()).strip('>') == credentials[1].rstrip():
                                     sock.send(str.encode('True'))
                                     time.sleep(.08)
                                     try:
