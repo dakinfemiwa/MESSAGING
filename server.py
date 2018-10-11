@@ -47,6 +47,8 @@ if __name__ == "__main__":
 
         startUp()
 
+        permnum = None
+
         while True:
             read_sockets, write_sockets, error_sockets = select.select(CLIST, [], [])
 
@@ -270,33 +272,70 @@ if __name__ == "__main__":
                                         if str(data.decode()).strip('~') in line:
                                             permnum = num - 1
 
-                                filef = open('data/game-accounts.txt', 'r')
-                                filer = filef.readlines()
-                                cred = str(filer[permnum])
-                                credentials = cred.split(',')
-                                recUser = data.decode().strip('~')
+                                if permnum is not None:
+                                    filef = open('data/game-accounts.txt', 'r')
+                                    filer = filef.readlines()
+                                    cred = str(filer[permnum])
+                                    credentials = cred.split(',')
+                                    recUser = data.decode().strip('~')
+                                else:
+                                    sock.send(str.encode('False'))
 
                             elif '>' == str(data.decode())[0]:
                                 time.sleep(.08)
-                                print(credentials[1])
-                                if str(data.decode()).strip('>') == credentials[1].rstrip():
-                                    sock.send(str.encode('True'))
-                                    time.sleep(.08)
-                                    try:
-                                        print('[' + str(datetime.now().strftime(
-                                            "%H:%M:%S")) + '] ' + 'GAME: User {0} logged in successfully'.format(recUser))
-                                    except:
-                                        pass
-                                    with open('data/data-{0}.json'.format(recUser)) as jsonConfig:
-                                        config = json.load(jsonConfig)
-                                        sock.send(str.encode(str(config)))
-                                else:
-                                    try:
-                                        print('[' + str(datetime.now().strftime(
-                                            "%H:%M:%S")) + '] ' + 'GAME: User {0} attempted to login (failed)'.format(recUser))
-                                    except:
-                                        pass
-                                    sock.send(str.encode('False'))
+                                if permnum is not None:
+                                    permnum = None
+                                    if str(data.decode()).strip('>') == credentials[1].rstrip():
+                                        sock.send(str.encode('True'))
+                                        time.sleep(.08)
+                                        try:
+                                            print('[' + str(datetime.now().strftime(
+                                                "%H:%M:%S")) + '] ' + 'GAME: User {0} logged in successfully'.format(recUser))
+                                        except:
+                                            pass
+                                        with open('data/data-{0}.json'.format(recUser)) as jsonConfig:
+                                            config = json.load(jsonConfig)
+                                            sock.send(str.encode(str(config)))
+                                    else:
+                                        try:
+                                            print('[' + str(datetime.now().strftime(
+                                                "%H:%M:%S")) + '] ' + 'GAME: User {0} attempted to login (failed)'.format(recUser))
+                                        except:
+                                            pass
+                                        sock.send(str.encode('False'))
+
+                            elif '/' == str(data.decode())[0]:
+                                if '_' == str(data.decode())[1]:
+
+                                    newUser = str(data.decode()).strip('/_')
+
+                                    with open('data/game-accounts.txt') as myFile:
+                                        for num, line in enumerate(myFile, 1):
+                                            if str(data.decode()).strip('/_') in line:
+                                                permnum = num - 1
+
+                                    if permnum is not None:
+                                        sock.send(str.encode('False'))
+
+                            elif '-' == str(data.decode())[0]:
+                                if '/' == str(data.decode())[1]:
+                                    if permnum is None:
+                                        import shutil
+                                        newPass = str(data.decode()).strip('-/')
+                                        file2 = open('data/game-accounts.txt', 'a')
+                                        newStr = newUser + ',' + newPass + '\n'
+                                        file2.write(newStr)
+                                        file2.close()
+                                        sock.send(str.encode('True'))
+                                        time.sleep(.08)
+                                        shutil.copy2('data/data-Default.json', 'data/data-{0}.json'.format(newUser))
+                                        with open('data/data-{0}.json'.format(newUser)) as jsonConfig:
+                                            config = json.load(jsonConfig)
+                                            config["information"]["username"] = newUser
+                                            config["information"]["name"] = newUser
+                                            sock.send(str.encode(str(config)))
+                                        with open('data/data-{0}.json'.format(newUser)) as jsonConfig:
+                                            json.dump(config, jsonConfig)
                                     
                             else:
                                 if "$" in data.decode():

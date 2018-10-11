@@ -25,6 +25,7 @@ class GameHub:
         self.AUTH_MESSAGE_1 = 'Could not connect to the auth server'.upper()
         self.AUTH_MESSAGE_2 = 'Invalid login details entered'.upper()
         self.AUTH_MESSAGE_3 = 'An unknown error occurred'.upper()
+        self.AUTH_MESSAGE_4 = 'Could not sign up correctly'.upper()
 
         self.IP = '127.0.0.1'
         self.PORT = 6666
@@ -40,6 +41,7 @@ class GameHub:
         titleText = StringVar()
         settingsText = StringVar()
         exitText = StringVar()
+        createText = StringVar()
         userText = StringVar()
         passText = StringVar()
         errorText = StringVar()
@@ -47,6 +49,7 @@ class GameHub:
         titleText.set('ENTER LOGIN DETAILS')
         settingsText.set('SIGN IN')
         exitText.set('SIGN IN AS GUEST')
+        createText.set('SIGN UP')
         userText.set('USERNAME')
         passText.set('PASSWORD')
         errorText.set('')
@@ -61,6 +64,7 @@ class GameHub:
 
         loginButton = Button(Window, textvariable=settingsText, font=self.WINDOW_BUTTON_FONT, fg=self.WINDOW_THEME, bg=self.WINDOW_BACKGROUND, bd=0, command=lambda: self.auth(True, userEntry.get(), passEntry.get()))
         guestButton = Button(Window, textvariable=exitText, font=self.WINDOW_BUTTON_FONT, fg='#3498db', bg=self.WINDOW_BACKGROUND, bd=0, command=lambda: self.auth(False))
+        createButton = Button(Window, textvariable=createText, font=self.WINDOW_BUTTON_FONT, fg='#3498db', bg=self.WINDOW_BACKGROUND, bd=0, command=lambda: self.signup(userEntry.get(), passEntry.get()))
 
         errorLabel = Label(Window, textvariable=errorText, font=self.WINDOW_SUB_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_ERROR)
         errorLabel.place(relx=0.05, rely=0.735)
@@ -75,6 +79,7 @@ class GameHub:
 
         loginButton.place(relx=0.85, rely=0.85)
         guestButton.place(relx=0.043, rely=0.85)
+        createButton.place(relx=0.7, rely=0.85)
 
         userEntry.bind('<Return>', (lambda event: self.auth(True, userEntry.get(), passEntry.get())))
         passEntry.bind('<Return>', (lambda event: self.auth(True, userEntry.get(), passEntry.get())))
@@ -82,6 +87,35 @@ class GameHub:
         checked = False
 
         Window.mainloop()
+
+    def signup(self, username=None, password=None):
+        global playerData, checked
+        if len(username) > 2 or len(password) <= 4:
+            try:
+                clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                clientSocket.settimeout(3)
+                clientSocket.connect((self.IP, self.PORT))
+                clientSocket.send(str.encode('/_' + str(username)))
+                time.sleep(.08)
+                clientSocket.send(str.encode('-/' + str(password)))
+                while True:
+                    serverResponse = clientSocket.recv(4096, ).decode()
+                    if serverResponse == 'True':
+                        checked = True
+                    elif serverResponse == 'False':
+                        errorText.set(self.AUTH_MESSAGE_2)
+                        userLabel.config(fg=self.WINDOW_ERROR)
+                        passLabel.config(fg=self.WINDOW_ERROR)
+                    elif 'information' in serverResponse:
+                        if checked is True:
+                            playerData = ast.literal_eval(serverResponse)
+                            clientSocket.close()
+                            Window.destroy()
+                            break
+            except:
+                errorText.set(self.AUTH_MESSAGE_1)
+        else:
+            errorText.set(self.AUTH_MESSAGE_4)
 
     def auth(self, authorize=False, username=None, password=None):
         global playerData, checked

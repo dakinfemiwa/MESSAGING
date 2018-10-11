@@ -86,9 +86,14 @@ elif 60 <= GH_LEVEL < 80:
     GH_COL2 = '#f1c40f'
     
 playedStr = '- {0} played'.format(GH_H_PLAYED)
-winsStr = '- {0} wins ({1:.2f}%)'.format(GH_H_WINS, float(int(GH_H_WINS) / int(GH_H_PLAYED) * 100))
-tiesStr = '- {0} ties ({1:.2f}%)'.format(GH_TIES, float(int(GH_H_TIES) / int(GH_H_PLAYED) * 100))
-lostStr = '- {0} lost ({1:.2f}%)'.format(GH_LOSSES, float(int(GH_H_LOSSES) / int(GH_H_PLAYED) * 100))
+try:
+    winsStr = '- {0} wins ({1:.2f}%)'.format(GH_H_WINS, float(int(GH_H_WINS) / int(GH_H_PLAYED) * 100))
+    tiesStr = '- {0} ties ({1:.2f}%)'.format(GH_TIES, float(int(GH_H_TIES) / int(GH_H_PLAYED) * 100))
+    lostStr = '- {0} lost ({1:.2f}%)'.format(GH_LOSSES, float(int(GH_H_LOSSES) / int(GH_H_PLAYED) * 100))
+except:
+    winsStr = '- N/A wins (--%)'
+    tiesStr = '- N/A ties (--%)'
+    lostStr = '- N/A lost (--%)'
 
 
 class GameMenu:
