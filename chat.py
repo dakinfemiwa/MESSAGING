@@ -5,7 +5,6 @@ import time
 import socket
 import _thread
 import os
-import updater
 import urllib.request
 import random
 import tools.updater
@@ -37,6 +36,7 @@ class Client:
     def connect():
 
         global clientSocket, username, GameToken, GameToken2, doneHere, ishost, ig
+
 
         ishost = False
         ig = False
@@ -75,6 +75,8 @@ class Client:
             print('INFO: Server is most likely offline, check with control panel.')
             exit(1)
 
+        Manager.search()
+
         try:
             while True:
                 continue
@@ -91,6 +93,8 @@ class Client:
         ishost = False
         ig = False
         doneHere = False
+
+
 
         if ADMIN_LEVEL > 0:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
@@ -124,6 +128,8 @@ class Client:
                 Window.show('You have been disconnected from the server.')
             except:
                 pass
+
+        Manager.search()
 
     @staticmethod
     def close(self):
@@ -460,8 +466,7 @@ class Client:
 
             elif command == '.update':
                 MainWindow.destroy()
-                # clientSocket.close()
-                Manager.search('FORCED')
+                Updater.draw()
 
             elif command == '.game':
                 MainWindow.destroy()
@@ -569,7 +574,7 @@ class Window:
         BackButton.place(relx=.03, rely=.84)
 
         LaunchButton = Button(Selector, text='LAUNCH GAME →', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
-                            fg='#2ecc71', command=lambda: launchGame())
+                              fg='#2ecc71', command=lambda: launchGame())
         LaunchButton.place(relx=.72, rely=.84)
 
         def selectGame(GameT=1):
@@ -1041,12 +1046,12 @@ class Window:
                         pass
 
                     GameRestart = Button(Game2, text='↻ RESTART GAME', font='Arial 12 bold', bg=windowBackground,
-                                        borderwidth=0,
-                                        fg='#f39c12', command=lambda: restartMatch())
+                                         borderwidth=0,
+                                         fg='#f39c12', command=lambda: restartMatch())
                     GameRestart.place(relx=.2, rely=.885)
                     GameReturn = Button(Game2, text='↻ PLAY MODE', font='Arial 12 bold', bg=windowBackground,
-                                         borderwidth=0,
-                                         fg='#f1c40f', command=lambda: Window.playMode())
+                                        borderwidth=0,
+                                        fg='#f1c40f', command=lambda: Window.playMode())
                     GameReturn.place(relx=.42, rely=.885)
                     LivesCounter = Label(Game2, textvariable=LivesNum, font='Arial 80 bold', bg=windowBackground, fg="#7f8c8d")
 
@@ -1058,8 +1063,8 @@ class Window:
                     StartButton.place_forget()
 
                     ViewButton = Button(Game2, text='MATCH ROOM →', font='Arial 12 bold', bg=windowBackground,
-                                         borderwidth=0,
-                                         fg='#2ecc71', command=lambda: viewPlayers())
+                                        borderwidth=0,
+                                        fg='#2ecc71', command=lambda: viewPlayers())
 
                     ViewButton.place(relx=.787, rely=.885)
                     Window.dragNotification('STARTED HANGMAN MATCH')
@@ -1117,7 +1122,7 @@ class Window:
                         setLives += 1
                 enterLivesBox.insert(0, setLives)
                 enterLivesBox.config(state=DISABLED)
-                    
+
             enterLivesLabel.place(relx=.7, rely=.68)
             enterLivesBox.place(relx=.835, rely=.68)
             enterLivesBox.insert(0, setLives)
@@ -1226,7 +1231,7 @@ class Window:
             enterWordBox.config(highlightbackground='#FFFFFF')
 
             StartButton = Button(Game2, text='START MATCH →', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
-                                fg='#2ecc71', command=lambda: startMatch(enterWordBox.get()))
+                                 fg='#2ecc71', command=lambda: startMatch(enterWordBox.get()))
 
             Game2.after(delay, lambda: enterWordLabel.place(relx=.7, rely=.5))
 
@@ -1241,7 +1246,7 @@ class Window:
             enterLivesBox.config(highlightbackground='#FFFFFF')
 
             AdvancedButton = Button(Game2, text='ADVANCED SETTINGS ⚙', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
-                                fg='#9b59b6', command=lambda: settingsMatch())
+                                    fg='#9b59b6', command=lambda: settingsMatch())
 
             AdvancedButton.place(relx=.496, rely=.885)
 
@@ -1349,25 +1354,25 @@ class Window:
                                command=lambda: sendMove('A'), borderwidth=1)
 
         GameInteract2B = Button(Game2, text='B', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
-                               command=lambda: sendMove('B'), borderwidth=1)
+                                command=lambda: sendMove('B'), borderwidth=1)
 
         GameInteract3B = Button(Game2, text='C', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
-                               command=lambda: sendMove('C'), borderwidth=1)
+                                command=lambda: sendMove('C'), borderwidth=1)
 
         GameInteract4B = Button(Game2, text='D', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
-                               command=lambda: sendMove('D'), borderwidth=1)
+                                command=lambda: sendMove('D'), borderwidth=1)
 
         GameInteract5B = Button(Game2, text='E', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
-                               command=lambda: sendMove('E'), borderwidth=1)
+                                command=lambda: sendMove('E'), borderwidth=1)
 
         GameInteract6B = Button(Game2, text='F', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
-                               command=lambda: sendMove('F'), borderwidth=1)
+                                command=lambda: sendMove('F'), borderwidth=1)
 
         GameInteract7B = Button(Game2, text='G', font='Arial 5 bold', fg='white', bg='#141414',  width=8, height=4,
-                               command=lambda: sendMove('G'), borderwidth=1)
+                                command=lambda: sendMove('G'), borderwidth=1)
 
         GameInteract8B = Button(Game2, text='H', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
-                               command=lambda: sendMove('H'), borderwidth=1)
+                                command=lambda: sendMove('H'), borderwidth=1)
 
         GameInteract9B = Button(Game2, text='I', font='Arial 5 bold', fg='white', bg='#141414', width=8, height=4,
                                 command=lambda: sendMove('I'), borderwidth=1)
@@ -1461,7 +1466,7 @@ class Window:
                              GameInteract15B, GameInteract16B, GameInteract17B, GameInteract18B, GameInteract19B, GameInteract20B, GameInteract21B,
                              GameInteract22B, GameInteract23B, GameInteract24B, GameInteract25B, GameInteract26B]
         GameLettersStatic = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-                       'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+                             'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         GameLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
         LetterBox.config(state=DISABLED)
@@ -1481,7 +1486,7 @@ class Window:
         enterGuessBox.config(highlightbackground='#FFFFFF')
 
         GuessWordButton = Button(Game2, text='GUESS WORD →', font='Arial 12 bold', bg=windowBackground, borderwidth=0,
-                           fg='#3498db', command=lambda: guessWord(enterGuessBox.get()))
+                                 fg='#3498db', command=lambda: guessWord(enterGuessBox.get()))
 
         GuessWarning = Label(Game2, text='Guessing incorrectly will cost two lives for the whole team.', font=('Hurme Geometric Sans 1', 8, ''), bg=windowBackground, fg="#7f8c8d")
 
@@ -1934,7 +1939,7 @@ class Window:
         barTop.place(relx=0, rely=0)
 
         title = Label(Notification2, textvariable=titleText, font=('Hurme Geometric Sans 4', 20, 'bold'),
-                       fg='#141414', bg=colour)
+                      fg='#141414', bg=colour)
         title.place(relx=.05, rely=.05)
 
         """text = Label(Notification2, textvariable=subText, font=('courier new', 10, 'bold'),
@@ -2036,11 +2041,11 @@ class Window:
         main_label.place(relx=.046, rely=.09)
 
         subtitle = Label(Settings, textvariable=subtitleset, font='Arial 11 bold', fg=colourTheme, bg='#141414',
-                      justify=LEFT)
+                         justify=LEFT)
         subtitle.place(relx=.046, rely=.26)
 
         font_label = Label(Settings, textvariable=font_message, font='Arial 9 bold', fg=colourTheme, bg='#141414',
-                         justify=LEFT)
+                           justify=LEFT)
         font_label.place(relx=.046, rely=.34)
 
         current_default_username = 'NONE'
@@ -2051,7 +2056,7 @@ class Window:
         user_label.place(relx=.046, rely=.48)
 
         ip_label = Label(Settings, textvariable=ip_text, font='Arial 9 bold', fg=colourTheme, bg='#141414',
-                           justify=LEFT)
+                         justify=LEFT)
         ip_label.place(relx=.046, rely=.62)
 
         fonts = [
@@ -2081,11 +2086,11 @@ class Window:
         ##################################################
 
         subtitle2 = Label(Settings, textvariable=configuration_text, font='Arial 11 bold', fg=colourTheme, bg='#141414',
-                         justify=LEFT)
+                          justify=LEFT)
         subtitle2.place(relx=.37, rely=.26)
 
         colour_label = Label(Settings, text='C O L O U R', font='Arial 9 bold', fg=colourTheme, bg='#141414',
-                           justify=LEFT)
+                             justify=LEFT)
         colour_label.place(relx=.37, rely=.34)
 
         colours = [
@@ -2107,7 +2112,7 @@ class Window:
         subtitle3.place(relx=.675, rely=.26)
 
         time_label = Label(Settings, text='C O N N E C T I O N  T I M E O U T', font='Arial 9 bold', fg=colourTheme, bg='#141414',
-                          justify=LEFT)
+                           justify=LEFT)
         time_label.place(relx=.675, rely=.34)
 
         time_entry = Entry(Settings, width=41)
@@ -2281,7 +2286,7 @@ PORT = 6666
 # Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
 
 Manager = Manager()
-External = updater.Update()
+# External = updater.Update()
 
 
 def has(permission):
