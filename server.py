@@ -3,6 +3,8 @@ import select
 import time
 from datetime import datetime
 import json
+import ast
+import os
 
 
 def Broadcast(sock, message, usr, hidden=False):
@@ -58,7 +60,6 @@ if __name__ == "__main__":
                     if sock == serverSocket:
                         sockfd, addr = serverSocket.accept()
                         CLIST.append(sockfd)
-                        print(CLIST)
                         print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'CONNECT: Client [%s, %s] connected' % addr)
 
                     else:
@@ -264,7 +265,47 @@ if __name__ == "__main__":
                                 Broadcast(sock, data, Users[addr], True)
                                 print('[' + str(datetime.now().strftime(
                                         "%H:%M:%S")) + '] ' + 'GAME: Hangman word was guessed correctly')
+                            elif '(' == str(data.decode())[0]:
+                                def replace_line(file_name, line_num, text):
+                                    lines = open(file_name, 'r').readlines()
+                                    lines[line_num] = text
+                                    out = open(file_name, 'w')
+                                    out.writelines(lines)
+                                    out.close()
 
+
+                                unsavedData = str(data.decode()).strip('(')
+                                unsavedData = ast.literal_eval(unsavedData)
+                                #dumped = json.dumps(unsavedData)
+                                #saveUser = unsavedData["information"]["username"]
+                                #unsavedData["information"]["username"]
+                                
+                                with open('data/data-{0}.json'.format(newName), 'w') as jsonConfig:
+                                    json.dump(unsavedData, jsonConfig)
+
+                                with open('data/game-accounts.txt', 'r+') as myFile:
+                                    print(myFile.readlines)
+                                    print(oldName)
+                                    for num, line in enumerate(myFile, 1):
+                                        if oldName in line:
+                                            permnum = num - 1
+
+                                file5 = open('data/game-accounts.txt', 'r')
+                                file5r = file5.readlines()
+                                cred2 = str(file5r[permnum])
+                                credentials2 = cred2.split(',')
+                                credentials2[0] = newName
+                                newl = ','.join(credentials2)
+                                replace_line('data/game-accounts.txt', permnum, newl)
+
+                            elif '}' == str(data.decode())[0]:
+
+                                allNames = str(data.decode()).strip('}').split(',')
+                                oldName = allNames[0]
+                                newName = allNames[1]
+
+                                os.rename('data/data-{0}.json'.format(oldName), 'data/data-{0}.json'.format(newName))
+                                
                             elif '~' == str(data.decode())[0]:
 
                                 with open('data/game-accounts.txt') as myFile:
@@ -348,10 +389,16 @@ if __name__ == "__main__":
                                         Broadcast(sock, data, 'SOLO')
                                         print('[' + str(datetime.now().strftime(
                                             "%H:%M:%S")) + '] ' + 'ERROR: Unable to broadcast message - hard disconnect')
-            except Exception as error:
-                print(error)
+            except Exception as e:
+                import sys
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)
 
-    except Exception as error:
-        print(error)
+    except Exception as e:
+        import sys
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(exc_type, fname, exc_tb.tb_lineno)
 
     serverSocket.close()    

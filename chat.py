@@ -8,7 +8,9 @@ import os
 import updater
 import urllib.request
 import random
+import tools.updater
 
+Updater = tools.updater.Updater()
 
 class Client:
     @staticmethod
@@ -16,6 +18,7 @@ class Client:
         global config, colourTheme, windowBackground, windowForeground
         global windowTitle, programVersion, programStage, windowResolution, windowFont
 
+        print(os.getcwd())
         with open('data/config.json') as jsonConfig:
             config = json.load(jsonConfig)
 
@@ -59,6 +62,7 @@ class Client:
             print("INFO: Sending client information")
             clientSocket.send(str.encode(final_name))
             print("INFO: Connected to:", str(IP) + ':' + str(PORT))
+            time.sleep(.08)
             clientSocket.send(str.encode(join_message))
 
             _thread.start_new_thread(Manager.search, ())
@@ -134,7 +138,7 @@ class Client:
                     Client.command(message)
                 else:
                     entryBox.delete(0, END)
-                    send_msg = username + ':' + message
+                    send_msg = username + ': ' + message
                     clientSocket.send(str.encode(send_msg))
             except TypeError:
                 pass
@@ -2213,24 +2217,9 @@ class Manager:
     def search(frame='AUTO'):
         global Notification
 
-        info_file = open('version.txt', 'r+')
-        current_version = info_file.readlines()[0]
-        info_file.close()
-        try:
-            if config['settings']['auth'] == 'true':
-                # print('INFO: Permissions support ON')
-                if ADMIN_LEVEL > 1:
-                    USER_PERMISSIONS.extend((ADMIN_COMMAND_KICK, ADMIN_COMMAND_CLEARALL, ADMIN_COMMAND_MESSAGE))
-                if ADMIN_LEVEL > 2:
-                    USER_PERMISSIONS.extend((ADMIN_COMMAND_RESTART, ADMIN_COMMAND_SHUTDOWN, ADMIN_COMMAND_FORCEQUIT, ADMIN_COMMAND_GHOST))
-        except:
-            pass
-
-        latest_version = External.Download()
-        # Update is available
-        if float(latest_version) > float(current_version):
+        if Updater.check():
             if frame is 'FORCED':
-                Window.alert('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V ' + latest_version, 'UPDATE2')
+                Window.alert('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V NULL', 'UPDATE2')
                 External.Switch()
             else:
                 Window.show('An update was found, type .update to update the client.')
@@ -2238,7 +2227,7 @@ class Manager:
         # Update is not available
         else:
             if frame is 'FORCED':
-                Window.alert('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V ' + current_version)
+                Window.alert('NORMAL', 'NO UPDATES WERE FOUND - CURRENT VERSION V NULL')
 
 
 Client.configure()
@@ -2308,7 +2297,7 @@ if __name__ == '__main__':
     Client.configure()
     Window.draw()
 
-    IP = 'chat-sv.ddns.net'
+    IP = '127.0.0.1'
     # Window.gamescreen2()
     Client.connect()
 

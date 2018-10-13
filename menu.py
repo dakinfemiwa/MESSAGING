@@ -1,9 +1,12 @@
 import game
+import socket
+import time
+import os
 from tkinter import *
 
 if True:
     GHub = game.GameHub()
-    GHub.draw()
+    GHub.run()
 
     while True:
         if not GHub.logged():
@@ -31,6 +34,8 @@ if True:
     GH_T_WINS = myData["tictactoe"]["wins"]
     GH_T_LOSSES = myData["tictactoe"]["losses"]
 
+tempName = GH_USERNAME
+
 if False:
 
     GH_NAME = 'Test'
@@ -44,6 +49,7 @@ if False:
     GH_H_TIES = '2'
     GH_H_LOSSES = '3'
     GH_TRACKING = 'Yes'
+    GH_H_TRACKING = 'Yes'
 
     GH_T_WINS = '5'
     GH_T_LOSSES = '3'
@@ -52,14 +58,18 @@ if False:
     GH_LEVEL = 85
     GH_XP = 300
 
+GH_ROLES = ['ADMIN', 'MEMBER']
+GH_ROLE_COLOURS = ['#e74c3c', '#f39c12']
+GH_T_WINS = '5'
+GH_T_LOSSES = '3'
 GH_H_PLAYED = int(GH_H_WINS) + int(GH_H_TIES) + int(GH_H_LOSSES)
+GH_T_PLAYED = int(GH_H_WINS) + int(GH_H_TIES) + int(GH_H_LOSSES)
 GH_XP = int(GH_XP)
 GH_LEVEL = int(GH_LEVEL)
 GH_TOTAL = 500
-GH_ROLE = 'ADMIN'
-GH_ROLE_COLOUR = '#e74c3c'
-#GH_ROLE = 'MEMBER'
-#GH_ROLE_COLOUR = '#f39c12'
+# GH_ROLE = 'ADMIN'
+GH_ROLE = 'MEMBER'
+GH_ROLE_COLOUR = GH_ROLE_COLOURS[GH_ROLES.index(GH_ROLE)]
 GH_COL = '#22a6b3'
 GH_COL2 = '#7ed6df'
 
@@ -86,21 +96,52 @@ elif 60 <= GH_LEVEL < 80:
     GH_COL2 = '#f1c40f'
     
 playedStr = '- {0} played'.format(GH_H_PLAYED)
+
 try:
     winsStr = '- {0} wins ({1:.2f}%)'.format(GH_H_WINS, float(int(GH_H_WINS) / int(GH_H_PLAYED) * 100))
+except:
+    winsStr = '- -- wins (--%)'
+
+try:
     tiesStr = '- {0} ties ({1:.2f}%)'.format(GH_TIES, float(int(GH_H_TIES) / int(GH_H_PLAYED) * 100))
+except:
+    tiesStr = '- -- ties (--%)'
+    
+try:
     lostStr = '- {0} lost ({1:.2f}%)'.format(GH_LOSSES, float(int(GH_H_LOSSES) / int(GH_H_PLAYED) * 100))
 except:
-    winsStr = '- N/A wins (--%)'
-    tiesStr = '- N/A ties (--%)'
-    lostStr = '- N/A lost (--%)'
+    lostStr = '- -- lost (--%)'
+
+playedStr2 = '- {0} played'.format(GH_T_PLAYED)
+
+try:
+    winsStr2 = '- {0} wins ({1:.2f}%)'.format(GH_H_WINS, float(int(GH_T_WINS) / int(GH_T_PLAYED) * 100))
+except:
+    winsStr2 = '- -- wins (--%)'
+
+try:
+    lostStr2 = '- {0} lost ({1:.2f}%)'.format(GH_LOSSES, float(int(GH_T_LOSSES) / int(GH_T_PLAYED) * 100))
+except:
+    lostStr2 = '- -- lost (--%)'
 
 
 class GameMenu:
     @staticmethod
+    def save(latestData):
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientSocket.settimeout(3)
+        clientSocket.connect(('127.0.0.1', 6666))
+        clientSocket.send(str.encode('}' + GH_USERNAME + ',' + myData["information"]["username"]))
+        time.sleep(.08)
+        clientSocket.send(str.encode('(' + str(latestData)))
+        time.sleep(.08)
+        clientSocket.close()
+
+    
+    @staticmethod
     def draw():
 
-        global hangmanButton, tttButton, gameButton
+        global hangmanButton, tttButton, gameButton, myData, Dashboard, titleLabel
 
         Dashboard = Tk()
         Dashboard.geometry('700x350')
@@ -110,14 +151,14 @@ class GameMenu:
         titleLabel = Label(Dashboard, text=GH_USERNAME.upper(), font=('Segoe UI', 15, 'bold'), fg='#FFFFFF', bg='#141414')
         titleLabel.place(relx=.05, rely=.08)
 
-        roleButton = Button(Dashboard, text=GH_ROLE.upper(), font=('Segoe UI', 12, 'bold'), fg=GH_ROLE_COLOUR, bg='#141414', bd=0, height=1)
-        roleButton.place(relx=.32, rely=.818)
-
         emptyBar = Label(Dashboard, text=z, font=('Segoe UI', 8, 'bold'), fg=GH_COL2, bg='#141414')
         emptyBar.place(relx=.052, rely=.885)
 
         fillBar = Label(Dashboard, text=y2, font=('Segoe UI', 8, 'bold'), fg=GH_COL, bg='#141414')
         fillBar.place(relx=.052, rely=.885)
+
+        roleButton = Button(Dashboard, text=GH_ROLE.upper(), font=('Segoe UI', 12, 'bold'), fg=GH_ROLE_COLOUR, bg='#141414', bd=0, height=1)
+        roleButton.place(relx=.32, rely=.828)
 
         levelLabel = Label(Dashboard, text='L E V E L', font=('Segoe UI', 25, 'bold'), fg=GH_COL, bg='#141414')
         levelLabel.place(relx=.05, rely=.78)
@@ -252,13 +293,13 @@ class GameMenu:
             playedLabel2 = Label(Dashboard, text='GAMES PLAYED', font=('Segoe UI', 12, 'bold'), fg='#ffffff', bg='#141414')
             playedLabel2.place(relx=.552, rely=.60)
 
-            winsStat2 = Label(Dashboard, text=winsStr, font=('Segoe UI', 10, 'bold italic'), fg='#bdc3c7', bg='#141414')
+            winsStat2 = Label(Dashboard, text=winsStr2, font=('Segoe UI', 10, 'bold italic'), fg='#bdc3c7', bg='#141414')
             winsStat2.place(relx=.78, rely=.41)
 
-            loseStat2 = Label(Dashboard, text=lostStr, font=('Segoe UI', 10, 'bold italic'), fg='#bdc3c7', bg='#141414')
+            loseStat2 = Label(Dashboard, text=lostStr2, font=('Segoe UI', 10, 'bold italic'), fg='#bdc3c7', bg='#141414')
             loseStat2.place(relx=.78, rely=.51)
 
-            playedStat2 = Label(Dashboard, text=playedStr, font=('Segoe UI', 10, 'bold italic'), fg='#bdc3c7', bg='#141414')
+            playedStat2 = Label(Dashboard, text=playedStr2, font=('Segoe UI', 10, 'bold italic'), fg='#bdc3c7', bg='#141414')
             playedStat2.place(relx=.78, rely=.61)
 
             ResetButton = Button(Dashboard, text='RESET STATS', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
@@ -268,7 +309,7 @@ class GameMenu:
             statsItems = [ResetButton, winsLabel2, loseLabel2, playedLabel2, winsStat2, loseStat2, playedStat2, statsLabel, tStatsLabel, hStatsLabel, winsLabel, tiesLabel, loseLabel, playedLabel, winsStat, tiesStat, loseStat, playedStat]
 
         def showSettings():
-            global settingsItems, changeButton
+            global settingsItems, changeButton, pUserLabel, pNameLabel
             
             settingsLabel = Label(Dashboard, text='SETTINGS', font=('Segoe UI', 13, 'bold'), fg='#9b59b6', bg='#141414')
             settingsLabel.place(relx=.15, rely=.22)
@@ -290,10 +331,10 @@ class GameMenu:
             changeButton.place(relx=.6, rely=.72)
 
             signButton = Button(Dashboard, text='SIGN OUT', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
-                                  fg='#9b59b6', command=lambda: Dashboard.destroy())
+                                  fg='#9b59b6', command=lambda: signOut())
             signButton.place(relx=.83, rely=.72)
 
-            pUserLabel = Label(Dashboard, text=GH_USERNAME, font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
+            pUserLabel = Label(Dashboard, text=myData["information"]["username"], font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
             pUserLabel.place(relx=.352, rely=.35)
 
             pNameLabel = Label(Dashboard, text=GH_NAME, font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
@@ -324,41 +365,34 @@ class GameMenu:
             detailsItems = [newUsernameEntry, newNameEntry, saveButton]
 
         def saveDetails(usr,  name):
+            global myData
             for item in detailsItems:
                 item.place_forget()
 
             savedLabel = Label(Dashboard, text='New details saved successfully', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
             savedLabel.place(relx=.53, rely=.732)
 
+            if len(usr) >= 3:
+                pUserLabel.config(text=usr)
+                titleLabel.config(text=usr.upper())
+                myData["information"]["username"] = usr
+            if len(name) >= 3:
+                pNameLabel.config(text=name)
+                myData["information"]["name"] = name
+                
+            GameMenu.save(myData)
+
             Dashboard.after(3000, lambda:savedLabel.place_forget())
             Dashboard.after(3000, lambda:changeButton.place(relx=.6, rely=.72))
 
+        def signOut():
+            try:
+                os.remove("data/data-stored.txt")
+            except:
+                pass
+            Dashboard.destroy()
+
         """
-
-        statsLabel = Label(Dashboard, text='STATISTICS', font=('Segoe UI', 13, 'bold'), fg='#f1c40f', bg='#141414')
-        statsLabel.place(relx=.363, rely=.41)
-
-        winsLabel = Label(Dashboard, text='WINS', font=('Segoe UI', 12, 'bold'), fg='#2ecc71', bg='#141414')
-        winsLabel.place(relx=.363, rely=.51)
-
-        tiesLabel = Label(Dashboard, text='TIES', font=('Segoe UI', 12, 'bold'), fg='#16a085', bg='#141414')
-        tiesLabel.place(relx=.363, rely=.61)
-
-        loseLabel = Label(Dashboard, text='LOSSES', font=('Segoe UI', 12, 'bold'), fg='#e74c3c', bg='#141414')
-        loseLabel.place(relx=.363, rely=.71)
-
-        winsStat = Label(Dashboard, text='5 - 50%', font=('Segoe UI', 12, 'bold'), fg='#ffffff', bg='#141414')
-        winsStat.place(relx=.473, rely=.51)
-
-        tiesStat = Label(Dashboard, text='1 - 10%', font=('Segoe UI', 12, 'bold'), fg='#ffffff', bg='#141414')
-        tiesStat.place(relx=.473, rely=.61)
-
-        loseStat = Label(Dashboard, text='4 - 40%', font=('Segoe UI', 12, 'bold'), fg='#ffffff', bg='#141414')
-        loseStat.place(relx=.473, rely=.71)
-
-        InfoButton = Button(Dashboard, text='VIEW ACCOUNT DETAILS', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
-                            fg='#9b59b6', command=lambda: Dashboard.destroy())
-        InfoButton.place(relx=.17, rely=.84)
 
         SwitchButton = Button(Dashboard, text='SWITCH ACCOUNTS', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
                             fg='#9b59b6', command=lambda: Dashboard.destroy())
@@ -366,7 +400,9 @@ class GameMenu:
 
         StoreButton = Button(Dashboard, text='SPEND CREDITS', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
                               fg='#f1c40f', command=lambda: Dashboard.destroy())
-        StoreButton.place(relx=.76, rely=.84)"""
+        StoreButton.place(relx=.76, rely=.84)
+
+        """
 
         def selectGame(GameT=1):
             global tttButton, hangmanButton, selected
@@ -389,7 +425,6 @@ class GameMenu:
             gameItems.append(hangmanButton)
             gameItems.append(tttButton)
                 
-        # drawImg()
         Dashboard.mainloop()
 
 if __name__ == '__main__':

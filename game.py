@@ -29,6 +29,20 @@ class GameHub:
 
         self.IP = '127.0.0.1'
         self.PORT = 6666
+    
+    def run(self):
+        global checked
+        checked = False
+        try:
+            storedFile = open('data/data-stored.txt', 'r')
+            contentLine = str(storedFile.readline())
+            detailsStored = contentLine.split(',')
+            userStored = detailsStored[0]
+            passStored = detailsStored[1]
+            self.auth(True, userStored, passStored)
+            self.draw()
+        except:
+            self.draw()
 
     def draw(self):
         global Window, errorText, userLabel, passLabel, checked
@@ -83,8 +97,6 @@ class GameHub:
 
         userEntry.bind('<Return>', (lambda event: self.auth(True, userEntry.get(), passEntry.get())))
         passEntry.bind('<Return>', (lambda event: self.auth(True, userEntry.get(), passEntry.get())))
-
-        checked = False
 
         Window.mainloop()
 
@@ -142,6 +154,9 @@ class GameHub:
                             playerData = ast.literal_eval(serverResponse)
                             clientSocket.close()
                             Window.destroy()
+                            rememberFile = open('data/data-stored.txt', 'w+')
+                            rememberFile.write(username + ',' + password)
+                            rememberFile.close()
                             break
             except:
                 errorText.set(self.AUTH_MESSAGE_1)
@@ -167,4 +182,4 @@ class GameHub:
 
 if __name__ == '__main__':
     Main = GameHub()
-    Main.draw()
+    Main.run()
