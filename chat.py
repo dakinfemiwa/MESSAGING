@@ -9,7 +9,6 @@ import urllib.request
 import random
 import tools.updater
 
-Updater = tools.updater.Updater()
 
 class Client:
     @staticmethod
@@ -17,7 +16,6 @@ class Client:
         global config, colourTheme, windowBackground, windowForeground
         global windowTitle, programVersion, programStage, windowResolution, windowFont
 
-        print(os.getcwd())
         with open('data/config.json') as jsonConfig:
             config = json.load(jsonConfig)
 
@@ -2225,7 +2223,6 @@ class Manager:
         if Updater.check():
             if frame is 'FORCED':
                 Window.alert('NORMAL', 'AN UPDATE WAS FOUND - THE LATEST VERSION IS V NULL', 'UPDATE2')
-                External.Switch()
             else:
                 Window.show('An update was found, type .update to update the client.')
 
@@ -2283,10 +2280,8 @@ INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this comma
 USER_PERMISSIONS = []
 PORT = 6666
 
-# Window.notif('GAME START', 'There was an error when trying to start a game. No end user responded to the game start request, you will have to launch the game and start a new match using the online users list.')
-
 Manager = Manager()
-# External = updater.Update()
+Updater = tools.updater.Updater()
 
 
 def has(permission):
@@ -2303,6 +2298,5 @@ if __name__ == '__main__':
     Window.draw()
 
     IP = '127.0.0.1'
-    # Window.gamescreen2()
     Client.connect()
 

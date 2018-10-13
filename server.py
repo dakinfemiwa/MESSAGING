@@ -273,19 +273,13 @@ if __name__ == "__main__":
                                     out.writelines(lines)
                                     out.close()
 
-
                                 unsavedData = str(data.decode()).strip('(')
                                 unsavedData = ast.literal_eval(unsavedData)
-                                #dumped = json.dumps(unsavedData)
-                                #saveUser = unsavedData["information"]["username"]
-                                #unsavedData["information"]["username"]
                                 
                                 with open('data/data-{0}.json'.format(newName), 'w') as jsonConfig:
                                     json.dump(unsavedData, jsonConfig)
 
                                 with open('data/game-accounts.txt', 'r+') as myFile:
-                                    print(myFile.readlines)
-                                    print(oldName)
                                     for num, line in enumerate(myFile, 1):
                                         if oldName in line:
                                             permnum = num - 1

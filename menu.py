@@ -372,6 +372,16 @@ class GameMenu:
             savedLabel = Label(Dashboard, text='New details saved successfully', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
             savedLabel.place(relx=.53, rely=.732)
 
+            try:
+                with open('data/data-stored.txt', 'r') as storedFile:
+                    storedData = storedFile.readlines()[0].split(',')
+                    storedData[0] = usr
+                    fileData = ",".join(storedData)
+                with open('data/data-stored.txt', 'w') as updatedFile:
+                    updatedFile.write(fileData)
+            except:
+                pass
+
             if len(usr) >= 3:
                 pUserLabel.config(text=usr)
                 titleLabel.config(text=usr.upper())
@@ -382,8 +392,8 @@ class GameMenu:
                 
             GameMenu.save(myData)
 
-            Dashboard.after(3000, lambda:savedLabel.place_forget())
-            Dashboard.after(3000, lambda:changeButton.place(relx=.6, rely=.72))
+            Dashboard.after(3000, lambda: savedLabel.place_forget())
+            Dashboard.after(3000, lambda: changeButton.place(relx=.6, rely=.72))
 
         def signOut():
             try:
@@ -426,6 +436,7 @@ class GameMenu:
             gameItems.append(tttButton)
                 
         Dashboard.mainloop()
+
 
 if __name__ == '__main__':
     GameMenu.draw()
