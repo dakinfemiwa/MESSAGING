@@ -265,6 +265,14 @@ if __name__ == "__main__":
                                 Broadcast(sock, data, Users[addr], True)
                                 print('[' + str(datetime.now().strftime(
                                         "%H:%M:%S")) + '] ' + 'GAME: Hangman word was guessed correctly')
+
+                            elif '€' == str(data.decode())[0]:
+                                unsavedData = str(data.decode()).strip('€')
+                                unsavedData = ast.literal_eval(unsavedData)
+
+                                with open('data/data-{0}.json'.format(unsavedData["information"]["username"]), 'w') as jsonConfig:
+                                    json.dump(unsavedData, jsonConfig)
+
                             elif '(' == str(data.decode())[0]:
                                 def replace_line(file_name, line_num, text):
                                     lines = open(file_name, 'r').readlines()

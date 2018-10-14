@@ -533,7 +533,7 @@ class Window:
         entryBox.bind("<Return>", disable)
         entryBox.bind("<KeyRelease-Return>", press)
 
-        entryBox.insert(END, '.game')
+        entryBox.insert(END, '.update')
 
         sendButton = Button(MainWindow, textvariable=buttonText, font='Arial 7 bold', width=7, height=1,
                             command=lambda: press("<Return>"))

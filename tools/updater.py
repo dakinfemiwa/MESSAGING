@@ -1,6 +1,9 @@
 from tkinter import *
 from datetime import datetime
+import shutil
+import zipfile
 import configparser, os, shutil, urllib.request
+
 
 class Updater:
     def __init__(self):
@@ -152,7 +155,7 @@ class Updater:
             return False
 
     def update(self):
-        os.chdir('tools/temp')
+        """os.chdir('tools/temp')
         main_url = self.CONFIG_PROGRAM_GITHUB.replace('github.com', 'raw.githubusercontent.com') + '/master/' + self.CONFIG_PROGRAM_FILES
         os.rename('../../' + self.CONFIG_PROGRAM_FILES, self.CONFIG_PROGRAM_FILES + '.old')
         urllib.request.urlretrieve(main_url, 'main.py')
@@ -163,7 +166,36 @@ class Updater:
         os.rename('version_new.txt', '../../version.txt')
         notesButton.place(relx=0.66, rely=0.85)
         os.chdir('../')
+        os.chdir('../')"""
+
+        """
+        cwd = str(os.getcwd())
+        cwd = cwd.replace(os.sep, '/')
+        counter = 0
+        folder = []
+        x = len(cwd) - 1
+        while True:
+            if cwd[x] != '/':
+                counter += 1
+                x = len(cwd) - counter
+                folder.insert(0, cwd[x])
+                continue
+            else:
+                break
+        folder.remove('/')
+        folder = "".join(folder)
         os.chdir('../')
+        shutil.make_archive(folder + '-BACKUP', 'zip', folder)
+        urllib.request.urlretrieve('https://github.com/dakinfemiwa/MESSAGING/archive/master.zip', folder + '-NEW.zip')
+        zip = zipfile.ZipFile(folder + '-NEW.zip')
+        try:
+            shutil.rmtree(folder, ignore_errors=True)
+        except PermissionError:
+            pass
+        zip.extractall(folder)
+        # os.rename('MESSAGING-master', folder)"""
+
+
 
     def notes(self):
         pass
