@@ -4,6 +4,7 @@ import time
 import os
 from tkinter import *
 import experimental.animator
+from datetime import datetime
 
 if True:
     GHub = game.GameHub()
@@ -34,6 +35,9 @@ if True:
     GH_T_WINS = myData["tictactoe"]["wins"]
     GH_T_LOSSES = myData["tictactoe"]["losses"]
 
+    GH_H_DATE = myData["hangman"]["date"]
+    GH_T_DATE = myData["tictactoe"]["date"]
+
 tempName = GH_USERNAME
 
 if False:
@@ -50,6 +54,8 @@ if False:
     GH_H_LOSSES = '3'
     GH_TRACKING = 'Yes'
     GH_H_TRACKING = 'Yes'
+    GH_H_DATE = '10/10/2018'
+    GH_T_DATE = '10/10/2018'
 
     GH_T_WINS = '5'
     GH_T_LOSSES = '3'
@@ -61,7 +67,7 @@ if False:
 GH_ROLES = ['ADMIN', 'MEMBER']
 GH_ROLE_COLOURS = ['#e74c3c', '#f39c12']
 GH_H_PLAYED = int(GH_H_WINS) + int(GH_H_TIES) + int(GH_H_LOSSES)
-GH_T_PLAYED = int(GH_H_WINS) + int(GH_H_TIES) + int(GH_H_LOSSES)
+GH_T_PLAYED = int(GH_T_WINS) + int(GH_T_LOSSES)
 GH_XP = int(GH_XP)
 GH_LEVEL = int(GH_LEVEL)
 GH_TOTAL = 500
@@ -104,24 +110,24 @@ except:
     winsStr = '-- wins (--%)'
 
 try:
-    tiesStr = '{0} ties ({1:.2f}%)'.format(GH_TIES, float(int(GH_H_TIES) / int(GH_H_PLAYED) * 100))
+    tiesStr = '{0} ties ({1:.2f}%)'.format(GH_H_TIES, float(int(GH_H_TIES) / int(GH_H_PLAYED) * 100))
 except:
     tiesStr = '-- ties (--%)'
     
 try:
-    lostStr = '{0} lost ({1:.2f}%)'.format(GH_LOSSES, float(int(GH_H_LOSSES) / int(GH_H_PLAYED) * 100))
+    lostStr = '{0} lost ({1:.2f}%)'.format(GH_H_LOSSES, float(int(GH_H_LOSSES) / int(GH_H_PLAYED) * 100))
 except:
     lostStr = '-- lost (--%)'
 
 playedStr2 = '{0} played'.format(GH_T_PLAYED)
 
 try:
-    winsStr2 = '{0} wins ({1:.2f}%)'.format(GH_H_WINS, float(int(GH_T_WINS) / int(GH_T_PLAYED) * 100))
+    winsStr2 = '{0} wins ({1:.2f}%)'.format(GH_T_WINS, float(int(GH_T_WINS) / int(GH_T_PLAYED) * 100))
 except:
     winsStr2 = '-- wins (--%)'
 
 try:
-    lostStr2 = '{0} lost ({1:.2f}%)'.format(GH_LOSSES, float(int(GH_T_LOSSES) / int(GH_T_PLAYED) * 100))
+    lostStr2 = '{0} lost ({1:.2f}%)'.format(GH_T_LOSSES, float(int(GH_T_LOSSES) / int(GH_T_PLAYED) * 100))
 except:
     lostStr2 = '-- lost (--%)'
 
@@ -131,7 +137,7 @@ class GameMenu:
     def save(latestData):
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientSocket.settimeout(3)
-        clientSocket.connect(('127.0.0.1', 6666))
+        clientSocket.connect(('chat-sv.ddns.net', 6666))
         clientSocket.send(str.encode('}' + GH_USERNAME + ',' + myData["information"]["username"]))
         time.sleep(.08)
         clientSocket.send(str.encode('(' + str(latestData)))
@@ -142,7 +148,7 @@ class GameMenu:
     def levelup(latestData):
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientSocket.settimeout(3)
-        clientSocket.connect(('127.0.0.1', 6666))
+        clientSocket.connect(('chat-sv.ddns.net', 6666))
         clientSocket.send(str.encode('€' + str(latestData)))
         time.sleep(.08)
         clientSocket.close()
@@ -179,7 +185,7 @@ class GameMenu:
         fillBar.place(relx=.052, rely=.885)
 
         roleButton = Button(Dashboard, text=GH_ROLE.upper(), font=('Segoe UI', 12, 'bold'), fg=GH_ROLE_COLOUR, bg='#141414', bd=0, height=1)
-        roleButton.place(relx=.32, rely=.815)
+        roleButton.place(relx=.32, rely=.825)
 
         if GH_XP >= GH_TOTAL:
             levelUpButton = Button(Dashboard, text='LEVEL UP', font=('Segoe UI', 12, 'bold'), fg='#2ecc71', bg='#141414', bd=0, height=1, command=lambda: levelUp())
@@ -246,16 +252,16 @@ class GameMenu:
             hangmanButton = Button(Dashboard, text='HANGMAN', font=('Segoe UI', 12, 'bold'), bg='#141414', fg='white', bd=0, command=lambda: selectGame(2))
             hangmanButton.place(relx=.15, rely=.44)
 
-            tttPlayed = Label(Dashboard, text='last played on 01/10/2018', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
+            tttPlayed = Label(Dashboard, text='last played on ' + str(GH_T_DATE), font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
             tttPlayed.place(relx=.35, rely=.355)
 
-            hangmanPlayed = Label(Dashboard, text='last played on 10/10/2018', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
+            hangmanPlayed = Label(Dashboard, text='last played on ' + str(GH_H_DATE), font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
             hangmanPlayed.place(relx=.35, rely=.455)
 
             unknownButton = Button(Dashboard, text='TEST GAME', font=('Segoe UI', 12, 'bold'), bg='#141414', fg='white', bd=0, command=lambda: selectGame(3))
             unknownButton.place(relx=.15, rely=.54)
 
-            unknownPlayed = Label(Dashboard, text='last played on 11/10/2018', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
+            unknownPlayed = Label(Dashboard, text='last played on --/--/----', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
             unknownPlayed.place(relx=.35, rely=.555)
 
             creditsLabel = Label(Dashboard, text='CREDITS', font=('Segoe UI', 13, 'bold'), fg='#f1c40f', bg='#141414')
@@ -268,10 +274,18 @@ class GameMenu:
             pointsAmount.place(relx=.774, rely=.445)
 
             LaunchButton = Button(Dashboard, text='LAUNCH GAME', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
-                                  fg='#2ecc71', command=lambda: Dashboard.destroy())
+                                  fg='#2ecc71', command=lambda: launchGame())
             LaunchButton.place(relx=.774, rely=.72)
 
             gameItems = [gamesLabel, tttButton, hangmanButton, LaunchButton, tttPlayed, hangmanPlayed, creditsLabel, creditsAmount, pointsAmount, unknownButton, unknownPlayed]
+
+        def launchGame():
+            selectedGame = 1
+            if selectedGame == 1:
+                myData["tictactoe"]["date"] = datetime.now().strftime("%d/%m/%Y")
+            else:
+                myData["hangman"]["date"] = datetime.now().strftime("%d/%m/%Y")
+            GameMenu.save(myData)
 
         def showStats():
             global statsItems
@@ -337,6 +351,7 @@ class GameMenu:
 
         def levelUp():
             newLevel = GH_LEVEL + 1
+
             if newLevel < 20:
                 GH_COL = '#22a6b3'
                 GH_COL2 = '#7ed6df'
@@ -363,23 +378,29 @@ class GameMenu:
             except:
                 pass
             myData["information"]["level"] = str(newLevel)
+            myData["information"]["xp"] = "10"
+            x = 10 / 500
+            y = x * 125
+            y = round(y)
+            y2 = '_' * y
+            z = '_' * 125
             GameMenu.levelup(myData)
-            global fillBar, levelLabel, levelNum, emptyBar
+            global fillBar, levelLabel, levelNum, emptyBar, roleButton
             fillBar = Label(Dashboard, text=y2, font=('Segoe UI', 8, 'bold'), fg=GH_COL, bg='#141414')
-            fillBar.place(relx=.052, rely=.885)
             emptyBar = Label(Dashboard, text=z, font=('Segoe UI', 8, 'bold'), fg=GH_COL2, bg='#141414')
-            emptyBar.place(relx=.052, rely=.885)
             levelLabel = Label(Dashboard, text='L E V E L', font=('Segoe UI', 25, 'bold'), fg=GH_COL, bg='#141414')
-            levelLabel.place(relx=.05, rely=.78)
 
             levelNum = Label(Dashboard, text=newLevel, font=('Segoe UI', 25, 'bold'), fg=GH_COL2, bg='#141414')
-            levelNum.place(relx=.25, rely=.78)
-
-
+            roleButton = Button(Dashboard, text=GH_ROLE.upper(), font=('Segoe UI', 12, 'bold'), fg=GH_ROLE_COLOUR, bg='#141414', bd=0, height=1)
 
             inst = experimental.animator.Test(newLevel, GH_COL, GH_COL2)
             inst.draw(Dashboard)
             Dashboard.after(5000, lambda: GameMenu.refresh())
+            Dashboard.after(5000, lambda: fillBar.place(relx=.052, rely=.885))
+            Dashboard.after(5000, lambda: emptyBar.place(relx=.052, rely=.885))
+            Dashboard.after(5000, lambda: levelLabel.place(relx=.05, rely=.78))
+            Dashboard.after(5000, lambda: levelNum.place(relx=.25, rely=.78))
+            Dashboard.after(5000, lambda: roleButton.place(relx=.32, rely=.825))
 
         def showSettings():
             global settingsItems, changeButton, pUserLabel, pNameLabel

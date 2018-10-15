@@ -27,7 +27,7 @@ class GameHub:
         self.AUTH_MESSAGE_3 = 'An unknown error occurred'.upper()
         self.AUTH_MESSAGE_4 = 'Could not sign up correctly'.upper()
 
-        self.IP = '127.0.0.1'
+        self.IP = 'chat-sv.ddns.net'
         self.PORT = 6666
     
     def run(self):

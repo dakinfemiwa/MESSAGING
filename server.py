@@ -271,7 +271,7 @@ if __name__ == "__main__":
                                 unsavedData = ast.literal_eval(unsavedData)
 
                                 with open('data/data-{0}.json'.format(unsavedData["information"]["username"]), 'w') as jsonConfig:
-                                    json.dump(unsavedData, jsonConfig)
+                                    json.dump(unsavedData, jsonConfig, sort_keys=True, indent=4,)
 
                             elif '(' == str(data.decode())[0]:
                                 def replace_line(file_name, line_num, text):
@@ -285,7 +285,7 @@ if __name__ == "__main__":
                                 unsavedData = ast.literal_eval(unsavedData)
                                 
                                 with open('data/data-{0}.json'.format(newName), 'w') as jsonConfig:
-                                    json.dump(unsavedData, jsonConfig)
+                                    json.dump(unsavedData, jsonConfig, sort_keys=True, indent=4,)
 
                                 with open('data/game-accounts.txt', 'r+') as myFile:
                                     for num, line in enumerate(myFile, 1):
@@ -372,13 +372,14 @@ if __name__ == "__main__":
                                         sock.send(str.encode('True'))
                                         time.sleep(.08)
                                         shutil.copy2('data/data-Default.json', 'data/data-{0}.json'.format(newUser))
-                                        with open('data/data-{0}.json'.format(newUser)) as jsonConfig:
+                                        with open('data/data-{0}.json'.format(newUser), 'r') as jsonConfig:
                                             config = json.load(jsonConfig)
                                             config["information"]["username"] = newUser
                                             config["information"]["name"] = newUser
+                                            config["information"]["date"] = datetime.now().strftime("%d/%m/%Y")
                                             sock.send(str.encode(str(config)))
-                                        with open('data/data-{0}.json'.format(newUser)) as jsonConfig:
-                                            json.dump(config, jsonConfig)
+                                        with open('data/data-{0}.json'.format(newUser), 'w') as jsonConfig:
+                                            json.dump(config, jsonConfig, sort_keys=True, indent=4,)
                                     
                             else:
                                 if "$" in data.decode():

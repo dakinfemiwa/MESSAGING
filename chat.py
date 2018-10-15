@@ -2297,6 +2297,6 @@ if __name__ == '__main__':
     Client.configure()
     Window.draw()
 
-    IP = '127.0.0.1'
+    IP = 'chat-sv.ddns.net'
     Client.connect()
 
