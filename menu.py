@@ -107,29 +107,29 @@ playedStr = '{0} played'.format(GH_H_PLAYED)
 try:
     winsStr = '{0} wins ({1:.2f}%)'.format(GH_H_WINS, float(int(GH_H_WINS) / int(GH_H_PLAYED) * 100))
 except:
-    winsStr = '-- wins (--%)'
+    winsStr = '0 wins (0%)'
 
 try:
     tiesStr = '{0} ties ({1:.2f}%)'.format(GH_H_TIES, float(int(GH_H_TIES) / int(GH_H_PLAYED) * 100))
 except:
-    tiesStr = '-- ties (--%)'
+    tiesStr = '0 ties (0%)'
     
 try:
     lostStr = '{0} lost ({1:.2f}%)'.format(GH_H_LOSSES, float(int(GH_H_LOSSES) / int(GH_H_PLAYED) * 100))
 except:
-    lostStr = '-- lost (--%)'
+    lostStr = '0 lost (0%)'
 
 playedStr2 = '{0} played'.format(GH_T_PLAYED)
 
 try:
     winsStr2 = '{0} wins ({1:.2f}%)'.format(GH_T_WINS, float(int(GH_T_WINS) / int(GH_T_PLAYED) * 100))
 except:
-    winsStr2 = '-- wins (--%)'
+    winsStr2 = '0 wins (0%)'
 
 try:
     lostStr2 = '{0} lost ({1:.2f}%)'.format(GH_T_LOSSES, float(int(GH_T_LOSSES) / int(GH_T_PLAYED) * 100))
 except:
-    lostStr2 = '-- lost (--%)'
+    lostStr2 = '0 lost (0%)'
 
 
 class GameMenu:

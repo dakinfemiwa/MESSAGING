@@ -14,7 +14,7 @@ class Client:
     @staticmethod
     def configure():
         global config, colourTheme, windowBackground, windowForeground
-        global windowTitle, programVersion, programStage, windowResolution, windowFont
+        global windowTitle, programVersion, programStage, windowResolution, windowFont, programVersionReal
 
         with open('data/config.json') as jsonConfig:
             config = json.load(jsonConfig)
@@ -29,6 +29,8 @@ class Client:
 
         programVersion = config['information']['version']
         programStage = config['information']['stage']
+
+        programVersionReal = float(open('version.txt', 'r').readline())
 
     @staticmethod
     def connect():
@@ -50,7 +52,7 @@ class Client:
         if ADMIN_LEVEL > 0:
             USER_PERMISSIONS.extend((ADMIN_COMMAND_SYNTAX, ADMIN_MESSAGE_JOIN, ADMIN_MESSAGE_LEAVE))
 
-        join_message = username + ' has joined the server' + ' [' + str(programVersion) + ']'
+        join_message = username + ' has joined the server' + ' [' + str(programVersionReal) + ']'
         final_name = '$$$' + username
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -505,13 +507,13 @@ class Window:
         lineText.set('___________________________________________________________________________')
 
         enterMessageText = StringVar()
-        enterMessageText.set('M E S S A G E: ')
+        enterMessageText.set('M E S S A G E')
 
         buttonText = StringVar()
-        buttonText.set(' ➤ ')
+        buttonText.set(' → ')
 
         settingsText = StringVar()
-        settingsText.set('⚙️')
+        settingsText.set('∎')
 
         versionText = StringVar()
         versionText.set('V E R S I O N  ' + programVersion)
@@ -523,32 +525,32 @@ class Window:
                            fg=windowForeground)
         titleLabel.place(relx=.04, rely=.09)
 
-        enterMessageLabel = Label(MainWindow, textvariable=enterMessageText, font='Arial 13 bold', bg=windowBackground,
-                                  fg=windowForeground)
-        enterMessageLabel.place(relx=.04, rely=.85)
+        enterMessageLabel = Label(MainWindow, textvariable=enterMessageText, width=16, font=('Segoe UI', 8, 'bold'), bg='#2f3640',
+                                  fg='white')
+        enterMessageLabel.place(relx=.041, rely=.85374)
 
-        entryBox = Entry(MainWindow, width=100)
-        entryBox.place(relx=.18, rely=.855)
+        entryBox = Entry(MainWindow, width=92, bg='#535c68', bd=0, fg='white', font=('Segoe UI', 10, 'bold'))
+        entryBox.place(relx=.185, rely=.855)
 
         entryBox.bind("<Return>", disable)
         entryBox.bind("<KeyRelease-Return>", press)
 
         entryBox.insert(END, '.update')
 
-        sendButton = Button(MainWindow, textvariable=buttonText, font='Arial 7 bold', width=7, height=1,
-                            command=lambda: press("<Return>"))
-        sendButton.place(relx=.86, rely=.855)
+        sendButton = Button(MainWindow, textvariable=buttonText, font=('Segoe UI', 8, ''), width=7, height=1,
+                            command=lambda: press("<Return>"), bd=0, fg='white', bg='#353b48')
+        sendButton.place(relx=.86, rely=.8555)
 
-        settingsButton = Button(MainWindow, textvariable=settingsText, font='Arial 7 bold', width=3, height=1,
-                                command=lambda: Window.settings())
-        settingsButton.place(relx=.927, rely=.855)
+        settingsButton = Button(MainWindow, textvariable=settingsText, font=('Segoe UI', 8, ''), width=5, height=1,
+                                command=lambda: Window.settings(), bd=0, fg='white', bg='#353b48')
+        settingsButton.place(relx=.922, rely=.855)
 
         versionLabel = Label(MainWindow, textvariable=versionText, font='Arial 11 bold', bg=windowBackground,
                              fg=colourTheme)
         versionLabel.place(relx=.08, rely=.17)
 
-        ChatLog = Text(MainWindow, bd=1, bg="#141414", height="13", width="91", font="Arial")
-        ChatLog.place(relx=.043, rely=.23)
+        ChatLog = Text(MainWindow, bd=8, bg="#141414", height="12", width="90", font="Arial")
+        ChatLog.place(relx=.0425, rely=.23)
 
     @staticmethod
     def gameselect():
