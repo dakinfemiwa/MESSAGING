@@ -527,7 +527,7 @@ class Window:
 
         enterMessageLabel = Label(MainWindow, textvariable=enterMessageText, width=16, font=('Segoe UI', 8, 'bold'), bg='#2f3640',
                                   fg='white')
-        enterMessageLabel.place(relx=.041, rely=.85374)
+        enterMessageLabel.place(relx=.041, rely=.8538)
 
         entryBox = Entry(MainWindow, width=92, bg='#535c68', bd=0, fg='white', font=('Segoe UI', 10, 'bold'))
         entryBox.place(relx=.185, rely=.855)

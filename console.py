@@ -26,6 +26,7 @@ class Console:
         self.COMMAND_LOG = '.LOG'
         self.COMMAND_GAME = '.GAME'
         self.COMMAND_CLEAR = '.CLEAR'
+        self.COMMAND_SHUTDOWN = '.SHUTDOWN'
 
         self.MESSAGE_HELP = '.LOG <on/off> - view server logs\n' \
                             '.GAME <player> <view/edit/delete> - manage players\n' \
@@ -39,14 +40,22 @@ class Console:
 
         self.MESSAGE_GAME = 'GAME COMMAND:\nManage registered players <player> <view/edit/delete>'
 
+        self.MESSAGE_SHUTDOWN_WARNING = 'SHUTDOWN COMMAND:\nAre you sure you want to shutdown the server? <Y/N>'
+        self.MESSAGE_SHUTDOWN_DONE = 'SHUTDOWN COMMAND:\nSent shutdown command to server successfully.'
+        self.MESSAGE_SHUTDOWN_CANCELLED = 'SHUTDOWN COMMAND:\nCancelled server shutdown command successfully.'
+        self.MESSAGE_SHUTDOWN_YES = 'Y'
+        self.MESSAGE_SHUTDOWN_NO = 'N'
+
         self.IP = 'chat-sv.ddns.net'
         self.PORT = 6666
 
     def draw(self):
-        global Window, chatBox, messageBox
+        global Window, chatBox, messageBox, hasConfirmed
+
+        hasConfirmed = False
 
         def send(event):
-            eventPlay = event
+            eventPlay = str(event)
             eventPlay.split()
             self.command(messageBox.get())
 
@@ -56,21 +65,11 @@ class Console:
         Window.title(self.WINDOW_TITLE)
 
         titleText = StringVar()
-        settingsText = StringVar()
-        exitText = StringVar()
-        createText = StringVar()
-        userText = StringVar()
-        passText = StringVar()
         enterMessageText = StringVar()
         buttonText = StringVar()
         errorText = StringVar()
 
         titleText.set('SERVER CONSOLE')
-        settingsText.set('SIGN IN')
-        exitText.set('SIGN IN AS GUEST')
-        createText.set('SIGN UP')
-        userText.set('USERNAME')
-        passText.set('PASSWORD')
         enterMessageText.set('M E S S A G E')
         buttonText.set(' → ')
         errorText.set('')
@@ -85,11 +84,11 @@ class Console:
 
         titleLabel.place(relx=0.05, rely=0.08)
 
-        chatBox.place(relx=.05, rely=.23)
+        chatBox.place(relx=0.05, rely=0.23)
 
         messageLabel.place(relx=0.05, rely=0.85374)
         messageBox.place(relx=0.265, rely=0.852)
-        sendButton.place(relx=0.87, rely=0.852)
+        sendButton.place(relx=0.872, rely=0.852)
 
         messageBox.focus_force()
         messageBox.bind('<Return>', send)
@@ -99,7 +98,10 @@ class Console:
         Window.mainloop()
 
     def command(self, cmd):
+        global hasConfirmed
+
         chatBox.config(state=NORMAL)
+        chatBox.insert(END, '\n')
         if self.COMMAND_HELP in cmd.upper():
             chatBox.insert(END, '\n' + self.MESSAGE_HELP)
         if self.COMMAND_CLEAR in cmd.upper():
@@ -117,6 +119,18 @@ class Console:
         elif self.COMMAND_GAME in cmd.upper():
             if len(cmd) <= 6:
                 chatBox.insert(END, '\n' + self.MESSAGE_GAME)
+        elif self.COMMAND_SHUTDOWN in cmd.upper():
+            chatBox.insert(END, '\n' + self.MESSAGE_SHUTDOWN_WARNING)
+            hasConfirmed = True
+        elif self.MESSAGE_SHUTDOWN_YES in cmd.upper():
+            if hasConfirmed:
+                chatBox.insert(END, '\n' + self.MESSAGE_SHUTDOWN_DONE)
+                hasConfirmed = False
+        elif self.MESSAGE_SHUTDOWN_NO in cmd.upper():
+            if hasConfirmed:
+                chatBox.insert(END, '\n' + self.MESSAGE_SHUTDOWN_CANCELLED)
+                hasConfirmed = False
+
         chatBox.tag_add('DEFAULT', 1.0, 1000.0)
         chatBox.tag_configure('DEFAULT', foreground=self.WINDOW_CHAT_BACKGROUND, font=('courier new', 10))
         chatBox.config(state=DISABLED)
