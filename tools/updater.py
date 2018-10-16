@@ -1,8 +1,8 @@
-from tkinter import *
-from datetime import datetime
+import configparser
+import os
 import shutil
-import zipfile
-import configparser, os, shutil, urllib.request
+import urllib.request
+from tkinter import *
 
 
 class Updater:

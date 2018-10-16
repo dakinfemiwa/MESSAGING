@@ -1,4 +1,5 @@
 from tkinter import *
+import socket
 
 
 class Console:
@@ -27,11 +28,15 @@ class Console:
         self.COMMAND_GAME = '.GAME'
         self.COMMAND_CLEAR = '.CLEAR'
         self.COMMAND_SHUTDOWN = '.SHUTDOWN'
+        self.COMMAND_CONNECT = '.CONNECT'
+        self.COMMAND_DISCONNECT = '.DISCONNECT'
 
         self.MESSAGE_HELP = '.LOG <on/off> - view server logs\n' \
                             '.GAME <player> <view/edit/delete> - manage players\n' \
+                            '.CONNECT [address] [port] - connect to server\n' \
+                            '.DISCONNECT - disconnect from server\n' \
                             '.SHUTDOWN - server shutdown\n' \
-                            '.CLEAR - clear console log'
+                            '.CLEAR - clear console log' \
 
         self.MESSAGE_LOG = 'LOG COMMAND:\nPrint server logs in console <on/off>'
         self.MESSAGE_LOG_ON = 'LOG COMMAND:\nTurned server logging on successfully.'
@@ -46,18 +51,25 @@ class Console:
         self.MESSAGE_SHUTDOWN_YES = 'Y'
         self.MESSAGE_SHUTDOWN_NO = 'N'
 
+        self.MESSAGE_DISCONNECT = 'DISCONNECT COMMAND:\nDisconnected from server successfully.'
+
+        self.MESSAGE_ERROR_CONNECT = 'CONNECT COMMAND:\nFailed to connect to server (the server is either offline or an invalid address was entered.'
+        self.MESSAGE_ERROR_DISCONNECT = 'DISCONNECT COMMAND:\nUnable to disconnect from server (there may have been no connection)'
+
         self.IP = 'chat-sv.ddns.net'
         self.PORT = 6666
 
+        self.consoleSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     def draw(self):
-        global Window, chatBox, messageBox, hasConfirmed
+        global Window, chatBox, commandBox, hasConfirmed
 
         hasConfirmed = False
 
         def send(event):
             eventPlay = str(event)
             eventPlay.split()
-            self.command(messageBox.get())
+            self.command(commandBox.get())
 
         Window = Tk()
         Window.geometry(self.WINDOW_RESOLUTION)
@@ -65,20 +77,20 @@ class Console:
         Window.title(self.WINDOW_TITLE)
 
         titleText = StringVar()
-        enterMessageText = StringVar()
+        enterCommandText = StringVar()
         buttonText = StringVar()
         errorText = StringVar()
 
         titleText.set('SERVER CONSOLE')
-        enterMessageText.set('M E S S A G E')
+        enterCommandText.set('C O M M A N D')
         buttonText.set(' → ')
         errorText.set('')
 
         titleLabel = Label(Window, textvariable=titleText, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
 
-        messageLabel = Label(Window, textvariable=enterMessageText, width=16, font=('Segoe UI', 8, 'bold'), fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND)
-        messageBox = Entry(Window, width=52, bd=0, font=('Segoe UI', 10, 'bold'), fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_HIGHLIGHT_BACKGROUND)
-        sendButton = Button(Window, textvariable=buttonText, font=('Segoe UI', 8, ''), width=7, bd=0, fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND, command=lambda: self.command(messageBox.get()))
+        commandLabel = Label(Window, textvariable=enterCommandText, width=16, font=('Segoe UI', 8, 'bold'), fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND)
+        commandBox = Entry(Window, width=52, bd=0, font=('Segoe UI', 10, 'bold'), fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_HIGHLIGHT_BACKGROUND)
+        sendButton = Button(Window, textvariable=buttonText, font=('Segoe UI', 8, ''), width=7, bd=0, fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND, command=lambda: self.command(commandBox.get()))
 
         chatBox = Text(Window, bd=2, bg=self.WINDOW_BACKGROUND, height="8", width="67", font=('courier new', 10))
 
@@ -86,12 +98,12 @@ class Console:
 
         chatBox.place(relx=0.05, rely=0.23)
 
-        messageLabel.place(relx=0.05, rely=0.85374)
-        messageBox.place(relx=0.265, rely=0.852)
+        commandLabel.place(relx=0.05, rely=0.85374)
+        commandBox.place(relx=0.265, rely=0.852)
         sendButton.place(relx=0.872, rely=0.852)
 
-        messageBox.focus_force()
-        messageBox.bind('<Return>', send)
+        commandBox.focus_force()
+        commandBox.bind('<Return>', send)
 
         chatBox.config(state=DISABLED)
 
@@ -100,42 +112,62 @@ class Console:
     def command(self, cmd):
         global hasConfirmed
 
-        chatBox.config(state=NORMAL)
-        chatBox.insert(END, '\n')
         if self.COMMAND_HELP in cmd.upper():
-            chatBox.insert(END, '\n' + self.MESSAGE_HELP)
+            self.show(self.MESSAGE_HELP)
         if self.COMMAND_CLEAR in cmd.upper():
             chatBox.delete(1.0, END)
         elif self.COMMAND_LOG in cmd.upper():
             if len(cmd) <= 6:
-                chatBox.insert(END, '\n' + self.MESSAGE_LOG)
+                self.show(self.MESSAGE_LOG)
             else:
                 if cmd.upper().split()[1] == 'ON':
-                    chatBox.insert(END, '\n' + self.MESSAGE_LOG_ON)
+                    self.show(self.MESSAGE_LOG_ON)
                 elif cmd.upper().split()[1] == 'OFF':
-                    chatBox.insert(END, '\n' + self.MESSAGE_LOG_OFF)
+                    self.show(self.MESSAGE_LOG_OFF)
                 else:
-                    chatBox.insert(END, '\n' + self.MESSAGE_LOG_FAIL)
+                    self.show(self.MESSAGE_LOG_FAIL)
         elif self.COMMAND_GAME in cmd.upper():
             if len(cmd) <= 6:
-                chatBox.insert(END, '\n' + self.MESSAGE_GAME)
+                self.show(self.MESSAGE_GAME)
+        elif self.COMMAND_CONNECT in cmd.upper():
+            self.connect()
+        elif self.COMMAND_DISCONNECT in cmd.upper():
+            self.disconnect()
         elif self.COMMAND_SHUTDOWN in cmd.upper():
-            chatBox.insert(END, '\n' + self.MESSAGE_SHUTDOWN_WARNING)
+            self.show(self.MESSAGE_SHUTDOWN_WARNING)
             hasConfirmed = True
-        elif self.MESSAGE_SHUTDOWN_YES in cmd.upper():
+        elif self.MESSAGE_SHUTDOWN_YES == cmd.upper():
             if hasConfirmed:
-                chatBox.insert(END, '\n' + self.MESSAGE_SHUTDOWN_DONE)
+                self.show(self.MESSAGE_SHUTDOWN_DONE)
                 hasConfirmed = False
-        elif self.MESSAGE_SHUTDOWN_NO in cmd.upper():
+        elif self.MESSAGE_SHUTDOWN_NO == cmd.upper():
             if hasConfirmed:
-                chatBox.insert(END, '\n' + self.MESSAGE_SHUTDOWN_CANCELLED)
+                self.show(self.MESSAGE_SHUTDOWN_CANCELLED)
                 hasConfirmed = False
+        commandBox.delete(0, END)
 
+    def show(self, message):
+        chatBox.config(state=NORMAL)
+        chatBox.insert(END, '\n' + message + '\n')
         chatBox.tag_add('DEFAULT', 1.0, 1000.0)
         chatBox.tag_configure('DEFAULT', foreground=self.WINDOW_CHAT_BACKGROUND, font=('courier new', 10))
         chatBox.config(state=DISABLED)
         chatBox.see(END)
-        messageBox.delete(0, END)
+
+    def connect(self):
+        try:
+            self.consoleSocket.settimeout(3)
+            self.consoleSocket.connect((self.IP, self.PORT))
+            self.consoleSocket.settimeout(None)
+        except:
+            self.show(self.MESSAGE_ERROR_CONNECT)
+
+    def disconnect(self):
+        try:
+            self.consoleSocket.close()
+            self.show(self.MESSAGE_DISCONNECT)
+        except:
+            self.show(self.MESSAGE_ERROR_DISCONNECT)
 
     @staticmethod
     def close():

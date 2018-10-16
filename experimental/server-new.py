@@ -61,7 +61,7 @@ if __name__ == "__main__":
                             except:
                                 pass
                             try:
-                                Broadcast(sock, str.encode((tempstore) + " has left the server"), 'SEN')
+                                Broadcast(sock, str.encode(tempstore + " has left the server"), 'SEN')
                                 time.sleep(.03)
                                 Broadcast(sock, str.encode('.;/~' + tempstore), 'SEN')
                             except Exception as details:
