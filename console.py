@@ -205,15 +205,16 @@ class Console:
         global isEditing, playerData
 
         playerData = self.request(name)
-        playerData = ast.literal_eval(playerData)
-        self.show((playerData['information']['username']).upper() + ' - INFORMATION', False)
-        self.show('1: USERNAME: ' + playerData['information']['username'], False)
-        self.show('2: LEVEL: ' + playerData['information']['level'], False)
-        self.show('3: XP: ' + playerData['information']['xp'], False)
-        self.show('4: CREDITS: ' + playerData['game']['credits'], False)
-        self.show('5: POINTS: ' + playerData['game']['points'], True)
-        self.show(self.MESSAGE_GAME_ENTER_NUM, False)
-        isEditing = True
+        if playerData:
+            playerData = ast.literal_eval(playerData)
+            self.show((playerData['information']['username']).upper() + ' - INFORMATION', False)
+            self.show('1: USERNAME: ' + playerData['information']['username'], False)
+            self.show('2: LEVEL: ' + playerData['information']['level'], False)
+            self.show('3: XP: ' + playerData['information']['xp'], False)
+            self.show('4: CREDITS: ' + playerData['game']['credits'], False)
+            self.show('5: POINTS: ' + playerData['game']['points'], True)
+            self.show(self.MESSAGE_GAME_ENTER_NUM, False)
+            isEditing = True
 
     def change(self, val, new):
         global isEditing, isEditingFinal
