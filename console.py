@@ -11,8 +11,8 @@ class Console:
         self.WINDOW_SPECIAL_FOREGROUND = '#2F3640'
         self.WINDOW_SPECIAL_BACKGROUND = '#DCDDE1'
         self.WINDOW_HIGHLIGHT_BACKGROUND = '#535C68'
-        self.WINDOW_CHAT_BACKGROUND = '#BDC3C7'
-        # self.WINDOW_CHAT_BACKGROUND = '#f39c12'
+        # self.WINDOW_CHAT_BACKGROUND = '#BDC3C7'
+        self.WINDOW_CHAT_BACKGROUND = '#f39c12'
         self.WINDOW_TITLE = 'Console'
         self.WINDOW_TITLE_FONT = ('Arial', 16, 'bold')
         self.WINDOW_SUB_FONT = ('Arial', 11, 'bold')
@@ -174,14 +174,17 @@ class Console:
                     self.change(valNumber, cmd)
             except:
                 pass
-            if isEditing:
-                for numbers in self.GAME_EDIT_NUMBERS:
-                    if numbers == int(cmd):
-                        valNumber = int(cmd)
-                        isEditingFinal = True
-                        isEditing = False
-                        self.show('\n' + self.MESSAGE_GAME_NEW)
-                        break
+            try:
+                if isEditing:
+                    for numbers in self.GAME_EDIT_NUMBERS:
+                        if numbers == int(cmd):
+                            valNumber = int(cmd)
+                            isEditingFinal = True
+                            isEditing = False
+                            self.show('\n' + self.MESSAGE_GAME_NEW)
+                            break
+            except:
+                pass
         commandBox.delete(0, END)
 
     def request(self, name):
