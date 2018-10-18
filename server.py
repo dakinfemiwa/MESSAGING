@@ -82,7 +82,7 @@ if __name__ == "__main__":
                                 print('[' + str(datetime.now().strftime(
                                     "%H:%M:%S")) + '] ' + 'DISCONNECT: Client [%s, %s] disconnected' % addr)
                             except Exception as details:
-                                print('ERROR OCCURED')
+                                print(details)
                             sock.close()
                             CLIST.remove(sock)
                             continue
@@ -266,6 +266,27 @@ if __name__ == "__main__":
                                 print('[' + str(datetime.now().strftime(
                                         "%H:%M:%S")) + '] ' + 'GAME: Hangman word was guessed correctly')
 
+                            elif 'D1SC0NN3CT' in data.decode():
+                                print('close')
+                                print('[' + str(datetime.now().strftime(
+                                    "%H:%M:%S")) + '] ' + 'DISCONNECT: Client [%s, %s] disconnected' % addr)
+                                sock.close()
+                                CLIST.remove(sock)
+
+                            elif 'QU3RY' in data.decode():
+                                nameQuery = data.decode().strip('QU3RY')
+                                try:
+                                    with open('data/data-{0}.json'.format(nameQuery), 'r') as jsonConfig:
+                                        config = json.load(jsonConfig)
+                                        time.sleep(.08)
+                                        sock.send(str.encode(str(config)))
+                                except Exception as e:
+                                    import sys
+                                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                                    print(exc_type, fname, exc_tb.tb_lineno)
+                                    sock.send(str.encode('GAME COMMAND:\nCould not retrieve user data for \'{0}\''.format(nameQuery)))
+
                             elif '€' == str(data.decode())[0]:
                                 unsavedData = str(data.decode()).strip('€')
                                 unsavedData = ast.literal_eval(unsavedData)
@@ -387,9 +408,8 @@ if __name__ == "__main__":
                                         pass
                                 else:
                                     try:
-                                        Broadcast(sock, data, Users[addr])
+                                        Broadcast(sock, data,'SOLO')
                                     except:
-                                        Broadcast(sock, data, 'SOLO')
                                         print('[' + str(datetime.now().strftime(
                                             "%H:%M:%S")) + '] ' + 'ERROR: Unable to broadcast message - hard disconnect')
             except Exception as e:
