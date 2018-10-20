@@ -7,9 +7,9 @@
                 "foreground": "#FFFFFF",
                 "background": "#141414",
                 "title": "CHAT-UI",
-                "theme": "#FF0000",
+                "theme": "#00BFFF",
                 "resolution": "900x400",
-                "font": "COURIER NEW"
+                "font": "ARIAL"
         },
         "settings": {
                 "auth": "true",

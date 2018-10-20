@@ -11,8 +11,8 @@ class Console:
         self.WINDOW_SPECIAL_FOREGROUND = '#2F3640'
         self.WINDOW_SPECIAL_BACKGROUND = '#DCDDE1'
         self.WINDOW_HIGHLIGHT_BACKGROUND = '#535C68'
-        # self.WINDOW_CHAT_BACKGROUND = '#BDC3C7'
-        self.WINDOW_CHAT_BACKGROUND = '#f39c12'
+        self.WINDOW_CHAT_BACKGROUND = '#BDC3C7'
+        # self.WINDOW_CHAT_BACKGROUND = '#f39c12'
         self.WINDOW_TITLE = 'Console'
         self.WINDOW_TITLE_FONT = ('Arial', 16, 'bold')
         self.WINDOW_SUB_FONT = ('Arial', 11, 'bold')
@@ -73,25 +73,52 @@ class Console:
         self.GAME_EDIT_VAlUES = ['username', 'level', 'xp', 'credits', 'points']
 
         self.IP = 'chat-sv.ddns.net'
-        self.IP = '127.0.0.1'
+        # self.IP = '127.0.0.1'
         self.PORT = 6666
 
         self.consoleSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.commandCache = []
 
     def draw(self):
-        global Window, chatBox, commandBox, hasConfirmed
+        global Window, chatBox, commandBox, hasConfirmed, cmdIndex
 
         hasConfirmed = False
+        cmdIndex = -1
 
         def send(event):
             eventPlay = str(event)
             eventPlay.split()
             self.command(commandBox.get())
 
+        def upKey(event):
+            global cmdIndex
+            try:
+                if cmdIndex != len(self.commandCache) - 1:
+                    commandBox.delete(0, END)
+                    cmdIndex += 1
+                    commandBox.insert(END, self.commandCache[cmdIndex])
+            except:
+                pass
+
+        def downKey(event):
+            global cmdIndex
+            try:
+                if cmdIndex > 0:
+                    commandBox.delete(0, END)
+                    cmdIndex -= 1
+                    commandBox.insert(END, self.commandCache[cmdIndex])
+                else:
+                    commandBox.delete(0, END)
+            except:
+                pass
+
         Window = Tk()
         Window.geometry(self.WINDOW_RESOLUTION + '+200+200')
         Window.configure(bg=self.WINDOW_BACKGROUND)
         Window.title(self.WINDOW_TITLE)
+
+        Window.bind('<Up>', upKey)
+        Window.bind('<Down>', downKey)
 
         titleText = StringVar()
         enterCommandText = StringVar()
@@ -101,11 +128,16 @@ class Console:
         enterCommandText.set('C O M M A N D')
         buttonText.set(' → ')
 
-        titleLabel = Label(Window, textvariable=titleText, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
+        titleLabel = Label(Window, textvariable=titleText, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND,
+                           fg=self.WINDOW_FOREGROUND)
 
-        commandLabel = Label(Window, textvariable=enterCommandText, width=16, font=('Segoe UI', 8, 'bold'), fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND)
-        commandBox = Entry(Window, width=52, bd=0, font=('Segoe UI', 10, 'bold'), fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_HIGHLIGHT_BACKGROUND)
-        sendButton = Button(Window, textvariable=buttonText, font=('Segoe UI', 8, ''), width=7, bd=0, fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND, command=lambda: self.command(commandBox.get()))
+        commandLabel = Label(Window, textvariable=enterCommandText, width=16, font=('Segoe UI', 8, 'bold'),
+                             fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND)
+        commandBox = Entry(Window, width=52, bd=0, font=('Segoe UI', 10, 'bold'), fg=self.WINDOW_FOREGROUND,
+                           bg=self.WINDOW_HIGHLIGHT_BACKGROUND)
+        sendButton = Button(Window, textvariable=buttonText, font=('Segoe UI', 8, ''), width=7, bd=0,
+                            fg=self.WINDOW_SPECIAL_FOREGROUND, bg=self.WINDOW_SPECIAL_BACKGROUND,
+                            command=lambda: self.command(commandBox.get()))
 
         chatBox = Text(Window, bd=2, bg=self.WINDOW_BACKGROUND, height="8", width="67", font=('courier new', 10))
         # chatScrollbar = Scrollbar(Window, orient="vertical")
@@ -130,6 +162,8 @@ class Console:
 
     def command(self, cmd):
         global hasConfirmed, isEditingFinal, valNumber, isEditing
+
+        self.commandCache.insert(0, cmd)
 
         if self.COMMAND_HELP in cmd.upper():
             self.show(self.MESSAGE_HELP)
@@ -181,7 +215,7 @@ class Console:
                             valNumber = int(cmd)
                             isEditingFinal = True
                             isEditing = False
-                            self.show('\n' + self.MESSAGE_GAME_NEW)
+                            self.show('\n' + self.MESSAGE_GAME_NEW, True)
                             break
             except:
                 pass
@@ -191,7 +225,7 @@ class Console:
         self.connect()
         self.consoleSocket.send(str.encode('QU3RY' + name))
         while True:
-            serverResponse = self.consoleSocket.recv(4096,).decode()
+            serverResponse = self.consoleSocket.recv(4096, ).decode()
             if 'information' in serverResponse:
                 returnedData = serverResponse
                 break

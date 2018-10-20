@@ -101,6 +101,18 @@ elif 40 <= GH_LEVEL < 60:
 elif 60 <= GH_LEVEL < 80:
     GH_COL = '#f39c12'
     GH_COL2 = '#f1c40f'
+
+elif 80 <= GH_LEVEL < 100:
+    GH_COL = '#6D214F'
+    GH_COL2 = '#B33771'
+
+elif 100 <= GH_LEVEL < 120:
+    GH_COL = '#82589F'
+    GH_COL2 = '#D6A2E8'
+
+else:
+    GH_COL = '#182C61'
+    GH_COL2 = '#3B3B98'
     
 playedStr = '{0} played'.format(GH_H_PLAYED)
 
@@ -153,7 +165,6 @@ class GameMenu:
         time.sleep(.08)
         clientSocket.close()
 
-
     @staticmethod
     def refresh():
         emptyBar.place(relx=.052, rely=.885)
@@ -185,7 +196,7 @@ class GameMenu:
         fillBar.place(relx=.052, rely=.885)
 
         roleButton = Button(Dashboard, text=GH_ROLE.upper(), font=('Segoe UI', 12, 'bold'), fg=GH_ROLE_COLOUR, bg='#141414', bd=0, height=1)
-        roleButton.place(relx=.32, rely=.825)
+        #roleButton.place(relx=.32, rely=.825)
 
         if GH_XP >= GH_TOTAL:
             levelUpButton = Button(Dashboard, text='LEVEL UP', font=('Segoe UI', 12, 'bold'), fg='#2ecc71', bg='#141414', bd=0, height=1, command=lambda: levelUp())
@@ -287,6 +298,22 @@ class GameMenu:
                 myData["hangman"]["date"] = datetime.now().strftime("%d/%m/%Y")
             GameMenu.save(myData)
 
+        def resetStats():
+            myData["game"]["wins"] = '0'
+            myData["game"]["ties"] = '0'
+            myData["game"]["losses"] = '0'
+            myData["hangman"]["ties"] = '0'
+            myData["hangman"]["wins"] = '0'
+            myData["hangman"]["losses"] = '0'
+            myData["tictactoe"]["wins"] = '0'
+            myData["tictactoe"]["losses"] = '0'
+            GameMenu.save(myData)
+
+            savedLabel = Label(Dashboard, text='Reset statistics successfully', font=("Segoe UI", 10, "bold italic"), fg='#bdc3c7', bg='#141414')
+            savedLabel.place(relx=.7, rely=.732)
+
+            Dashboard.after(3000, lambda: savedLabel.place_forget())
+
         def showStats():
             global statsItems
             
@@ -344,7 +371,7 @@ class GameMenu:
             playedStat2.place(relx=.78, rely=.61)
 
             ResetButton = Button(Dashboard, text='RESET STATS', font=('Segoe UI', 12, 'bold'), bg='#141414', borderwidth=0,
-                                  fg='#f1c40f', command=lambda: Dashboard.destroy())
+                                  fg='#f1c40f', command=lambda: resetStats())
             ResetButton.place(relx=.8, rely=.72)
 
             statsItems = [ResetButton, winsLabel2, loseLabel2, playedLabel2, winsStat2, loseStat2, playedStat2, statsLabel, tStatsLabel, hStatsLabel, winsLabel, tiesLabel, loseLabel, playedLabel, winsStat, tiesStat, loseStat, playedStat]
@@ -367,6 +394,20 @@ class GameMenu:
             elif 60 <= newLevel < 80:
                 GH_COL = '#f39c12'
                 GH_COL2 = '#f1c40f'
+
+            elif 80 <= newLevel < 100:
+                GH_COL = '#6D214F'
+                GH_COL2 = '#B33771'
+
+            elif 100 <= newLevel < 120:
+                GH_COL = '#82589F'
+                GH_COL2 = '#D6A2E8'
+
+            else:
+                GH_COL = '#182C61'
+                GH_COL2 = '#3B3B98'
+
+
             hideAll()
             statsButton.place_forget()
             gameButton.place_forget()
