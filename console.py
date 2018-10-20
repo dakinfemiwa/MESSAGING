@@ -53,6 +53,7 @@ class Console:
 
         self.MESSAGE_SHUTDOWN_WARNING = 'SHUTDOWN COMMAND:\nAre you sure you want to shutdown the server? <Y/N>'
         self.MESSAGE_SHUTDOWN_DONE = 'SHUTDOWN COMMAND:\nSent shutdown command to server successfully.'
+        self.MESSAGE_SHUTDOWN_FAIL = 'SHUTDOWN COMMAND:\nFailed to send shutdown command to server.'
         self.MESSAGE_SHUTDOWN_CANCELLED = 'SHUTDOWN COMMAND:\nCancelled server shutdown command successfully.'
         self.MESSAGE_SHUTDOWN_YES = 'Y'
         self.MESSAGE_SHUTDOWN_NO = 'N'
@@ -196,7 +197,10 @@ class Console:
             hasConfirmed = True
         elif self.MESSAGE_SHUTDOWN_YES == cmd.upper():
             if hasConfirmed:
-                self.show(self.MESSAGE_SHUTDOWN_DONE)
+                if self.shutdown():
+                    self.show(self.MESSAGE_SHUTDOWN_DONE)
+                else:
+                    self.show(self.MESSAGE_SHUTDOWN_FAIL)
                 hasConfirmed = False
         elif self.MESSAGE_SHUTDOWN_NO == cmd.upper():
             if hasConfirmed:
@@ -220,6 +224,13 @@ class Console:
             except:
                 pass
         commandBox.delete(0, END)
+
+    def shutdown(self):
+        try:
+            self.consoleSocket.send(str.encode('SHUTD0WN'))
+            return True
+        except OSError:
+            return False
 
     def request(self, name):
         self.connect()

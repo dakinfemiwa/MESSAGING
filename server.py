@@ -266,6 +266,12 @@ if __name__ == "__main__":
                                 print('[' + str(datetime.now().strftime(
                                         "%H:%M:%S")) + '] ' + 'GAME: Hangman word was guessed correctly')
 
+                            elif 'SHUTD0WN' in data.decode():
+                                print('Received shutdown command')
+                                time.sleep(2)
+                                serverSocket.close()
+                                break
+
                             elif 'D1SC0NN3CT' in data.decode():
                                 print('close')
                                 print('[' + str(datetime.now().strftime(

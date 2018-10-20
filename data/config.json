@@ -9,7 +9,7 @@
                 "title": "CHAT-UI",
                 "theme": "#00BFFF",
                 "resolution": "900x400",
-                "font": "ARIAL"
+                "font": "COURIER NEW"
         },
         "settings": {
                 "auth": "true",
