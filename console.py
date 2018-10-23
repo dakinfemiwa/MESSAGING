@@ -169,7 +169,7 @@ class Console:
         if self.COMMAND_HELP in cmd.upper():
             self.show(self.MESSAGE_HELP)
         if self.COMMAND_CLEAR in cmd.upper():
-            commandBox.delete(1.0, END)
+            chatBox.delete(1.0, END)
         elif self.COMMAND_LOG in cmd.upper():
             if len(cmd) <= 6:
                 self.show(self.MESSAGE_LOG)
