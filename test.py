@@ -1,6 +1,8 @@
 from tkinter import *
 import socket
 import random
+import _thread
+
 
 class Game:
     def __init__(self, data):
@@ -40,8 +42,8 @@ class Game:
         self.STR_LOBBY_READY = 'READY'
         self.STR_LOBBY_UNREADY = 'UNREADY'
 
-        # self.IP = '127.0.0.1'
-        self.IP = 'chat-sv.ddns.net'
+        self.IP = '127.0.0.1'
+        # self.IP = 'chat-sv.ddns.net'
         self.PORT = 6666
 
         def nextPage():
@@ -52,11 +54,14 @@ class Game:
             self.pageNumber = self.pageNumber - 1
             self.set(self.pageNumber)
 
-        self.consoleSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.gameSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.commandCache = []
         self.windowItems = []
         self.pageNumber = 1
         self.hostCode = 'N/A'
+        self.gameState = 'N/A'
+        self.gamePlayers = []
+        self.readyPlayers = []
 
         self.Window = Tk()
         self.Window.geometry(self.WINDOW_RESOLUTION)
@@ -69,62 +74,156 @@ class Game:
         self.titleText.set((data['information']['username']).upper())
         self.creditsText.set(data['game']['credits'] + ' credits')
 
-        self.titleLabel = Label(self.Window, textvariable=self.titleText, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
+        self.titleLabel = Label(self.Window, textvariable=self.titleText, font=self.WINDOW_TITLE_FONT,
+                                bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
         self.titleLabel.place(relx=.05, rely=.08)
 
-        self.creditsLabel = Label(self.Window, textvariable=self.creditsText, font=self.WINDOW_SUB_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
+        self.creditsLabel = Label(self.Window, textvariable=self.creditsText, font=self.WINDOW_SUB_FONT,
+                                  bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
         # self.creditsLabel.place(relx=.82, rely=.10)
 
-        self.hostButton = Button(self.Window, text=self.STR_HOST_MATCH, font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME, command=lambda: self.set(2), bd=0)
-        self.hostInfo = Label(self.Window, text=self.MESSAGE_HOST_MATCH, font=self.WINDOW_SUB_FONT2, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+        self.hostButton = Button(self.Window, text=self.STR_HOST_MATCH, font=self.WINDOW_BUTTON_FONT,
+                                 bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME, command=lambda: self.set(2), bd=0)
+        self.hostInfo = Label(self.Window, text=self.MESSAGE_HOST_MATCH, font=self.WINDOW_SUB_FONT2,
+                              bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
 
-        self.joinButton = Button(self.Window, text=self.STR_JOIN_MATCH, font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME2, command=lambda: self.set(3), bd=0)
-        self.joinInfo = Label(self.Window, text=self.MESSAGE_JOIN_MATCH, font=self.WINDOW_SUB_FONT2, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+        self.joinButton = Button(self.Window, text=self.STR_JOIN_MATCH, font=self.WINDOW_BUTTON_FONT,
+                                 bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME2, command=lambda: self.set(3), bd=0)
+        self.joinInfo = Label(self.Window, text=self.MESSAGE_JOIN_MATCH, font=self.WINDOW_SUB_FONT2,
+                              bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
 
-        self.nextButton = Button(self.Window, text='→', font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME, command=lambda: nextPage(), bd=0)
+        self.nextButton = Button(self.Window, text='→', font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND,
+                                 fg=self.WINDOW_THEME, command=lambda: nextPage(), bd=0)
         self.nextButton.place(relx=.92, rely=.84)
 
-        self.backButton = Button(self.Window, text='←', font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME, command=lambda: lastPage(), bd=0)
+        self.backButton = Button(self.Window, text='←', font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND,
+                                 fg=self.WINDOW_THEME, command=lambda: lastPage(), bd=0)
         self.backButton.place(relx=.05, rely=.84)
 
-        self.codeLabel = Label(self.Window, text=self.hostCode, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+        self.codeLabel = Label(self.Window, text=self.hostCode, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND,
+                               fg=self.WINDOW_CHAT_BACKGROUND)
 
-        self.codeInfo = Label(self.Window, text=self.MESSAGE_HOST_CODE, font=self.WINDOW_SUB_FONT2, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
-        self.entryInfo = Label(self.Window, text=self.MESSAGE_JOIN_CODE, font=self.WINDOW_SUB_FONT2, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+        self.codeInfo = Label(self.Window, text=self.MESSAGE_HOST_CODE, font=self.WINDOW_SUB_FONT2,
+                              bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+        self.entryInfo = Label(self.Window, text=self.MESSAGE_JOIN_CODE, font=self.WINDOW_SUB_FONT2,
+                               bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
 
-        self.codeEntry = Entry(self.Window, width=10, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND, bd=0)
+        self.codeEntry = Entry(self.Window, width=10, font=self.WINDOW_TITLE_FONT, bg=self.WINDOW_BACKGROUND,
+                               fg=self.WINDOW_CHAT_BACKGROUND, bd=0)
         self.codeEntry.configure(insertbackground=self.WINDOW_THEME2)
 
-        self.lobbyChat = Text(self.Window, bd=0, bg=self.WINDOW_BACKGROUND, fg='white', height="7", width="40", font=self.WINDOW_LOBBY_FONT)
-        self.lobbyEntry = Entry(self.Window, width=39, font=self.WINDOW_SUB_FONT, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND, bd=2)
+        self.lobbyChat = Text(self.Window, bd=0, bg=self.WINDOW_BACKGROUND, fg='white', height="7", width="40",
+                              font=self.WINDOW_LOBBY_FONT)
+        self.lobbyEntry = Entry(self.Window, width=39, font=self.WINDOW_SUB_FONT, bg=self.WINDOW_BACKGROUND,
+                                fg=self.WINDOW_CHAT_BACKGROUND, bd=2)
         self.lobbyEntry.configure(insertbackground='white')
 
-        self.lobbyPlayers = Label(self.Window, text='Players currently connected [2/5]', font=('Segoe UI', 10, 'bold italic'), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND)
+        self.lobbyPlayers = Label(self.Window, text='Players currently connected [2/4]',
+                                  font=('Segoe UI', 10, 'bold italic'), fg=self.WINDOW_CHAT_BACKGROUND,
+                                  bg=self.WINDOW_BACKGROUND)
 
-        self.playerOne = Label(self.Window, text=testData['information']['username'], font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND)
-        self.playerTwo = Label(self.Window, text='Green', font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND)
-        self.playerThree = Label(self.Window, text='Yellow', font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND)
-        self.playerFour = Label(self.Window, text='Blue', font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND)
+        self.playerOne = Label(self.Window, text=testData['information']['username'], font=self.WINDOW_SUB_FONT2,
+                               fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND)
+        self.playerTwo = Label(self.Window, text='--', font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND,
+                               bg=self.WINDOW_BACKGROUND)
+        self.playerThree = Label(self.Window, text='--', font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND,
+                                 bg=self.WINDOW_BACKGROUND)
+        self.playerFour = Label(self.Window, text='--', font=self.WINDOW_SUB_FONT2, fg=self.WINDOW_CHAT_BACKGROUND,
+                                bg=self.WINDOW_BACKGROUND)
 
-        self.readyOne = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c', bg=self.WINDOW_BACKGROUND)
-        self.readyTwo = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#2ecc71', bg=self.WINDOW_BACKGROUND)
-        self.readyThree = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c', bg=self.WINDOW_BACKGROUND)
-        self.readyFour = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c', bg=self.WINDOW_BACKGROUND)
+        self.readyOne = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c',
+                              bg=self.WINDOW_BACKGROUND)
+        self.readyTwo = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c',
+                              bg=self.WINDOW_BACKGROUND)
+        self.readyThree = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c',
+                                bg=self.WINDOW_BACKGROUND)
+        self.readyFour = Label(self.Window, text='▇', font=self.WINDOW_SUB_FONT2, fg='#e74c3c',
+                               bg=self.WINDOW_BACKGROUND)
 
-        self.lobbyLeave = Button(self.Window, text=self.STR_LOBBY_EXIT, font=('segoe ui', 10, 'bold'), bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0, command=lambda: self.exitlobby())
-        self.lobbyReady = Button(self.Window, text=self.STR_LOBBY_READY, font=('segoe ui', 10, 'bold'), bg=self.WINDOW_BACKGROUND, fg='#2ecc71', bd=0, command=lambda: self.readyplayer())
-        self.lobbyUnready = Button(self.Window, text=self.STR_LOBBY_UNREADY, font=('segoe ui', 10, 'bold'), bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0, command=lambda: self.readyplayer(False))
+        self.lobbyLeave = Button(self.Window, text=self.STR_LOBBY_EXIT, font=('segoe ui', 10, 'bold'),
+                                 bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0, command=lambda: self.exitlobby())
+        self.lobbyReady = Button(self.Window, text=self.STR_LOBBY_READY, font=('segoe ui', 10, 'bold'),
+                                 bg=self.WINDOW_BACKGROUND, fg='#2ecc71', bd=0, command=lambda: self.readyplayer())
+        self.lobbyUnready = Button(self.Window, text=self.STR_LOBBY_UNREADY, font=('segoe ui', 10, 'bold'),
+                                   bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
+                                   command=lambda: self.readyplayer(False))
+        self.lobbyTest = Button(self.Window, text='TEST', font=('segoe ui', 10, 'bold'),
+                                   bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
+                                   command=lambda: self.send('JOIN REQUEST:Player'))
+        self.lobbyTest.place(relx=.4, rely=.85)
 
-        self.windowItems = [self.hostButton, self.hostInfo, self.joinButton, self.joinInfo, self.codeLabel, self.codeInfo,
-                            self.codeEntry, self.entryInfo, self.lobbyEntry, self.lobbyChat, self.lobbyPlayers, self.playerOne,
-                            self.playerTwo, self.playerThree, self.playerFour, self.readyOne, self.readyTwo, self.readyThree,
+        self.playerLabels = [self.playerOne, self.playerTwo, self.playerThree, self.playerFour]
+
+        self.windowItems = [self.hostButton, self.hostInfo, self.joinButton, self.joinInfo, self.codeLabel,
+                            self.codeInfo,
+                            self.codeEntry, self.entryInfo, self.lobbyEntry, self.lobbyChat, self.lobbyPlayers,
+                            self.playerOne,
+                            self.playerTwo, self.playerThree, self.playerFour, self.readyOne, self.readyTwo,
+                            self.readyThree,
                             self.readyFour, self.lobbyLeave, self.lobbyReady, self.lobbyUnready]
 
         # self.set(self.pageNumber)
-        self.set(4)
+        self.set(1)
         # self.notify()
 
+        self.connect()
+        _thread.start_new_thread(self.listen, ())
+
         self.Window.mainloop()
+
+    def connect(self):
+        try:
+            self.gameSocket.connect((self.IP, self.PORT))
+        except:
+            self.chat('ERROR: Failed to connect to relay server\n')
+
+    def send(self, message):
+        self.gameSocket.send(str.encode(message))
+
+    def refresh(self):
+        for player in self.gamePlayers:
+            pIndex = self.gamePlayers.index(player)
+            self.playerLabels[pIndex].config(text=player)
+
+    def joinmatch(self):
+        self.connect()
+        self.send('JOIN REQUEST:Player')
+
+    def listen(self):
+        # self.connect()
+        print('listening!')
+        while True:
+            try:
+                receivedData = self.gameSocket.recv(4096)
+                receivedData = receivedData.decode()
+            except:
+                try:
+                    self.chat('ERROR: Lost connection to game server\n')
+                except:
+                    pass
+                break
+            if not receivedData:
+                try:
+                    self.chat('ERROR: Lost connection to game server\n')
+                except:
+                    pass
+                break
+            else:
+                print(receivedData)
+                print(self.gameState)
+                if self.gameState == 'N/A':
+                    allArguments = receivedData.split(':')
+                    if allArguments[0] == 'JOIN REQUEST':
+                        requesterName = allArguments[1]
+                        self.gamePlayers.append(requesterName)
+                        self.refresh()
+                        self.chat('GAME: {0} joined the lobby'.format(requesterName.upper()))
+                    elif allArguments[0] == 'READY':
+                        readyPlayer = allArguments[1]
+                        self.readyPlayers.append(readyPlayer)
+                    elif allArguments[0] == 'UNREADY':
+                        unreadyPlayer = allArguments[1]
+                        self.readyPlayers.remove(unreadyPlayer)
 
     @staticmethod
     def generate():
@@ -143,6 +242,7 @@ class Game:
 
     def host(self):
         self.clear()
+        self.gameState = 'HOST'
         self.hostCode = self.generate()
         self.hostButton.place(relx=.05, rely=.3)
         self.codeLabel.place(relx=.054, rely=.44)
@@ -150,29 +250,37 @@ class Game:
         self.codeLabel.config(text=self.hostCode)
 
     def join(self):
+        def sendcode(event):
+            self.joinmatch()
         self.clear()
+        self.gameState = 'JOIN'
         self.joinButton.place(relx=.05, rely=.3)
         self.codeEntry.place(relx=.055, rely=.44)
         self.entryInfo.place(relx=.055, rely=.61)
         self.codeEntry.focus_force()
+        self.codeEntry.bind('<Return>', sendcode)
 
     def notify(self):
-        self.notificationBox = Text(self.Window, bg='#141414', fg='white', font=('Arial', 11, 'bold'), bd=0, width=59, height=1)
+        self.notificationBox = Text(self.Window, bg='#141414', fg='white', font=('Arial', 11, 'bold'), bd=0, width=59,
+                                    height=1)
         self.notificationBox.place(relx=.11, rely=.86)
         self.notificationBox.insert(END, 'This is an example notification, no further action is required.')
         self.notificationBox.tag_add("!", 1.0, 99999999999999.0)
-        self.notificationBox.tag_config("!", foreground='WHITE', font=('Arial', 11, "bold"), justify='center', spacing1='1')
+        self.notificationBox.tag_config("!", foreground='WHITE', font=('Arial', 11, "bold"), justify='center',
+                                        spacing1='1')
         self.notificationBox.config(state=DISABLED)
 
     def lobby(self):
 
         def send(event):
             if self.lobbyEntry.get() != '':
-                self.chat('TEST (HOST): ' + self.lobbyEntry.get() + '\n')
+                self.chat('{0} ({1}): '.format((testData['information']['username']).upper(), self.gameState) + self.lobbyEntry.get() + '\n')
                 self.lobbyEntry.delete(0, END)
-                self.lobbyChat.see(END)
 
         self.chat('HOST: Created new lobby\n')
+        self.gameState = 'HOST-LOBBY'
+        self.gamePlayers.append(testData['information']['username'])
+        self.refresh()
 
         self.clear()
         self.lobbyChat.place(relx=.052, rely=.26)
@@ -196,27 +304,36 @@ class Game:
         self.lobbyReady.place(relx=.6075, rely=.75)
         self.lobbyLeave.place(relx=.8, rely=.75)
 
+        # _thread.start_new_thread(self.listen, ())
+
     def chat(self, text):
         self.lobbyChat.config(state=NORMAL)
         self.lobbyChat.tag_add('DEFAULT', 1.0, 1000.0)
         self.lobbyChat.tag_configure('DEFAULT', foreground=self.WINDOW_CHAT_BACKGROUND, font=('courier new', 10))
         self.lobbyChat.insert(END, text)
         self.lobbyChat.config(state=DISABLED)
+        self.lobbyChat.see(END)
 
     def readyplayer(self, x=True):
         if x:
+            # self.send('READY:{0}'.format(testData['information']['username']))
+            if self.gameState is not 'HOST-LOBBY':
+                self.send('READY:{0}'.format('Player'))
             self.chat('GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyReady.place_forget()
             self.lobbyUnready.place(relx=.6075, rely=.75)
             self.readyOne.config(fg='#2ecc71')
         else:
+            # self.send('READY:{0}'.format(testData['information']['username']))
+            if self.gameState is not 'HOST-LOBBY':
+                self.send('UNREADY:{0}'.format('Player'))
             self.chat('GAME: {0} is not ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyUnready.place_forget()
             self.lobbyReady.place(relx=.6075, rely=.75)
             self.readyOne.config(fg='#e74c3c')
 
     def exitlobby(self):
-        self.set(3)
+        self.set(1)
 
     def game(self):
         self.clear()
@@ -233,7 +350,7 @@ class Game:
             self.lobby()
         elif page == 5:
             self.game()
-        if page == 1:
+        if page == 1 or page == 4:
             self.backButton.place_forget()
         else:
             self.backButton.place(relx=.05, rely=.84)
@@ -241,7 +358,7 @@ class Game:
 
 testData = {
     'information': {
-        'username': 'Test'
+        'username': 'Shivam'
     },
     'game': {
         'credits': '300'

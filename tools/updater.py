@@ -3,6 +3,7 @@ import os
 import shutil
 import urllib.request
 from tkinter import *
+import zipfile
 
 
 class Updater:
@@ -60,7 +61,7 @@ class Updater:
         exitText = StringVar()
 
         programNameText = StringVar()
-        programVersionText  = StringVar()
+        programVersionText = StringVar()
         programNewText = StringVar()
         programStatusText = StringVar()
         
@@ -155,20 +156,7 @@ class Updater:
             return False
 
     def update(self):
-        """os.chdir('tools/temp')
-        main_url = self.CONFIG_PROGRAM_GITHUB.replace('github.com', 'raw.githubusercontent.com') + '/master/' + self.CONFIG_PROGRAM_FILES
-        os.rename('../../' + self.CONFIG_PROGRAM_FILES, self.CONFIG_PROGRAM_FILES + '.old')
-        urllib.request.urlretrieve(main_url, 'main.py')
-        os.rename('main.py', '../../' + self.CONFIG_PROGRAM_FILES)
-        updateButton.place_forget()
-        programStatusText.set('UPDATE DOWNLOADED')
-        os.remove('../../version.txt')
-        os.rename('version_new.txt', '../../version.txt')
-        notesButton.place(relx=0.66, rely=0.85)
-        os.chdir('../')
-        os.chdir('../')"""
 
-        """
         cwd = str(os.getcwd())
         cwd = cwd.replace(os.sep, '/')
         counter = 0
@@ -184,18 +172,31 @@ class Updater:
                 break
         folder.remove('/')
         folder = "".join(folder)
+
         os.chdir('../')
         shutil.make_archive(folder + '-BACKUP', 'zip', folder)
-        urllib.request.urlretrieve('https://github.com/dakinfemiwa/MESSAGING/archive/master.zip', folder + '-NEW.zip')
+        urllib.request.urlretrieve(self.CONFIG_PROGRAM_GITHUB + '/archive/master.zip', folder + '-NEW.zip')
         zip = zipfile.ZipFile(folder + '-NEW.zip')
+
         try:
             shutil.rmtree(folder, ignore_errors=True)
         except PermissionError:
             pass
-        zip.extractall(folder)
-        # os.rename('MESSAGING-master', folder)"""
+        zip.extractall()
 
+        for file in os.listdir(os.getcwd() + '/' + folder + '-master'):
+            os.rename(os.getcwd() + '/' + folder + '-master/' + file, os.getcwd() + '/' + folder + '/' + file)
 
+        zip.close()
+        try:
+            shutil.rmtree(folder + '-master', ignore_errors=True)
+            shutil.rmtree(folder + '-NEW.zip', ignore_errors=True)
+        except PermissionError:
+            pass
+        try:
+            os.remove(folder + '-NEW.zip')
+        except:
+            pass
 
     def notes(self):
         pass
@@ -204,4 +205,3 @@ class Updater:
 if __name__ == '__main__':
     Main = Updater()
     Main.draw()
-    
