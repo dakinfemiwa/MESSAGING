@@ -2,12 +2,24 @@ from tkinter import *
 import socket
 import random
 import _thread
+import time
 
 
 class Game:
     def __init__(self, data):
+        # 192a56 dark blue
+        # 2f3640 dark gray
+        # 40739e ok blue
+        # 6F1E51 magenta
+        # 0652DD marine blue
+        # 5758BB weird purple
+        # 0a3d62 good blue
+        # 1e272e almost black
+        # 000000 pure black
+
         self.WINDOW_RESOLUTION = '600x250'
         self.WINDOW_BACKGROUND = '#141414'
+        # self.WINDOW_BACKGROUND = '#000000'
         self.WINDOW_FOREGROUND = '#FFFFFF'
         self.WINDOW_SPECIAL_FOREGROUND = '#2F3640'
         self.WINDOW_SPECIAL_BACKGROUND = '#DCDDE1'
@@ -149,10 +161,11 @@ class Game:
                                    command=lambda: self.readyplayer(False))
         self.lobbyTest = Button(self.Window, text='TEST', font=('segoe ui', 10, 'bold'),
                                    bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
-                                   command=lambda: self.send('JOIN REQUEST:Player'))
+                                   command=lambda: (self.send('JOIN REQUEST:{0}'.format(testData['information']['username'])), self.lobby(False)))
         self.lobbyTest.place(relx=.4, rely=.85)
 
         self.playerLabels = [self.playerOne, self.playerTwo, self.playerThree, self.playerFour]
+        self.readyLabels = [self.readyOne, self.readyTwo, self.readyThree, self.readyFour]
 
         self.windowItems = [self.hostButton, self.hostInfo, self.joinButton, self.joinInfo, self.codeLabel,
                             self.codeInfo,
@@ -181,17 +194,25 @@ class Game:
         self.gameSocket.send(str.encode(message))
 
     def refresh(self):
+        for label in self.playerLabels:
+            label.config(text='--')
         for player in self.gamePlayers:
             pIndex = self.gamePlayers.index(player)
             self.playerLabels[pIndex].config(text=player)
+        for player in self.readyPlayers:
+            rIndex = self.gamePlayers.index(player)
+            self.readyLabels[rIndex].config(fg='#2ecc71')
+        for player in self.gamePlayers:
+            rIndex = self.gamePlayers.index(player)
+            if player not in self.readyPlayers:
+                self.readyLabels[rIndex].config(fg='#e74c3c')
+        print(self.readyPlayers)
 
     def joinmatch(self):
         self.connect()
         self.send('JOIN REQUEST:Player')
 
     def listen(self):
-        # self.connect()
-        print('listening!')
         while True:
             try:
                 receivedData = self.gameSocket.recv(4096)
@@ -209,21 +230,55 @@ class Game:
                     pass
                 break
             else:
-                print(receivedData)
-                print(self.gameState)
-                if self.gameState == 'N/A':
+                if self.gameState == 'HOST-LOBBY':
                     allArguments = receivedData.split(':')
                     if allArguments[0] == 'JOIN REQUEST':
                         requesterName = allArguments[1]
                         self.gamePlayers.append(requesterName)
                         self.refresh()
-                        self.chat('GAME: {0} joined the lobby'.format(requesterName.upper()))
+                        self.chat('GAME: {0} joined the lobby \n'.format(requesterName.upper()))
+                        self.send('HOST NAME:{0}'.format(testData['information']['username']))
                     elif allArguments[0] == 'READY':
                         readyPlayer = allArguments[1]
-                        self.readyPlayers.append(readyPlayer)
+                        if readyPlayer not in self.readyPlayers:
+                            self.readyPlayers.append(readyPlayer)
+                            self.refresh()
                     elif allArguments[0] == 'UNREADY':
                         unreadyPlayer = allArguments[1]
                         self.readyPlayers.remove(unreadyPlayer)
+                        self.refresh()
+                    elif allArguments[0] == 'LEAVE':
+                        leftPlayer = allArguments[1]
+                        try:
+                            self.gamePlayers.remove(leftPlayer)
+                            self.readyPlayers.remove(leftPlayer)
+                        except:
+                            pass  # Player was not ready before leaving
+                        self.send('CHAT:GAME: {0} left the lobby'.format(leftPlayer.upper()))
+                        self.refresh()
+                    elif allArguments[0] == 'CHAT':
+                        allArguments.remove('CHAT')
+                        self.chat(' '.join(allArguments))
+                else:
+                    allArguments = receivedData.split(':')
+                    if allArguments[0] == 'HOST NAME':
+                        hostName = allArguments[1]
+                        self.gamePlayers.append(hostName)
+                        self.gamePlayers.append(testData['information']['username'])
+                        self.refresh()
+                        self.chat('GAME: {0} is the lobby leader \n'.format(hostName.upper()))
+                    elif allArguments[0] == 'READY':
+                        readyPlayer = allArguments[1]
+                        if readyPlayer not in self.readyPlayers:
+                            self.readyPlayers.append(readyPlayer)
+                            self.refresh()
+                    elif allArguments[0] == 'UNREADY':
+                        unreadyPlayer = allArguments[1]
+                        self.readyPlayers.remove(unreadyPlayer)
+                        self.refresh()
+                    elif allArguments[0] == 'CHAT':
+                        allArguments.remove('CHAT')
+                        self.chat(' '.join(allArguments))
 
     @staticmethod
     def generate():
@@ -270,17 +325,20 @@ class Game:
                                         spacing1='1')
         self.notificationBox.config(state=DISABLED)
 
-    def lobby(self):
+    def lobby(self, host=True):
 
         def send(event):
             if self.lobbyEntry.get() != '':
                 self.chat('{0} ({1}): '.format((testData['information']['username']).upper(), self.gameState) + self.lobbyEntry.get() + '\n')
                 self.lobbyEntry.delete(0, END)
 
-        self.chat('HOST: Created new lobby\n')
-        self.gameState = 'HOST-LOBBY'
-        self.gamePlayers.append(testData['information']['username'])
-        self.refresh()
+        if host:
+            self.chat('HOST: Created new lobby\n')
+            self.gameState = 'HOST-LOBBY'
+            self.gamePlayers.append(testData['information']['username'])
+            self.refresh()
+        else:
+            self.gameState = 'JOIN-LOBBY'
 
         self.clear()
         self.lobbyChat.place(relx=.052, rely=.26)
@@ -317,22 +375,36 @@ class Game:
     def readyplayer(self, x=True):
         if x:
             # self.send('READY:{0}'.format(testData['information']['username']))
-            if self.gameState is not 'HOST-LOBBY':
-                self.send('READY:{0}'.format('Player'))
-            self.chat('GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
+            self.send('READY:{0}'.format(testData['information']['username']))
+            # self.chat('GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
+            time.sleep(.02)
+            self.send('CHAT:GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyReady.place_forget()
             self.lobbyUnready.place(relx=.6075, rely=.75)
-            self.readyOne.config(fg='#2ecc71')
+            # self.readyPlayers.append(testData['information']['username'])
+            self.refresh()
+            for player in self.readyPlayers:
+                if player == testData['information']['username']:
+                    rIndex = self.gamePlayers.index(player)
+                    self.readyLabels[rIndex].config(fg='#2ecc71')
         else:
             # self.send('READY:{0}'.format(testData['information']['username']))
-            if self.gameState is not 'HOST-LOBBY':
-                self.send('UNREADY:{0}'.format('Player'))
-            self.chat('GAME: {0} is not ready to play\n'.format((testData['information']['username']).upper()))
+            # if self.gameState is not 'HOST-LOBBY':
+            self.send('UNREADY:{0}'.format(testData['information']['username']))
+            # self.chat('GAME: {0} is not ready to play\n'.format((testData['information']['username']).upper()))
+            time.sleep(.02)
+            self.send('CHAT:GAME: {0} is not ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyUnready.place_forget()
             self.lobbyReady.place(relx=.6075, rely=.75)
-            self.readyOne.config(fg='#e74c3c')
+            # self.readyPlayers.remove(testData['information']['username'])
+            self.refresh()
+            for player in self.readyPlayers:
+                if player == testData['information']['username']:
+                    rIndex = self.gamePlayers.index(player)
+                    self.readyLabels[rIndex].config(fg='#e74c3c')
 
     def exitlobby(self):
+        self.send('LEAVE:{0}'.format(testData['information']['username']))
         self.set(1)
 
     def game(self):
@@ -364,6 +436,8 @@ testData = {
         'credits': '300'
     }
 }
+
+# testData['information']['username'] = input('Test user: ')
 
 if __name__ == '__main__':
     GameT = Game(testData)
