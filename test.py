@@ -95,10 +95,6 @@ class Game:
                                 bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
         self.titleLabel.place(relx=.05, rely=.08)
 
-        self.creditsLabel = Label(self.Window, textvariable=self.creditsText, font=self.WINDOW_SUB_FONT,
-                                  bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND)
-        # self.creditsLabel.place(relx=.82, rely=.10)
-
         self.hostButton = Button(self.Window, text=self.STR_HOST_MATCH, font=self.WINDOW_BUTTON_FONT,
                                  bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME, command=lambda: self.set(2), bd=0)
         self.hostInfo = Label(self.Window, text=self.MESSAGE_HOST_MATCH, font=self.WINDOW_SUB_FONT2,
@@ -110,9 +106,9 @@ class Game:
                               bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
 
         self.browseButton = Button(self.Window, text=self.STR_BROWSE_LOBBY, font=self.WINDOW_BUTTON_FONT,
-                                 bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME3, command=lambda: self.list(), bd=0)
+                                   bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME3, command=lambda: self.list(), bd=0)
         self.browseInfo = Label(self.Window, text=self.MESSAGE_BROWSE_LOBBY, font=self.WINDOW_SUB_FONT2,
-                              bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+                                bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
 
         self.nextButton = Button(self.Window, text='→', font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND,
                                  fg=self.WINDOW_THEME, command=lambda: nextPage(), bd=0)
@@ -140,7 +136,7 @@ class Game:
                                 fg=self.WINDOW_CHAT_BACKGROUND, bd=2)
         self.lobbyEntry.configure(insertbackground='white')
 
-        self.lobbyPlayers = Label(self.Window, text='Players currently connected [2/4]',
+        self.lobbyPlayers = Label(self.Window, text='Players currently connected [1/4]',
                                   font=('Segoe UI', 10, 'bold italic'), fg=self.WINDOW_CHAT_BACKGROUND,
                                   bg=self.WINDOW_BACKGROUND)
 
@@ -170,25 +166,27 @@ class Game:
                                    bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
                                    command=lambda: self.readyplayer(False))
         self.lobbyTest = Button(self.Window, text='TEST', font=('segoe ui', 10, 'bold'),
-                                   bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
-                                   command=lambda: (self.send('JOIN REQUEST:{0}'.format(testData['information']['username'])), self.lobby(False)))
+                                bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
+                                command=lambda: (self.send('JOIN REQUEST:{0}'.format(testData['information']['username'])), self.lobby(False)))
         self.lobbyTest.place(relx=.8, rely=.85)
+
+        self.lobbyStatName = 'None'
+        self.lobbyStatPlayers = 'None'
+        self.lobbyStatReady = 'None'
+        self.lobbyStatGame = 'None'
+        self.gotLobbyData = False
 
         self.playerLabels = [self.playerOne, self.playerTwo, self.playerThree, self.playerFour]
         self.readyLabels = [self.readyOne, self.readyTwo, self.readyThree, self.readyFour]
 
         self.windowItems = [self.hostButton, self.hostInfo, self.joinButton, self.joinInfo, self.codeLabel,
-                            self.codeInfo,
-                            self.codeEntry, self.entryInfo, self.lobbyEntry, self.lobbyChat, self.lobbyPlayers,
-                            self.playerOne,
-                            self.playerTwo, self.playerThree, self.playerFour, self.readyOne, self.readyTwo,
-                            self.readyThree,
-                            self.readyFour, self.lobbyLeave, self.lobbyReady, self.lobbyUnready, self.browseInfo, self.browseButton]
+                            self.codeInfo, self.codeEntry, self.entryInfo, self.lobbyEntry, self.lobbyChat,
+                            self.lobbyPlayers, self.playerOne, self.playerTwo, self.playerThree, self.playerFour,
+                            self.readyOne, self.readyTwo, self.readyThree, self.readyFour, self.lobbyLeave,
+                            self.lobbyReady, self.lobbyUnready, self.browseInfo, self.browseButton]
 
-        # self.set(self.pageNumber)
         self.set(1)
-        # self.list()
-        # self.notify()
+        self.notify()
 
         self.connect()
         _thread.start_new_thread(self.listen, ())
@@ -203,6 +201,8 @@ class Game:
 
     def send(self, message):
         self.gameSocket.send(str.encode(message))
+        # Delay required due to high buffer.
+        time.sleep(.01)
 
     def refresh(self):
         for label in self.playerLabels:
@@ -217,7 +217,7 @@ class Game:
             rIndex = self.gamePlayers.index(player)
             if player not in self.readyPlayers:
                 self.readyLabels[rIndex].config(fg='#e74c3c')
-        print(self.readyPlayers)
+        self.lobbyPlayers.config(text='Players currently connected [{0}/4]'.format(len(self.gamePlayers)))
 
     def joinmatch(self):
         self.connect()
@@ -281,11 +281,13 @@ class Game:
                             self.readyPlayers.remove(leftPlayer)
                         except:
                             pass  # Player was not ready before leaving
-                        self.send('CHAT:GAME: {0} left the lobby'.format(leftPlayer.upper()))
+                        self.send('CHAT:GAME: {0} left the lobby\n'.format(leftPlayer.upper()))
                         self.refresh()
                     elif allArguments[0] == 'CHAT':
                         allArguments.remove('CHAT')
-                        self.chat(' '.join(allArguments))
+                        allArguments.remove('GAME')
+                        chatMessage = ' '.join(allArguments)
+                        self.chat('CHAT:' + chatMessage)
                 elif self.gameState == 'MAIN':
                     if 'LOBBY DATA' in receivedData:
                         lobbyData = receivedData.strip('LOBBY DATA')
@@ -295,6 +297,7 @@ class Game:
                             self.lobbyStatPlayers = lobbyData['lobby']['users']
                             self.lobbyStatReady = lobbyData['lobby']['ready']
                             self.lobbyStatGame = lobbyData['lobby']['game']
+                            self.gotLobbyData = True
                             self.refreshlist()
 
                 else:
@@ -320,7 +323,9 @@ class Game:
                         self.refresh()
                     elif allArguments[0] == 'CHAT':
                         allArguments.remove('CHAT')
-                        self.chat(' '.join(allArguments))
+                        allArguments.remove('GAME')
+                        chatMessage = ' '.join(allArguments)
+                        self.chat('CHAT:' + chatMessage)
 
     @staticmethod
     def generate():
@@ -361,14 +366,25 @@ class Game:
         self.codeEntry.bind('<Return>', sendcode)
 
     def notify(self):
-        self.notificationBox = Text(self.Window, bg='#141414', fg='white', font=('Arial', 11, 'bold'), bd=0, width=59,
-                                    height=1)
-        self.notificationBox.place(relx=.11, rely=.86)
-        self.notificationBox.insert(END, 'This is an example notification, no further action is required.')
+        notifText = 'CONNECTION ERROR'
+        widthText = len(notifText) + 2
+        self.notificationTitle = Label(self.Window, text=notifText, bg='#e74c3c', fg='#141414', font=('Calibri', 14, 'bold'), height=1, width=31, anchor='w')
+        self.notificationTitle.place(relx=.15, rely=.25)
+        self.notificationBox = Text(self.Window, bg='#140000', fg='white', font=('Segoe UI', 10, ''), bd=0, width=58,
+                                    height=5)
+        self.notificationBox.place(relx=.15, rely=.35)
+        self.notificationBox.insert(END, 'The client failed to connect to the game server, so some features such as lobbies and game statistics will be unavailable. You could try reconnecting or changing the server address below.')
         self.notificationBox.tag_add("!", 1.0, 99999999999999.0)
-        self.notificationBox.tag_config("!", foreground='WHITE', font=('Arial', 11, "bold"), justify='center',
-                                        spacing1='1')
+        self.notificationBox.tag_config("!", foreground='WHITE', font=('Calibri', 11, ""), justify='left',
+                                        spacing1='5', spacing2='5')
         self.notificationBox.config(state=DISABLED)
+        self.notificationBar = Label(self.Window, bg='#140000', height=1, width=57)
+        self.notificationBar.place(relx=.15, rely=.7)
+        self.notificationConfirm = Button(self.Window, text='CONFIRM', font=('Segoe UI', 11, "bold"), bg='#140000', fg='#e74c3c', bd=0, height=1, command=lambda: (self.notificationBox.place_forget(),
+                                                                                                                                                                   self.notificationTitle.place_forget(),
+                                                                                                                                                                   self.notificationBar.place_forget(),
+                                                                                                                                                                   self.notificationConfirm.place_forget()))
+        self.notificationConfirm.place(relx=.698, rely=.655)
 
     def lobby(self, host=True):
 
@@ -407,15 +423,9 @@ class Game:
         self.lobbyReady.place(relx=.6075, rely=.75)
         self.lobbyLeave.place(relx=.8, rely=.75)
 
-        # _thread.start_new_thread(self.listen, ())
-
     def refreshlist(self):
-        # self.lobbyName = 'Shivam'
-        # self.lobbyGame = 'Hangman'
-        # self.lobbyPlayers = '2'
-        # self.lobbyReady = '1'
 
-        try:
+        if self.gotLobbyData:
 
             lobbyNameLabel = Label(self.Window, text=str(self.lobbyStatName).upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
             lobbyGameLabel = Label(self.Window, text=str(self.lobbyStatGame).upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
@@ -436,13 +446,13 @@ class Game:
             lReady = Label(self.Window, text='READY', fg=self.WINDOW_THEME3, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_BUTTON_FONT)
             lReady.place(relx=.05, rely=.6)
 
-        except AttributeError:
+        else:
             lUnavailable = Label(self.Window, text='There are no lobbies available this time.', fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT2)
             lUnavailable.place(relx=.05, rely=.3)
 
     def list(self):
         self.clear()
-        self.send('QUERY')#
+        self.send('QUERY')
         self.refreshlist()
 
     def chat(self, text):
@@ -455,29 +465,20 @@ class Game:
 
     def readyplayer(self, x=True):
         if x:
-            # self.send('READY:{0}'.format(testData['information']['username']))
             self.send('READY:{0}'.format(testData['information']['username']))
-            # self.chat('GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
-            time.sleep(.02)
             self.send('CHAT:GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyReady.place_forget()
             self.lobbyUnready.place(relx=.6075, rely=.75)
-            # self.readyPlayers.append(testData['information']['username'])
             self.refresh()
             for player in self.readyPlayers:
                 if player == testData['information']['username']:
                     rIndex = self.gamePlayers.index(player)
                     self.readyLabels[rIndex].config(fg='#2ecc71')
         else:
-            # self.send('READY:{0}'.format(testData['information']['username']))
-            # if self.gameState is not 'HOST-LOBBY':
             self.send('UNREADY:{0}'.format(testData['information']['username']))
-            # self.chat('GAME: {0} is not ready to play\n'.format((testData['information']['username']).upper()))
-            time.sleep(.02)
             self.send('CHAT:GAME: {0} is not ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyUnready.place_forget()
             self.lobbyReady.place(relx=.6075, rely=.75)
-            # self.readyPlayers.remove(testData['information']['username'])
             self.refresh()
             for player in self.readyPlayers:
                 if player == testData['information']['username']:
@@ -518,7 +519,7 @@ testData = {
     }
 }
 
-testData['information']['username'] = input('Test user: ')
+# testData['information']['username'] = input('Test user: ')
 
 if __name__ == '__main__':
     GameT = Game(testData)
