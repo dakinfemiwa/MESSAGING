@@ -3,6 +3,7 @@ import socket
 import random
 import _thread
 import time
+import ast
 
 
 class Game:
@@ -30,10 +31,12 @@ class Game:
         self.WINDOW_TITLE_FONT = ('Segoe UI', 16, 'bold')
         self.WINDOW_SUB_FONT = ('Arial', 11, 'bold')
         self.WINDOW_SUB_FONT2 = ('Segoe UI', 10, 'bold')
+        self.WINDOW_SUB_FONT3 = ('Segoe UI', 10, 'bold italic')
         self.WINDOW_BUTTON_FONT = ('Segoe UI', 12, 'bold')
         self.WINDOW_LOBBY_FONT = ('courier new', 10, 'bold')
         self.WINDOW_THEME = '#16A085'
         self.WINDOW_THEME2 = '#9B59B6'
+        self.WINDOW_THEME3 = '#f39c12'
         self.WINDOW_ERROR = '#E74C3C'
 
         self.CONFIG_LOGGER = 'True'
@@ -43,12 +46,14 @@ class Game:
 
         self.MESSAGE_HOST_MATCH = 'Host match as lobby leader and configure game settings'
         self.MESSAGE_JOIN_MATCH = 'Join a match using a valid lobby host code'
+        self.MESSAGE_BROWSE_LOBBY = 'Browse a list of public lobbies that you can join'
 
         self.MESSAGE_HOST_CODE = 'Share this code with new players so they can join the match'
         self.MESSAGE_JOIN_CODE = 'To join the match you must enter a valid host code'
 
         self.STR_HOST_MATCH = 'HOST MATCH'
         self.STR_JOIN_MATCH = 'JOIN MATCH'
+        self.STR_BROWSE_LOBBY = 'FIND LOBBY'
 
         self.STR_LOBBY_EXIT = 'LEAVE LOBBY'
         self.STR_LOBBY_READY = 'READY'
@@ -102,6 +107,11 @@ class Game:
         self.joinButton = Button(self.Window, text=self.STR_JOIN_MATCH, font=self.WINDOW_BUTTON_FONT,
                                  bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME2, command=lambda: self.set(3), bd=0)
         self.joinInfo = Label(self.Window, text=self.MESSAGE_JOIN_MATCH, font=self.WINDOW_SUB_FONT2,
+                              bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
+
+        self.browseButton = Button(self.Window, text=self.STR_BROWSE_LOBBY, font=self.WINDOW_BUTTON_FONT,
+                                 bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_THEME3, command=lambda: self.list(), bd=0)
+        self.browseInfo = Label(self.Window, text=self.MESSAGE_BROWSE_LOBBY, font=self.WINDOW_SUB_FONT2,
                               bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_CHAT_BACKGROUND)
 
         self.nextButton = Button(self.Window, text='→', font=self.WINDOW_BUTTON_FONT, bg=self.WINDOW_BACKGROUND,
@@ -162,7 +172,7 @@ class Game:
         self.lobbyTest = Button(self.Window, text='TEST', font=('segoe ui', 10, 'bold'),
                                    bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
                                    command=lambda: (self.send('JOIN REQUEST:{0}'.format(testData['information']['username'])), self.lobby(False)))
-        self.lobbyTest.place(relx=.4, rely=.85)
+        self.lobbyTest.place(relx=.8, rely=.85)
 
         self.playerLabels = [self.playerOne, self.playerTwo, self.playerThree, self.playerFour]
         self.readyLabels = [self.readyOne, self.readyTwo, self.readyThree, self.readyFour]
@@ -173,10 +183,11 @@ class Game:
                             self.playerOne,
                             self.playerTwo, self.playerThree, self.playerFour, self.readyOne, self.readyTwo,
                             self.readyThree,
-                            self.readyFour, self.lobbyLeave, self.lobbyReady, self.lobbyUnready]
+                            self.readyFour, self.lobbyLeave, self.lobbyReady, self.lobbyUnready, self.browseInfo, self.browseButton]
 
         # self.set(self.pageNumber)
         self.set(1)
+        # self.list()
         # self.notify()
 
         self.connect()
@@ -230,14 +241,30 @@ class Game:
                     pass
                 break
             else:
+                print(receivedData)
                 if self.gameState == 'HOST-LOBBY':
                     allArguments = receivedData.split(':')
                     if allArguments[0] == 'JOIN REQUEST':
                         requesterName = allArguments[1]
+                        self.send('HOST NAME:{0}'.format(testData['information']['username']))
                         self.gamePlayers.append(requesterName)
                         self.refresh()
                         self.chat('GAME: {0} joined the lobby \n'.format(requesterName.upper()))
-                        self.send('HOST NAME:{0}'.format(testData['information']['username']))
+                        playersSplit = ";".join(self.gamePlayers)
+                        self.send('PLAYER LIST:{0}'.format(playersSplit))
+                    elif allArguments[0] == 'QUERY':
+                        lobbyData = {
+                            'lobbies': {
+                                'number': '1'
+                            },
+                            'lobby':  {
+                                'name': testData['information']['username'],
+                                'users': str(len(self.gamePlayers)),
+                                'ready': str(len(self.readyPlayers)),
+                                'game': 'hangman'
+                            }
+                        }
+                        self.send('LOBBY DATA' + str(lobbyData))
                     elif allArguments[0] == 'READY':
                         readyPlayer = allArguments[1]
                         if readyPlayer not in self.readyPlayers:
@@ -259,6 +286,17 @@ class Game:
                     elif allArguments[0] == 'CHAT':
                         allArguments.remove('CHAT')
                         self.chat(' '.join(allArguments))
+                elif self.gameState == 'MAIN':
+                    if 'LOBBY DATA' in receivedData:
+                        lobbyData = receivedData.strip('LOBBY DATA')
+                        lobbyData = ast.literal_eval(lobbyData)
+                        if int(lobbyData['lobbies']['number']) != 0:
+                            self.lobbyStatName = lobbyData['lobby']['name']
+                            self.lobbyStatPlayers = lobbyData['lobby']['users']
+                            self.lobbyStatReady = lobbyData['lobby']['ready']
+                            self.lobbyStatGame = lobbyData['lobby']['game']
+                            self.refreshlist()
+
                 else:
                     allArguments = receivedData.split(':')
                     if allArguments[0] == 'HOST NAME':
@@ -267,6 +305,10 @@ class Game:
                         self.gamePlayers.append(testData['information']['username'])
                         self.refresh()
                         self.chat('GAME: {0} is the lobby leader \n'.format(hostName.upper()))
+                    elif allArguments[0] == 'PLAYER LIST':
+                        playersGame = allArguments[1]
+                        self.gamePlayers = playersGame.split(';')
+                        self.refresh()
                     elif allArguments[0] == 'READY':
                         readyPlayer = allArguments[1]
                         if readyPlayer not in self.readyPlayers:
@@ -289,19 +331,22 @@ class Game:
             item.place_forget()
 
     def front(self):
+        self.gameState = 'MAIN'
         self.clear()
-        self.hostButton.place(relx=.05, rely=.3)
-        self.hostInfo.place(relx=.054, rely=.41)
-        self.joinButton.place(relx=.05, rely=.5)
-        self.joinInfo.place(relx=.054, rely=.61)
+        self.hostButton.place(relx=.05, rely=.27)
+        self.hostInfo.place(relx=.054, rely=.38)
+        self.joinButton.place(relx=.05, rely=.47)
+        self.joinInfo.place(relx=.054, rely=.58)
+        self.browseButton.place(relx=.05, rely=.67)
+        self.browseInfo.place(relx=.054, rely=.78)
 
     def host(self):
         self.clear()
         self.gameState = 'HOST'
         self.hostCode = self.generate()
-        self.hostButton.place(relx=.05, rely=.3)
-        self.codeLabel.place(relx=.054, rely=.44)
-        self.codeInfo.place(relx=.054, rely=.61)
+        self.hostButton.place(relx=.05, rely=.27)
+        self.codeLabel.place(relx=.054, rely=.41)
+        self.codeInfo.place(relx=.054, rely=.58)
         self.codeLabel.config(text=self.hostCode)
 
     def join(self):
@@ -309,9 +354,9 @@ class Game:
             self.joinmatch()
         self.clear()
         self.gameState = 'JOIN'
-        self.joinButton.place(relx=.05, rely=.3)
-        self.codeEntry.place(relx=.055, rely=.44)
-        self.entryInfo.place(relx=.055, rely=.61)
+        self.joinButton.place(relx=.05, rely=.27)
+        self.codeEntry.place(relx=.055, rely=.41)
+        self.entryInfo.place(relx=.055, rely=.58)
         self.codeEntry.focus_force()
         self.codeEntry.bind('<Return>', sendcode)
 
@@ -363,6 +408,42 @@ class Game:
         self.lobbyLeave.place(relx=.8, rely=.75)
 
         # _thread.start_new_thread(self.listen, ())
+
+    def refreshlist(self):
+        # self.lobbyName = 'Shivam'
+        # self.lobbyGame = 'Hangman'
+        # self.lobbyPlayers = '2'
+        # self.lobbyReady = '1'
+
+        try:
+
+            lobbyNameLabel = Label(self.Window, text=str(self.lobbyStatName).upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
+            lobbyGameLabel = Label(self.Window, text=str(self.lobbyStatGame).upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
+            lobbyPlayersLabel = Label(self.Window, text=str(self.lobbyStatPlayers + ' PLAYERS').upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
+            lobbyReadyLabel = Label(self.Window, text=str(self.lobbyStatReady + ' READY').upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
+
+            lobbyNameLabel.place(relx=.45, rely=.3)
+            lobbyGameLabel.place(relx=.45, rely=.4)
+            lobbyPlayersLabel.place(relx=.45, rely=.5)
+            lobbyReadyLabel.place(relx=.45, rely=.6)
+
+            lName = Label(self.Window, text='LOBBY NAME', fg=self.WINDOW_THEME3, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_BUTTON_FONT)
+            lName.place(relx=.05, rely=.3)
+            lGame = Label(self.Window, text='LOBBY GAME', fg=self.WINDOW_THEME3, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_BUTTON_FONT)
+            lGame.place(relx=.05, rely=.4)
+            lPlayers = Label(self.Window, text='PLAYERS', fg=self.WINDOW_THEME3, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_BUTTON_FONT)
+            lPlayers.place(relx=.05, rely=.5)
+            lReady = Label(self.Window, text='READY', fg=self.WINDOW_THEME3, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_BUTTON_FONT)
+            lReady.place(relx=.05, rely=.6)
+
+        except AttributeError:
+            lUnavailable = Label(self.Window, text='There are no lobbies available this time.', fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT2)
+            lUnavailable.place(relx=.05, rely=.3)
+
+    def list(self):
+        self.clear()
+        self.send('QUERY')#
+        self.refreshlist()
 
     def chat(self, text):
         self.lobbyChat.config(state=NORMAL)
@@ -437,7 +518,7 @@ testData = {
     }
 }
 
-# testData['information']['username'] = input('Test user: ')
+testData['information']['username'] = input('Test user: ')
 
 if __name__ == '__main__':
     GameT = Game(testData)
