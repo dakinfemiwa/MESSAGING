@@ -4,6 +4,7 @@ import random
 import _thread
 import time
 import ast
+from tools.logger import Logger
 
 
 class Game:
@@ -168,7 +169,7 @@ class Game:
         self.lobbyTest = Button(self.Window, text='TEST', font=('segoe ui', 10, 'bold'),
                                 bg=self.WINDOW_BACKGROUND, fg='#e74c3c', bd=0,
                                 command=lambda: (self.send('JOIN REQUEST:{0}'.format(testData['information']['username'])), self.lobby(False)))
-        self.lobbyTest.place(relx=.8, rely=.85)
+        self.lobbyTest.place(relx=.7, rely=.85)
 
         self.lobbyStatName = 'None'
         self.lobbyStatPlayers = 'None'
@@ -186,7 +187,6 @@ class Game:
                             self.lobbyReady, self.lobbyUnready, self.browseInfo, self.browseButton]
 
         self.set(1)
-        self.notify()
 
         self.connect()
         _thread.start_new_thread(self.listen, ())
@@ -197,7 +197,10 @@ class Game:
         try:
             self.gameSocket.connect((self.IP, self.PORT))
         except:
+            self.notify('Connection error', 'The client failed to connect to the game server, so some features such as lobbies and game statistics will be unavailable. '
+                                            'You could try reconnecting or changing the server address below.', '#e74c3c')
             self.chat('ERROR: Failed to connect to relay server\n')
+            Logger.log('Failed to connect to the game server.', 'ERROR')
 
     def send(self, message):
         self.gameSocket.send(str.encode(message))
@@ -218,30 +221,34 @@ class Game:
             if player not in self.readyPlayers:
                 self.readyLabels[rIndex].config(fg='#e74c3c')
         self.lobbyPlayers.config(text='Players currently connected [{0}/4]'.format(len(self.gamePlayers)))
+        Logger.log('Refreshed window layout.')
 
     def joinmatch(self):
         self.connect()
         self.send('JOIN REQUEST:Player')
 
     def listen(self):
+        Logger.log('Attempted to start listening for data.', 'WARNING')
         while True:
             try:
                 receivedData = self.gameSocket.recv(4096)
                 receivedData = receivedData.decode()
             except:
                 try:
+                    Logger.log('Lost connection to the game server.', 'ERROR')
                     self.chat('ERROR: Lost connection to game server\n')
                 except:
                     pass
                 break
             if not receivedData:
                 try:
+                    Logger.log('Lost connection to the game server.', 'ERROR')
                     self.chat('ERROR: Lost connection to game server\n')
                 except:
                     pass
                 break
             else:
-                print(receivedData)
+                Logger.log('Received \'{0}\' from game server.'.format(receivedData))
                 if self.gameState == 'HOST-LOBBY':
                     allArguments = receivedData.split(':')
                     if allArguments[0] == 'JOIN REQUEST':
@@ -326,6 +333,10 @@ class Game:
                         allArguments.remove('GAME')
                         chatMessage = ' '.join(allArguments)
                         self.chat('CHAT:' + chatMessage)
+            chatArguments = receivedData.split('^')
+            if chatArguments[0] == 'CHAT':
+                chatArguments.remove('CHAT')
+                self.chat(' '.join(chatArguments))
 
     @staticmethod
     def generate():
@@ -365,40 +376,67 @@ class Game:
         self.codeEntry.focus_force()
         self.codeEntry.bind('<Return>', sendcode)
 
-    def notify(self):
-        notifText = 'CONNECTION ERROR'
-        widthText = len(notifText) + 2
-        self.notificationTitle = Label(self.Window, text=notifText, bg='#e74c3c', fg='#141414', font=('Calibri', 14, 'bold'), height=1, width=31, anchor='w')
-        self.notificationTitle.place(relx=.15, rely=.25)
-        self.notificationBox = Text(self.Window, bg='#140000', fg='white', font=('Segoe UI', 10, ''), bd=0, width=58,
-                                    height=5)
-        self.notificationBox.place(relx=.15, rely=.35)
-        self.notificationBox.insert(END, 'The client failed to connect to the game server, so some features such as lobbies and game statistics will be unavailable. You could try reconnecting or changing the server address below.')
-        self.notificationBox.tag_add("!", 1.0, 99999999999999.0)
-        self.notificationBox.tag_config("!", foreground='WHITE', font=('Calibri', 11, ""), justify='left',
-                                        spacing1='5', spacing2='5')
-        self.notificationBox.config(state=DISABLED)
-        self.notificationBar = Label(self.Window, bg='#140000', height=1, width=57)
-        self.notificationBar.place(relx=.15, rely=.7)
-        self.notificationConfirm = Button(self.Window, text='CONFIRM', font=('Segoe UI', 11, "bold"), bg='#140000', fg='#e74c3c', bd=0, height=1, command=lambda: (self.notificationBox.place_forget(),
-                                                                                                                                                                   self.notificationTitle.place_forget(),
-                                                                                                                                                                   self.notificationBar.place_forget(),
-                                                                                                                                                                   self.notificationConfirm.place_forget()))
-        self.notificationConfirm.place(relx=.698, rely=.655)
+    def notify(self, err_name, err_info, err_col):
+        Logger.log('Spawned notification symbol \'{0}\'.'.format(err_name))
+
+        notifTitle = err_name
+        notifText = err_info
+        notifCol = err_col
+
+        # notifTitle = 'Update available'
+        # notifText = 'You are not on the latest version of the client. Press update to download the latest project version from GitHub. Current files will be stored in a BACKUP ZIP file.\nCurrent Version: 4.70\nLatest Version: 4.71'
+        # notifCol = '#f39c12'
+
+        # notifTitle = 'Invalid configuration'
+        # notifText = 'An invalid configuration file was detected. A new configuration file has been generated with default settings, to update these settings click your username'
+        # notifCol = '#f39c12'
+
+        def viewNotif():
+            Logger.log('User acknowledged notification.')
+            self.clear()
+            notifIcon.place_forget()
+            self.notificationTitle = Label(self.Window, text=notifTitle, bg=self.WINDOW_BACKGROUND, fg=notifCol, font=('Calibri', 14, 'bold italic'), height=1, width=31, anchor='w')
+            self.notificationTitle.place(relx=.05, rely=.3)
+            self.notificationBox = Text(self.Window, bd=0, width=65, height=6, bg=self.WINDOW_BACKGROUND)
+            self.notificationBox.place(relx=.055, rely=.4)
+            self.notificationBox.insert(END, notifText)
+            self.notificationBox.tag_add("!", 1.0, 99999999999999.0)
+            self.notificationBox.tag_config("!", foreground=self.WINDOW_CHAT_BACKGROUND, font=('Segoe UI', 10, "bold italic"),
+                                            spacing1='5', spacing2='5')
+            self.notificationBox.config(state=DISABLED)
+            self.notificationConfirm = Button(self.Window, text='CONFIRM', font=('Segoe UI', 10, "bold"), bg=self.WINDOW_BACKGROUND, fg=notifCol, bd=0, height=1, command=lambda: (self.notificationBox.place_forget(),
+                                                                                                                                                                                   self.notificationTitle.place_forget(),
+                                                                                                                                                                                   self.notificationConfirm.place_forget(),
+                                                                                                                                                                                   self.set(self.pageNumber),
+                                                                                                                                                                                   notifIcon2.place_forget()))
+
+            self.notificationConfirm.place(relx=.78, rely=.85)
+
+            notifIcon2 = Button(self.Window, text='!', font=('Segoe UI', 15, "bold"), bg='#141414', fg=notifCol, bd=0, width=4, height=1, command=lambda: (self.notificationBox.place_forget(),
+                                                                                                                                                           self.notificationTitle.place_forget(),
+                                                                                                                                                           self.notificationConfirm.place_forget(),
+                                                                                                                                                           self.set(self.pageNumber),
+                                                                                                                                                           notifIcon2.place_forget()))
+            notifIcon2.place(relx=.9, rely=.05)
+
+        notifIcon = Button(self.Window, text='!', font=('Segoe UI', 15, "bold"), bg='#141414', fg=notifCol, bd=0, width=4, height=1, command=lambda: viewNotif())
+        notifIcon.place(relx=.9, rely=.05)
 
     def lobby(self, host=True):
 
         def send(event):
             if self.lobbyEntry.get() != '':
-                self.chat('{0} ({1}): '.format((testData['information']['username']).upper(), self.gameState) + self.lobbyEntry.get() + '\n')
+                self.send('CHAT^{0} ({1}): '.format((testData['information']['username']).upper(), self.gameState) + self.lobbyEntry.get() + '\n')
                 self.lobbyEntry.delete(0, END)
 
         if host:
+            Logger.log('Created new lobby successfully.')
             self.chat('HOST: Created new lobby\n')
             self.gameState = 'HOST-LOBBY'
             self.gamePlayers.append(testData['information']['username'])
             self.refresh()
         else:
+            Logger.log('Joined a lobby successfully.')
             self.gameState = 'JOIN-LOBBY'
 
         self.clear()
@@ -407,8 +445,6 @@ class Game:
         self.lobbyEntry.place(relx=.052, rely=.73)
         self.lobbyEntry.focus_force()
         self.lobbyPlayers.place(relx=.61, rely=.25)
-
-        # TEST
 
         self.playerOne.place(relx=.61, rely=.35)
         self.playerTwo.place(relx=.61, rely=.45)
@@ -426,6 +462,8 @@ class Game:
     def refreshlist(self):
 
         if self.gotLobbyData:
+
+            Logger.log('Received lobby data from game server.')
 
             lobbyNameLabel = Label(self.Window, text=str(self.lobbyStatName).upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
             lobbyGameLabel = Label(self.Window, text=str(self.lobbyStatGame).upper(), fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT3)
@@ -447,6 +485,7 @@ class Game:
             lReady.place(relx=.05, rely=.6)
 
         else:
+            Logger.log('No lobby data was retrieved - list is empty.', 'WARNING')
             lUnavailable = Label(self.Window, text='There are no lobbies available this time.', fg=self.WINDOW_CHAT_BACKGROUND, bg=self.WINDOW_BACKGROUND, font=self.WINDOW_SUB_FONT2)
             lUnavailable.place(relx=.05, rely=.3)
 
@@ -454,6 +493,7 @@ class Game:
         self.clear()
         self.send('QUERY')
         self.refreshlist()
+        Logger.log('Sent a request for all lobby data.')
 
     def chat(self, text):
         self.lobbyChat.config(state=NORMAL)
@@ -463,8 +503,8 @@ class Game:
         self.lobbyChat.config(state=DISABLED)
         self.lobbyChat.see(END)
 
-    def readyplayer(self, x=True):
-        if x:
+    def readyplayer(self, rState=True):
+        if rState:
             self.send('READY:{0}'.format(testData['information']['username']))
             self.send('CHAT:GAME: {0} is ready to play\n'.format((testData['information']['username']).upper()))
             self.lobbyReady.place_forget()
@@ -488,11 +528,13 @@ class Game:
     def exitlobby(self):
         self.send('LEAVE:{0}'.format(testData['information']['username']))
         self.set(1)
+        Logger.log('Left lobby successfully and moved to home screen.')
 
     def game(self):
         self.clear()
 
     def set(self, page):
+        Logger.log('Set current window page to \'{0}\'.'.format(self.pageNumber))
         self.pageNumber = page
         if page == 1:
             self.front()
@@ -519,7 +561,7 @@ testData = {
     }
 }
 
-# testData['information']['username'] = input('Test user: ')
+testData['information']['username'] = input('Test user: ')
 
 if __name__ == '__main__':
     GameT = Game(testData)
