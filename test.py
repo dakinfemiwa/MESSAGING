@@ -340,6 +340,7 @@ class Game:
 
     @staticmethod
     def generate():
+        Logger.log('Generated new host code.')
         return str(random.randint(1000000, 9999999))
 
     def clear(self):
@@ -355,6 +356,7 @@ class Game:
         self.joinInfo.place(relx=.054, rely=.58)
         self.browseButton.place(relx=.05, rely=.67)
         self.browseInfo.place(relx=.054, rely=.78)
+        Logger.log(f'Set game state to \'{self.gameState}\'.')
 
     def host(self):
         self.clear()
@@ -364,6 +366,7 @@ class Game:
         self.codeLabel.place(relx=.054, rely=.41)
         self.codeInfo.place(relx=.054, rely=.58)
         self.codeLabel.config(text=self.hostCode)
+        Logger.log(f'Set game state to \'{self.gameState}\'.')
 
     def join(self):
         def sendcode(event):
@@ -375,6 +378,7 @@ class Game:
         self.entryInfo.place(relx=.055, rely=.58)
         self.codeEntry.focus_force()
         self.codeEntry.bind('<Return>', sendcode)
+        Logger.log(f'Set game state to \'{self.gameState}\'.')
 
     def notify(self, err_name, err_info, err_col):
         Logger.log('Spawned notification symbol \'{0}\'.'.format(err_name))
@@ -438,6 +442,8 @@ class Game:
         else:
             Logger.log('Joined a lobby successfully.')
             self.gameState = 'JOIN-LOBBY'
+
+        Logger.log(f'Set game state to \'{self.gameState}\'.')
 
         self.clear()
         self.lobbyChat.place(relx=.052, rely=.26)

@@ -5,7 +5,6 @@ from tools.logger import Logger
 from requests import get
 
 
-# Rewriting game server using classes.
 class GameServer:
     def __init__(self):
         self.IP = '0.0.0.0'
@@ -35,17 +34,17 @@ class GameServer:
                 read_sockets, write_sockets, error_sockets = select.select(self.LIST, [], [])
                 for sock in read_sockets:
                     if sock == self.serverSocket:
-                        sockfd, addr = self.serverSocket.accept()
+                        sockfd, address = self.serverSocket.accept()
                         self.LIST.append(sockfd)
-                        Logger.log('Client [{0}:{1}] connected to the server.'.format(addr[0], addr[1]), 'CONNECT')
+                        Logger.log(f'Client [{address[0]}:{address[1]}] connected to the server.', 'CONNECT')
                     else:
                         try:
                             receivedData = sock.recv(self.BUFFER_SIZE, )
                         except:
-                            self.broadcast("[undefined] left the server")
+                            self.broadcast('[{user_leaving}] left the server'.format(user_leaving='undefined'))
                             try:
-                                del self.connectedUsers[addr]
-                                Logger.log('Client [{0}:{1}] disconnected from the server.'.format(addr[0], addr[1]), 'DISCONNECT')
+                                del self.connectedUsers[address]
+                                Logger.log(f'Client [{address[0]}:{address[1]}] disconnected from the server.', 'DISCONNECT')
                             except Exception as error:
                                 Logger.error(error)
                             sock.close()
@@ -55,6 +54,10 @@ class GameServer:
                             if 'QUIT' in receivedData.decode():
                                 self.LIST.remove(sock)
                                 sock.close()
+                                Logger.log(f'Received quit command from client [{address[0]}:{address[1]}]')
+                            # elif 'USERNAME' in receivedData.decode():
+                            #     self.connectedUsers[address] = receivedData.decode().strip('USERNAME')
+                            #     print(self.connectedUsers)
                             else:
                                 self.broadcast(receivedData.decode())
             except Exception as error:
@@ -65,8 +68,8 @@ class GameServer:
             for connectedSocket in self.LIST:
                 if connectedSocket != self.serverSocket:
                     connectedSocket.send(str.encode(message))
-                    Logger.log(message.rstrip().lstrip(), 'MESSAGE')
                     time.sleep(0.05)
+            Logger.log(message.rstrip().lstrip(), 'BROADCAST')
         except Exception as error:
             Logger.error(error)
 

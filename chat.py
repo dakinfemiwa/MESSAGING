@@ -136,22 +136,25 @@ class Client:
         pass
 
     @staticmethod
-    def send(message, inGame=False):
+    def send(message, inGame=False, woUser=False):
         global isTurn
-        if inGame is False:
-            try:
-                if message[0] == '.':
-                    Client.command(message)
-                else:
-                    entryBox.delete(0, END)
-                    send_msg = username + ': ' + message
-                    clientSocket.send(str.encode(send_msg))
-            except TypeError:
-                pass
-            except IndexError:
-                pass
+        if woUser is False:
+            if inGame is False:
+                try:
+                    if message[0] == '.':
+                        Client.command(message)
+                    else:
+                        entryBox.delete(0, END)
+                        send_msg = username + ': ' + message
+                        clientSocket.send(str.encode(send_msg))
+                except TypeError:
+                    pass
+                except IndexError:
+                    pass
+            else:
+                isTurn = False
+                clientSocket.send(str.encode(message))
         else:
-            isTurn = False
             clientSocket.send(str.encode(message))
 
     @staticmethod
@@ -352,6 +355,12 @@ class Client:
             if command == '.help':
                 Window.show(HELP_MESSAGE)
 
+            if '.send' in command:
+                command2 = command.split(' ')
+                del command2[0]
+                newmsg = ' '.join(command2)
+                Client.send(newmsg, False, True)
+
             elif command == '.clear':
                 ChatLog.config(state=NORMAL)
                 ChatLog.delete(1.0, END)
@@ -475,8 +484,8 @@ class Client:
             else:
                 Window.show('That is an invalid command')
 
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     def disconnect(self):
         pass
