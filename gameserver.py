@@ -1,103 +1,79 @@
 import socket
 import select
 import time
-from datetime import datetime
-import json
-import ast
-import os
-import sys
+from tools.logger import Logger
+from requests import get
 
 
-def Broadcast(message):
-    for iSocket in CLIST:
-        if iSocket != serverSocket:
-            iSocket.send(str.encode(message))
-        print(message)
+# Rewriting game server using classes.
+class GameServer:
+    def __init__(self):
+        self.IP = '0.0.0.0'
+        self.EXTERNAL_IP = get('https://api.ipify.org').text
+        self.PORT = 6666
+        self.BUFFER_SIZE = 4096
+        self.LISTEN_INT = 10
+        self.LIST = []
 
+        self.connectedUsers = {}
+        self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serverStatus = True
 
-if __name__ == "__main__":
-    if 1:
-        def startUp():
-            global CLIST, People, Users, IP, serverSocket
+        Logger.log('Initialized chat server with version four support.')
 
-            CLIST = []
-            People = []
-            Users = {}
+    def run(self):
+        self.serverSocket.bind((self.IP, self.PORT))
+        self.serverSocket.listen(self.LISTEN_INT)
+        self.LIST.append(self.serverSocket)
+        self.receive()
 
-            print('[' + str(datetime.now().strftime(
-                "%H:%M:%S")) + '] ' + 'STATUS: Chat server initialized with version four support')
-            IP = '0.0.0.0'
-
-            serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            serverSocket.bind((IP, 6666))
-            serverSocket.listen(10)
-
-            print('[' + str(datetime.now().strftime(
-                "%H:%M:%S")) + '] ' + 'STATUS: Listening for incoming connections')
-
-            CLIST.append(serverSocket)
-
-        startUp()
-
-        while True:
-            read_sockets, write_sockets, error_sockets = select.select(CLIST, [], [])
-
-            if 1:
-
+    def receive(self):
+        Logger.log(f'Started listening for connections at [{self.EXTERNAL_IP}:{self.PORT}]')
+        Logger.log(f'Accepting local connections at [127.0.0.1:{self.PORT}]')
+        while self.serverStatus:
+            try:
+                read_sockets, write_sockets, error_sockets = select.select(self.LIST, [], [])
                 for sock in read_sockets:
-                    if sock == serverSocket:
-                        sockfd, addr = serverSocket.accept()
-                        CLIST.append(sockfd)
-                        print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'CONNECT: Client [%s, %s] connected' % addr)
-                        sockfd.send(str.encode('TT'))
-
+                    if sock == self.serverSocket:
+                        sockfd, addr = self.serverSocket.accept()
+                        self.LIST.append(sockfd)
+                        Logger.log('Client [{0}:{1}] connected to the server.'.format(addr[0], addr[1]), 'CONNECT')
                     else:
                         try:
-                            data = sock.recv(4096, )
+                            receivedData = sock.recv(self.BUFFER_SIZE, )
                         except:
+                            self.broadcast("[undefined] left the server")
                             try:
-                                tempstore = str(Users[addr])
-                            except:
-                                pass
-                            try:
-                                Broadcast("DISCONNECT:{0}".format(tempstore))
-                                time.sleep(.02)
-                                Broadcast("USER has left the server")
-                            except Exception as details:
-                                print('[' + str(datetime.now().strftime(
-                                    "%H:%M:%S")) + '] ' + 'WARNING: A disconnect message may have failed to send')
-                            try:
-                                del Users[addr]
-                                print('[' + str(datetime.now().strftime(
-                                    "%H:%M:%S")) + '] ' + 'DISCONNECT: Client [%s, %s] disconnected' % addr)
-                            except Exception as details:
-                                print(details)
+                                del self.connectedUsers[addr]
+                                Logger.log('Client [{0}:{1}] disconnected from the server.'.format(addr[0], addr[1]), 'DISCONNECT')
+                            except Exception as error:
+                                Logger.error(error)
                             sock.close()
-                            CLIST.remove(sock)
+                            self.LIST.remove(sock)
                             continue
-
-                        if data:
-                            if '$$$' in data.decode():
-                                USERNAME = data.decode().strip('$$$')
-                                if '%!' in USERNAME:
-                                    tempUsername = USERNAME.strip('%!')
-                                else:
-                                    Users[addr] = USERNAME
-
+                        if receivedData:
+                            if 'QUIT' in receivedData.decode():
+                                self.LIST.remove(sock)
+                                sock.close()
                             else:
-                                if 1:
-                                    Broadcast(data.decode())
-                                if 0:
-                                    print('[' + str(datetime.now().strftime(
-                                        "%H:%M:%S")) + '] ' + 'ERROR: Unable to broadcast message - hard disconnect')
-            if 0:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                print(exc_type, fname, exc_tb.tb_lineno)
+                                self.broadcast(receivedData.decode())
+            except Exception as error:
+                Logger.error(error)
 
-    if 0:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(exc_type, fname, exc_tb.tb_lineno)
+    def broadcast(self, message):
+        try:
+            for connectedSocket in self.LIST:
+                if connectedSocket != self.serverSocket:
+                    connectedSocket.send(str.encode(message))
+                    Logger.log(message.rstrip().lstrip(), 'MESSAGE')
+                    time.sleep(0.05)
+        except Exception as error:
+            Logger.error(error)
 
-    serverSocket.close()    
+
+if __name__ == '__main__':
+    try:
+        Server = GameServer()
+        Server.run()
+    except Exception as e:
+        Logger.error(e)
