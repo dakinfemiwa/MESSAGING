@@ -1,7 +1,7 @@
 import socket
 import time
+import ast
 from tools.logger import Logger
-
 
 """
 
@@ -55,7 +55,7 @@ gameSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 gameSocket.connect((IP, PORT))
 gameSocket.send(str.encode(f'CLIENT_INFORMATION<>{str(clientInformation)}'))
 time.sleep(0.01)
-# gameSocket.send(b'ONLINE')
+gameSocket.send(b'ONLINE')
 
 
 while True:
@@ -75,7 +75,14 @@ while True:
             break
         elif arguments[0] == 'CONN_SUCCESS':
             Logger.log(arguments[1])
+        elif arguments[0] == 'SERVER_INFORMATION':
+            serverInfo = ast.literal_eval(str(arguments[1]))
+            serverData = []
+            for field in ['Server Name', 'Uptime', 'Minimum Version']:
+                serverData.append(serverInfo['Server Information'][field])
+                Logger.log(f'{field}: {str(serverInfo["Server Information"][field])}', 'SERVER')
         elif arguments[0] == 'USER_LIST':
             all_users = arguments[1].split(';')
             for user in all_users:
-                print(user)
+                if user is not '':
+                    Logger.log(user, 'USER LIST')

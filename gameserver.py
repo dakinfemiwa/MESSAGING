@@ -3,6 +3,7 @@ import select
 import time
 import ast
 from tools.logger import Logger
+from datetime import datetime, date
 from requests import get
 
 
@@ -20,6 +21,16 @@ class GameServer:
         self.connectedUsers = {}
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverStatus = True
+
+        self.launchTime = datetime.now().strftime('%H:%M:%S')
+
+        self.serverInformation = {
+            'Server Information': {
+                'Server Name': 'Game Server [TEST]',
+                'Uptime': self.launchTime,
+                'Minimum Version': self.MIN_VERSION
+            }
+        }
 
         Logger.log('Initialized chat server with version four support.')
 
@@ -104,6 +115,16 @@ class GameServer:
                                             self.connectedUsers[address] = clientData[0]
                                             sock.send(b'CONN_SUCCESS<>Successfully connected to the server.')
                                             Logger.log(f'Allowed connection from [{address[0]}:{address[1]}] ({clientData[0]}) [{clientData[1]}]', 'CONNECT')
+                                            time.sleep(0.05)
+                                            start_dt = datetime.strptime(self.serverInformation['Server Information']['Uptime'], '%H:%M:%S')
+                                            end_dt = datetime.strptime(datetime.now().strftime('%H:%M:%S'), '%H:%M:%S')
+                                            diff = (end_dt - start_dt)
+                                            serverInformationTemp = self.serverInformation
+                                            serverInformationTemp['Server Information']['Uptime'] = str(diff)
+                                            time.sleep(0.05)
+                                            sock.send(str.encode(f'SERVER_INFORMATION<>{str(serverInformationTemp)}'))
+                                            Logger.log(f'Sent server information to client [{address[0]}:{address[1]}] ({clientData[0]})')
+                                            self.serverInformation['Server Information']['Uptime'] = self.launchTime
                             else:
                                 self.broadcast(receivedData.decode())
             except Exception as error:
