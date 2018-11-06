@@ -9,7 +9,8 @@ from requests import get
 class GameServer:
     def __init__(self):
         self.IP = '0.0.0.0'
-        self.EXTERNAL_IP = get('https://api.ipify.org').text
+        # self.EXTERNAL_IP = get('https://api.ipify.org').text
+        self.EXTERNAL_IP = '12.345.67.890'
         self.PORT = 6666
         self.BUFFER_SIZE = 4096
         self.LISTEN_INT = 10
@@ -66,6 +67,13 @@ class GameServer:
                                     disconnected_user = '[undefined]'
                                 Logger.log(f'Client [{address[0]}:{address[1]}] ({disconnected_user}) disconnected from the server.', 'DISCONNECT')
                                 Logger.log(f'Received quit command from client [{address[0]}:{address[1]}]')
+                            elif arguments[0] == 'ONLINE':
+                                userList = ''
+                                for user in self.connectedUsers:
+                                    userList = userList + self.connectedUsers[user] + ';'
+                                sock.send(str.encode('USER_LIST<>' + userList))
+                                Logger.log(f'[{address[0]}:{address[1]}] ({self.connectedUsers[address]}) requested user list.')
+                                Logger.log(f'Current connected users: {userList.replace(";", " ")}')
                             elif arguments[0] == 'CLIENT_INFORMATION':
                                 Logger.log(f'Received client information from [{address[0]}:{address[1]}]')
                                 clientInformation = ast.literal_eval(arguments[1])
@@ -75,15 +83,27 @@ class GameServer:
                                 if clientData[0] == '' or clientData[0] == ' ':
                                     sock.send(b'CONN_ERROR<>Invalid username (username not allowed)')
                                     Logger.log(f'Rejected connection from [{address[0]}:{address[1]}] due to invalid username.')
+                                    sock.close()
+                                    self.LIST.remove(sock)
                                 else:
-                                    if float(clientData[1]) < self.MIN_VERSION:
-                                        sock.send(str.encode(f'CONN_ERROR<>Client is out of date (latest version is {str(self.MIN_VERSION)})'))
-                                        Logger.log(f'Rejected connection from [{address[0]}:{address[1]}] ({clientData[0]}) due to outdated client [{clientData[1]}]', 'DISCONNECT')
+                                    userListByName = []
+                                    for user in self.connectedUsers:
+                                        userListByName.append(self.connectedUsers[user])
+                                    if clientData[0] in userListByName:
+                                        sock.send(b'CONN_ERROR<>A user with that name is already connected (use a different username)')
+                                        Logger.log(f'Rejected connection from [{address[0]}:{address[1]}] ({clientData[0]}) due to duplicate username.', 'DISCONNECT')
                                         sock.close()
                                         self.LIST.remove(sock)
                                     else:
-                                        self.connectedUsers[address] = clientData[0]
-                                        sock.send(b'CONN_SUCCESS<>Successfully connected to the server.')
+                                        if float(clientData[1]) < self.MIN_VERSION:
+                                            sock.send(str.encode(f'CONN_ERROR<>Client is out of date (latest version is {str(self.MIN_VERSION)})'))
+                                            Logger.log(f'Rejected connection from [{address[0]}:{address[1]}] ({clientData[0]}) due to outdated client [{clientData[1]}]', 'DISCONNECT')
+                                            sock.close()
+                                            self.LIST.remove(sock)
+                                        else:
+                                            self.connectedUsers[address] = clientData[0]
+                                            sock.send(b'CONN_SUCCESS<>Successfully connected to the server.')
+                                            Logger.log(f'Allowed connection from [{address[0]}:{address[1]}] ({clientData[0]}) [{clientData[1]}]', 'CONNECT')
                             else:
                                 self.broadcast(receivedData.decode())
             except Exception as error:
