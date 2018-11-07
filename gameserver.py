@@ -4,32 +4,43 @@ import time
 import ast
 from tools.logger import Logger
 from datetime import datetime
+import configparser
 from requests import get
 
 
 class GameServer:
     def __init__(self):
-        self.IP = '0.0.0.0'
         # self.EXTERNAL_IP = get('https://api.ipify.org').text
         self.EXTERNAL_IP = '12.345.67.890'
+        self.IP = '0.0.0.0'
         self.PORT = 6666
         self.BUFFER_SIZE = 4096
         self.LISTEN_INT = 10
         self.LIST = []
-        self.MIN_VERSION = 3.00
+        self.MIN_VERSION = 0.00
+        self.SERVER_VERSION = 1.00
+        self.SERVER_NAME = 'Default Server'
         self.LAUNCH_TIME = datetime.now().strftime('%H:%M:%S')
-        self.SERVER_NAME = 'Game Server [TEST]'
 
         self.connectedUsers = {}
         self.reversedUsers = {}
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverStatus = True
 
+        self.serverConfig = configparser.ConfigParser()
+        self.serverConfig.read('server-config.ini')
+
+        self.SERVER_NAME = self.serverConfig['Server']['Name']
+        self.SERVER_VERSION = float(self.serverConfig['Server']['Server Version'])
+        self.MIN_VERSION = float(self.serverConfig['Server']['Minimum Version'])
+        self.ALLOW_DUPLICATES = self.serverConfig['Server']['Duplicate Names']
+
         self.serverInformation = {
             'Server Information': {
                 'Server Name': self.SERVER_NAME,
                 'Uptime': self.LAUNCH_TIME,
-                'Minimum Version': self.MIN_VERSION
+                'Minimum Version': self.MIN_VERSION,
+                'Server Version': self.SERVER_VERSION
             }
         }
 
@@ -124,13 +135,13 @@ class GameServer:
                                             self.connectedUsers[address] = clientData[0]
                                             sock.send(b'CONN_SUCCESS<>Successfully connected to the server.')
                                             Logger.log(f'Allowed connection from [{address[0]}:{address[1]}] ({clientData[0]}) [{clientData[1]}]', 'CONNECT')
-                                            time.sleep(0.05)
+                                            time.sleep(0.10)
                                             start_dt = datetime.strptime(self.serverInformation['Server Information']['Uptime'], '%H:%M:%S')
                                             end_dt = datetime.strptime(datetime.now().strftime('%H:%M:%S'), '%H:%M:%S')
                                             diff = (end_dt - start_dt)
                                             serverInformationTemp = self.serverInformation
                                             serverInformationTemp['Server Information']['Uptime'] = str(diff)
-                                            time.sleep(0.05)
+                                            time.sleep(0.10)
                                             sock.send(str.encode(f'SERVER_INFORMATION<>{str(serverInformationTemp)}'))
                                             Logger.log(f'Sent server information to client [{address[0]}:{address[1]}] ({clientData[0]})')
                                             self.serverInformation['Server Information']['Uptime'] = self.LAUNCH_TIME

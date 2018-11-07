@@ -3,6 +3,7 @@ import time
 import ast
 import _thread
 from tools.logger import Logger
+from datetime import datetime
 
 """
 
@@ -47,7 +48,7 @@ clientInformation = {
     }
 }
 
-clientInformation['Client Information']['Username'] = input(Logger.log('Enter username: '))
+clientInformation['Client Information']['Username'] = input(f'[{datetime.now().strftime("%H:%M:%S")}] INPUT: Enter username: ')
 
 IP = '127.0.0.1'
 PORT = 6666
@@ -82,7 +83,7 @@ def listen():
             elif arguments[0] == 'SERVER_INFORMATION':
                 serverInfo = ast.literal_eval(str(arguments[1]))
                 serverData = []
-                for field in ['Server Name', 'Uptime', 'Minimum Version']:
+                for field in ['Server Name', 'Uptime', 'Minimum Version', 'Server Version']:
                     serverData.append(serverInfo['Server Information'][field])
                     Logger.log(f'{field}: {str(serverInfo["Server Information"][field])}', 'SERVER')
             elif arguments[0] == 'USER_LIST':
@@ -91,18 +92,17 @@ def listen():
                     if user is not '':
                         Logger.log(user, 'USER LIST')
 
-#test code, ignore.
 
-# _thread.start_new_thread(listen(), )
+Testing = False
 
-from tkinter import *
-root = Tk()
-ent = Entry(root)
-ent.pack()
-but = Button(root, command=lambda:(gameSocket.send(str.encode(f'{ent.get()}')))).pack()
-# _thread.start_new_thread(root.mainloop(),)
+if Testing:
+
+    from tkinter import *
+    root = Tk()
+    ent = Entry(root)
+    ent.pack()
+    but = Button(root, command=lambda:(gameSocket.send(str.encode(f'{ent.get()}')))).pack()
+    _thread.start_new_thread(root.mainloop(),)
+
+
 _thread.start_new_thread(listen(), )
-# root.mainloop()
-
-
-# _thread.start_new_thread(listen(), )
