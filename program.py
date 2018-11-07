@@ -60,6 +60,7 @@ gameSocket.connect((IP, PORT))
 gameSocket.send(str.encode(f'CLIENT_INFORMATION<>{str(clientInformation)}'))
 time.sleep(0.01)
 # gameSocket.send(b'ONLINE')
+gameSocket.send(b'CONNECT4<>START<>SM')
 
 
 def listen():
@@ -91,6 +92,16 @@ def listen():
                 for user in all_users:
                     if user is not '':
                         Logger.log(user, 'USER LIST')
+            elif arguments[0] == 'CONNECT4':
+                handle_game_cmd(arguments)
+
+
+def handle_game_cmd(cmd):
+    if cmd[1] == 'CHALLENGED':
+        print('Challenged by', cmd[2])
+        gameSocket.send(str.encode('CONNECT4<>ACCEPTED<>' + cmd[2]))
+    elif cmd[1] == 'ACCEPTED':
+        print('Accepted by', cmd[2])
 
 
 Testing = False

@@ -23,6 +23,7 @@ class GameServer:
         self.LAUNCH_TIME = datetime.now().strftime('%H:%M:%S')
 
         self.connectedUsers = {}
+        self.extendedUsers = {}
         self.reversedUsers = {}
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverStatus = True
@@ -73,14 +74,16 @@ class GameServer:
                         try:
                             receivedData = sock.recv(self.BUFFER_SIZE, )
                         except:
-                            self.broadcast('[{user_leaving}] left the server'.format(user_leaving='undefined'))
                             try:
                                 try:
                                     disconnected_user = self.connectedUsers[address]
                                     del self.connectedUsers[address]
+                                    del self.extendedUsers[disconnected_user]
                                 except:
                                     disconnected_user = '[undefined]'
                                 Logger.log(f'Client [{address[0]}:{address[1]}] ({disconnected_user}) disconnected from the server.', 'DISCONNECT')
+                                self.broadcast(f'({disconnected_user}) left the server')
+                                self.broadcast(f'LEFT<>{disconnected_user}')
                             except Exception as error:
                                 Logger.error(error)
                             sock.close()
@@ -92,12 +95,18 @@ class GameServer:
                                 try:
                                     disconnected_user = self.connectedUsers[address]
                                     del self.connectedUsers[address]
+                                    del self.extendedUsers[disconnected_user]
                                 except:
                                     disconnected_user = '[undefined]'
                                 Logger.log(f'Client [{address[0]}:{address[1]}] ({disconnected_user}) disconnected from the server.', 'DISCONNECT')
                                 Logger.log(f'Received quit command from client [{address[0]}:{address[1]}]')
+                                self.broadcast(f'({disconnected_user}) left the server')
+                                self.broadcast(f'LEFT<>{disconnected_user}')
+                                sock.close()
+                                self.LIST.remove(sock)
+                                continue
                             elif arguments[0] == 'CONNECT4':
-                                self.handle_game_commands(arguments, sock)
+                                self.handle_game_commands(arguments, sock, self.connectedUsers[address])
                             elif arguments[0] == 'ONLINE':
                                 userList = ''
                                 for user in self.connectedUsers:
@@ -133,6 +142,7 @@ class GameServer:
                                             self.LIST.remove(sock)
                                         else:
                                             self.connectedUsers[address] = clientData[0]
+                                            self.extendedUsers[clientData[0]] = sock
                                             sock.send(b'CONN_SUCCESS<>Successfully connected to the server.')
                                             Logger.log(f'Allowed connection from [{address[0]}:{address[1]}] ({clientData[0]}) [{clientData[1]}]', 'CONNECT')
                                             time.sleep(0.10)
@@ -150,23 +160,27 @@ class GameServer:
             except Exception as error:
                 Logger.error(error)
 
-    def handle_game_commands(self, args, sender):
+    def handle_game_commands(self, args, sender, name):
         if args[0] == 'CONNECT4':
             if args[1] == 'START':
                 if args[2] in self.users():
-                    ind = self.users().index(args[2])
-                    print(self.LIST)
-                    print(self.LIST[ind - 1])
-
+                    time.sleep(0.1)
+                    challengedSocket = self.extendedUsers[args[2]]
+                    challengedSocket.send(str.encode('CONNECT4<>CHALLENGED<>' + name))
                 else:
                     sender.send(b'GAME_ERROR<>MEMBER_NOT_FOUND')
+            elif args[1] == 'ACCEPTED':
+                time.sleep(0.1)
+                challengedSocket = self.extendedUsers[args[2]]
+                challengedSocket.send(str.encode('<>'.join(args)))
+
 
     def broadcast(self, message):
         try:
             for connectedSocket in self.LIST:
                 if connectedSocket != self.serverSocket:
                     connectedSocket.send(str.encode(message))
-                    time.sleep(0.05)
+                    time.sleep(0.10)
             Logger.log(message.rstrip().lstrip(), 'BROADCAST')
         except Exception as error:
             Logger.error(error)
