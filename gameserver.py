@@ -17,22 +17,22 @@ class GameServer:
         self.LISTEN_INT = 10
         self.LIST = []
         self.MIN_VERSION = 3.00
+        self.LAUNCH_TIME = datetime.now().strftime('%H:%M:%S')
+        self.SERVER_NAME = 'Game Server [TEST]'
 
         self.connectedUsers = {}
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverStatus = True
 
-        self.launchTime = datetime.now().strftime('%H:%M:%S')
-
         self.serverInformation = {
             'Server Information': {
-                'Server Name': 'Game Server [TEST]',
-                'Uptime': self.launchTime,
+                'Server Name': self.SERVER_NAME,
+                'Uptime': self.LAUNCH_TIME,
                 'Minimum Version': self.MIN_VERSION
             }
         }
 
-        Logger.log('Initialized chat server with version four support.')
+        Logger.log(f'Initialized chat server with version {str(self.MIN_VERSION)} support.')
 
     def run(self):
         self.serverSocket.bind((self.IP, self.PORT))

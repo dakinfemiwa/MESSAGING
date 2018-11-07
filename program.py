@@ -51,11 +51,13 @@ clientInformation['Client Information']['Username'] = input(Logger.log('Enter us
 IP = '127.0.0.1'
 PORT = 6666
 
+Logger.log(f'Attempting to connect to [{IP}:{PORT}]')
+
 gameSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 gameSocket.connect((IP, PORT))
 gameSocket.send(str.encode(f'CLIENT_INFORMATION<>{str(clientInformation)}'))
 time.sleep(0.01)
-gameSocket.send(b'ONLINE')
+# gameSocket.send(b'ONLINE')
 
 
 while True:
