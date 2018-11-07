@@ -1,6 +1,7 @@
 import socket
 import time
 import ast
+import _thread
 from tools.logger import Logger
 
 """
@@ -60,31 +61,48 @@ time.sleep(0.01)
 # gameSocket.send(b'ONLINE')
 
 
-while True:
-    try:
-        receive_data = gameSocket.recv(4096)
-    except:
-        Logger.log('The server closed the connection (failed to receive any data)', 'ERROR')
-        break
-    if not receive_data:
-        Logger.log('Lost connection to the server (received invalid data)', 'ERROR')
-        break
-    else:
-        arguments = receive_data.decode().split('<>')
-        if arguments[0] == 'CONN_ERROR':
-            Logger.log('Server rejected connection based on client information.', 'DISCONNECT')
-            Logger.log(arguments[1])
+def listen():
+    while True:
+        try:
+            receive_data = gameSocket.recv(4096)
+        except:
+            Logger.log('The server closed the connection (failed to receive any data)', 'ERROR')
             break
-        elif arguments[0] == 'CONN_SUCCESS':
-            Logger.log(arguments[1])
-        elif arguments[0] == 'SERVER_INFORMATION':
-            serverInfo = ast.literal_eval(str(arguments[1]))
-            serverData = []
-            for field in ['Server Name', 'Uptime', 'Minimum Version']:
-                serverData.append(serverInfo['Server Information'][field])
-                Logger.log(f'{field}: {str(serverInfo["Server Information"][field])}', 'SERVER')
-        elif arguments[0] == 'USER_LIST':
-            all_users = arguments[1].split(';')
-            for user in all_users:
-                if user is not '':
-                    Logger.log(user, 'USER LIST')
+        if not receive_data:
+            Logger.log('Lost connection to the server (received invalid data)', 'ERROR')
+            break
+        else:
+            arguments = receive_data.decode().split('<>')
+            if arguments[0] == 'CONN_ERROR':
+                Logger.log('Server rejected connection based on client information.', 'DISCONNECT')
+                Logger.log(arguments[1])
+                break
+            elif arguments[0] == 'CONN_SUCCESS':
+                Logger.log(arguments[1])
+            elif arguments[0] == 'SERVER_INFORMATION':
+                serverInfo = ast.literal_eval(str(arguments[1]))
+                serverData = []
+                for field in ['Server Name', 'Uptime', 'Minimum Version']:
+                    serverData.append(serverInfo['Server Information'][field])
+                    Logger.log(f'{field}: {str(serverInfo["Server Information"][field])}', 'SERVER')
+            elif arguments[0] == 'USER_LIST':
+                all_users = arguments[1].split(';')
+                for user in all_users:
+                    if user is not '':
+                        Logger.log(user, 'USER LIST')
+
+#test code, ignore.
+
+# _thread.start_new_thread(listen(), )
+
+from tkinter import *
+root = Tk()
+ent = Entry(root)
+ent.pack()
+but = Button(root, command=lambda:(gameSocket.send(str.encode(f'{ent.get()}')))).pack()
+# _thread.start_new_thread(root.mainloop(),)
+_thread.start_new_thread(listen(), )
+# root.mainloop()
+
+
+# _thread.start_new_thread(listen(), )

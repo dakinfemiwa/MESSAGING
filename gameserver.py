@@ -3,7 +3,7 @@ import select
 import time
 import ast
 from tools.logger import Logger
-from datetime import datetime, date
+from datetime import datetime
 from requests import get
 
 
@@ -21,6 +21,7 @@ class GameServer:
         self.SERVER_NAME = 'Game Server [TEST]'
 
         self.connectedUsers = {}
+        self.reversedUsers = {}
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverStatus = True
 
@@ -39,6 +40,12 @@ class GameServer:
         self.serverSocket.listen(self.LISTEN_INT)
         self.LIST.append(self.serverSocket)
         self.receive()
+
+    def users(self):
+        userList = []
+        for user in self.connectedUsers:
+            userList.append(self.connectedUsers[user])
+        return userList
 
     def receive(self):
         Logger.log(f'Started listening for connections at [{self.EXTERNAL_IP}:{self.PORT}]')
@@ -78,6 +85,8 @@ class GameServer:
                                     disconnected_user = '[undefined]'
                                 Logger.log(f'Client [{address[0]}:{address[1]}] ({disconnected_user}) disconnected from the server.', 'DISCONNECT')
                                 Logger.log(f'Received quit command from client [{address[0]}:{address[1]}]')
+                            elif arguments[0] == 'CONNECT4':
+                                self.handle_game_commands(arguments, sock)
                             elif arguments[0] == 'ONLINE':
                                 userList = ''
                                 for user in self.connectedUsers:
@@ -124,11 +133,22 @@ class GameServer:
                                             time.sleep(0.05)
                                             sock.send(str.encode(f'SERVER_INFORMATION<>{str(serverInformationTemp)}'))
                                             Logger.log(f'Sent server information to client [{address[0]}:{address[1]}] ({clientData[0]})')
-                                            self.serverInformation['Server Information']['Uptime'] = self.launchTime
+                                            self.serverInformation['Server Information']['Uptime'] = self.LAUNCH_TIME
                             else:
                                 self.broadcast(receivedData.decode())
             except Exception as error:
                 Logger.error(error)
+
+    def handle_game_commands(self, args, sender):
+        if args[0] == 'CONNECT4':
+            if args[1] == 'START':
+                if args[2] in self.users():
+                    ind = self.users().index(args[2])
+                    print(self.LIST)
+                    print(self.LIST[ind - 1])
+
+                else:
+                    sender.send(b'GAME_ERROR<>MEMBER_NOT_FOUND')
 
     def broadcast(self, message):
         try:
