@@ -14,7 +14,7 @@ class GameServer:
         self.EXTERNAL_IP = '12.345.67.890'
         self.IP = '0.0.0.0'
         self.PORT = 6666
-        self.BUFFER_SIZE = 4096
+        self.BUFFER_SIZE = 27
         self.LISTEN_INT = 10
         self.LIST = []
         self.MIN_VERSION = 0.00
@@ -26,6 +26,7 @@ class GameServer:
         self.extendedUsers = {}
         self.reversedUsers = {}
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serverSocket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.serverStatus = True
 
         self.serverConfig = configparser.ConfigParser()
@@ -105,6 +106,10 @@ class GameServer:
                                 sock.close()
                                 self.LIST.remove(sock)
                                 continue
+                            elif arguments[0] == 'USERNAME':
+                                self.connectedUsers[address] = arguments[1]
+                                self.extendedUsers[arguments[1]] = sock
+                                Logger.log(f'Allowed connection from [{address[0]}:{address[1]}] ({arguments[1]})', 'CONNECT')
                             elif arguments[0] == 'CONNECT4':
                                 self.handle_game_commands(arguments, sock, self.connectedUsers[address])
                             elif arguments[0] == 'ONLINE':
@@ -180,7 +185,6 @@ class GameServer:
             for connectedSocket in self.LIST:
                 if connectedSocket != self.serverSocket:
                     connectedSocket.send(str.encode(message))
-                    time.sleep(0.10)
             Logger.log(message.rstrip().lstrip(), 'BROADCAST')
         except Exception as error:
             Logger.error(error)
