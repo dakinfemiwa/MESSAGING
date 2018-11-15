@@ -4,6 +4,7 @@ import time
 from tools.logger import Logger
 import socket
 import ast
+import random
 
 
 class Connect:
@@ -93,12 +94,22 @@ class Connect:
 
         self.Window.after(3000, lambda: self.notificationText.set(''))
 
+        self.currentItemCoords = [0, 0, 0, 0]
+
         Logger.log(f"Launched game window -  running on {self.tickrate} tickrate.")
 
         # _thread.start_new_thread(self.updatePieces, ())
         _thread.start_new_thread(self.startListening, ())
         _thread.start_new_thread(self.updatePieces, ())
-        _thread.start_new_thread(self.Window.mainloop(), ())
+        # _thread.start_new_thread(self.makeItems, ())
+        _thread.start_new_thread(self.Window.mainloop(), )
+
+    def makeItems(self):
+        while True:
+            time.sleep(random.randint(2, 5))
+            locX2 = random.uniform(0.20, 0.90)
+            locY2 = random.uniform(0.20, 0.85)
+            self.clientSocket.send(str.encode(f'ITEM<>{locX2:.2f},{locY2:.2f}'))
 
     def setVelocityX(self, playerName, velocityX):
         self.velocityX[self.gamePlayers.index(playerName)] = velocityX
@@ -137,6 +148,14 @@ class Connect:
                 if self.locations[self.locIndex][1] < 0.88:
                     self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + self.getVelocityY(Username)
 
+
+            if self.locations[self.locIndex][0] > self.currentItemCoords[0]:
+                if self.locations[self.locIndex][0] > self.currentItemCoords[2]:
+                    if self.locations[self.locIndex][0] > self.currentItemCoords[1]:
+                        if self.locations[self.locIndex][0] < self.currentItemCoords[3]:
+                            print('In box')
+
+
             xloc = self.locations[self.locIndex][0]
             yloc = self.locations[self.locIndex][1]
 
@@ -146,7 +165,16 @@ class Connect:
             self.gamePieces[self.gamePlayers.index(Username)].place_forget()
             self.Window.after(1, (self.gamePieces[self.gamePlayers.index(Username)].place(relx=self.locations[self.locIndex][0], rely=self.locations[self.locIndex][1])))
 
+    def createItem(self, x, y):
+        tempItem = Label(self.Window, text='▲', fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_BACKGROUND)
+        tempItem.place(relx=x, rely=y)
+
+        self.currentItemCoords = [x-0.01, y-0.01, y+0.05, x+0.05]
+
+        self.Window.after(6000, lambda: tempItem.place_forget())
+
     def startListening(self):
+        # _thread.start_new_thread(self.makeItems, ())
         try:
             self.clientSocket.connect((self.IP, self.PORT))
             self.hasConnected = True
@@ -162,7 +190,7 @@ class Connect:
             while True:
                 try:
                     receive_data = self.clientSocket.recv(27)
-                    print(receive_data.decode())
+                    # print(receive_data.decode())
                     arguments = receive_data.decode().split('<>')
                     if arguments[0] == 'CONN_ERROR':
                         Logger.log('Server rejected connection based on client information.', 'DISCONNECT')
@@ -176,15 +204,19 @@ class Connect:
                         for field in ['Server Name', 'Uptime', 'Minimum Version', 'Server Version']:
                             serverData.append(serverInfo['Server Information'][field])
                             Logger.log(f'{field}: {str(serverInfo["Server Information"][field])}', 'SERVER')
+                    elif arguments[0] == 'ITEM':
+                        # print(receive_data.decode())
+                        posArgs2 = receive_data.decode().strip('ITEM<>')
+                        posArgs2 = posArgs2.split(',')
+                        self.createItem(float(posArgs2[0]), float(posArgs2[1]))
                     elif arguments[0] == 'USER_LIST':
                         all_users = arguments[1].split(';')
                         for user in all_users:
                             if user is not '':
                                 Logger.log(user, 'USER LIST')
                     elif arguments[0] == 'POSITION':
-                        print(receive_data.decode())
+                        # print(receive_data.decode())
                         userName = arguments[1]
-                        print(userName)
                         if userName != Username:
                             Logger.log('handling', userName)
                             posArgs = receive_data.decode().strip('POSITION<>' + userName)
