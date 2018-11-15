@@ -41,6 +41,42 @@ class Connect:
             self.setVelocityY(Username, 0.00)
             self.setVelocityX(Username, 0.00)
 
+        def handlePosW(event):
+            if self.facing != 1:
+                if self.facing == 4:
+                    self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + 0.028
+                self.facing = 1
+                self.locations[self.locIndex][1] = self.locations[self.locIndex][1] - 0.0625
+                self.GAME_PIECE_PLAYER_2.config(text="""↑
+●""")
+
+        def handlePosS(event):
+            pass
+#            """
+#            if self.facing != 3:
+#                self.facing = 1
+#                self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + 0.0625
+#                self.GAME_PIECE_PLAYER_2.config(text="""●
+#↓""")
+
+        def handlePosA(event):
+            if self.facing != 4:
+                if self.facing == 1:
+                    self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + 0.0625
+                self.locations[self.locIndex][0] = self.locations[self.locIndex][0] - 0.028
+                self.facing = 4
+                self.GAME_PIECE_PLAYER_2.config(text="← ●")
+
+        def handlePosD(event):
+            if self.facing != 2:
+                if self.facing == 1:
+                    self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + 0.0625
+                elif self.facing == 4:
+                    self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + 0.028
+                self.facing = 2
+                self.GAME_PIECE_PLAYER_2.config(text="● →")
+        
+
         self.gamePlayers = ['Shivam', 'TEST', 'TEST2', 'TEST3']
         self.velocityX = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.velocityY = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -55,6 +91,8 @@ class Connect:
         self.Window.title(self.WINDOW_TITLE)
 
         self.locIndex = self.gamePlayers.index(uName)
+        
+        self.facing = 3
 
         self.tickrate = 40
         self.strVolX = '+0.00'
@@ -72,10 +110,20 @@ class Connect:
         self.Window.bind('<Down>', handleMovementD)
         self.Window.bind('<space>', handleMovementS)
 
+        self.Window.bind('w', handlePosW)
+        self.Window.bind('W', handlePosW)
+        self.Window.bind('s', handlePosS)
+        self.Window.bind('S', handlePosS)
+        self.Window.bind('a', handlePosA)
+        self.Window.bind('A', handlePosA)
+        self.Window.bind('d', handlePosD)
+        self.Window.bind('D', handlePosD)
+
         self.GAME_PIECE_PLAYER_1 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#e74c3c', font=('Segoe UI', 12, 'bold'))
         self.GAME_PIECE_PLAYER_1.place(relx=.05, rely=.25)
 
-        self.GAME_PIECE_PLAYER_2 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#16a085', font=('Segoe UI', 12, 'bold'))
+        self.GAME_PIECE_PLAYER_2 = Label(self.Window, text="""●
+↓""", bg=self.WINDOW_BACKGROUND, fg='#16a085', font=('Segoe UI', 12, 'bold'))
         self.GAME_PIECE_PLAYER_2.place(relx=.05, rely=.45)
 
         self.GAME_PIECE_PLAYER_3 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#3498db', font=('Segoe UI', 12, 'bold'))
@@ -94,7 +142,7 @@ class Connect:
 
         self.Window.after(3000, lambda: self.notificationText.set(''))
 
-        self.currentItemCoords = [0, 0, 0, 0]
+        self.currentItemCoords = [0, 0]
 
         Logger.log(f"Launched game window -  running on {self.tickrate} tickrate.")
 
@@ -148,12 +196,32 @@ class Connect:
                 if self.locations[self.locIndex][1] < 0.88:
                     self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + self.getVelocityY(Username)
 
+            diffX = self.locations[self.locIndex][0] - 1.00
+            diffY = self.locations[self.locIndex][1] - 1.00
 
-            if self.locations[self.locIndex][0] > self.currentItemCoords[0]:
-                if self.locations[self.locIndex][0] > self.currentItemCoords[2]:
-                    if self.locations[self.locIndex][0] > self.currentItemCoords[1]:
-                        if self.locations[self.locIndex][0] < self.currentItemCoords[3]:
-                            print('In box')
+            if diffX < 0:
+                diffX = diffX * -1
+
+            if diffY < 0:
+                diffY = diffY * -1
+
+            diffXItem = self.currentItemCoords[0] - 1
+            diffYItem = self.currentItemCoords[1] - 1
+
+            if diffXItem < 0:
+                diffXItem = diffXItem * -1
+
+            if diffYItem < 0:
+                diffYItem = diffYItem * -1
+
+            if diffXItem - 0.03 < diffX < diffXItem + 0.03:
+                if diffYItem - 0.03 < diffY < diffYItem + 0.03:
+                    self.tempItem.place_forget()
+                    self.currentItemCoords = [0, 0]
+                    self.notificationText.set('Received power-up!')
+                    self.Window.after(3000, lambda: self.notificationText.set(''))
+
+                    print('IN BOX, ', diffY, diffX)
 
 
             xloc = self.locations[self.locIndex][0]
@@ -166,12 +234,12 @@ class Connect:
             self.Window.after(1, (self.gamePieces[self.gamePlayers.index(Username)].place(relx=self.locations[self.locIndex][0], rely=self.locations[self.locIndex][1])))
 
     def createItem(self, x, y):
-        tempItem = Label(self.Window, text='▲', fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_BACKGROUND)
-        tempItem.place(relx=x, rely=y)
+        self.tempItem = Label(self.Window, text='▲', fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_BACKGROUND)
+        self.tempItem.place(relx=x, rely=y)
 
-        self.currentItemCoords = [x-0.01, y-0.01, y+0.05, x+0.05]
+        self.currentItemCoords = [x, y]
 
-        self.Window.after(6000, lambda: tempItem.place_forget())
+        self.Window.after(5000, lambda: self.tempItem.place_forget())
 
     def startListening(self):
         # _thread.start_new_thread(self.makeItems, ())
@@ -231,7 +299,8 @@ class Connect:
                     break
 
 
-Username = input('U: ')
+# Username = input('U: ')
+Username = 'TEST'
 
 clientInformation = {'Client Information': {'Username': Username, 'Version': '5.00', 'Rank': 'User'}}
 
