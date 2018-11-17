@@ -1,6 +1,4 @@
-import game
-import menu
-import _thread
+from experimental import game, menu
 
 GHub = game.GameHub()
 GHub.draw()

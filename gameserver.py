@@ -5,9 +5,9 @@ import ast
 from tools.logger import Logger
 from datetime import datetime
 import configparser
-import _thread
-import random
-from requests import get
+# import _thread
+# import random
+# from requests import get
 
 
 class GameServer:
@@ -181,7 +181,6 @@ class GameServer:
                 challengedSocket = self.extendedUsers[args[2]]
                 challengedSocket.send(str.encode('<>'.join(args)))
 
-
     def broadcast(self, message):
         global tempMsg
         try:
@@ -193,6 +192,7 @@ class GameServer:
                 tempMsg = message
         except Exception as error:
             Logger.error(error)
+
 
 tempMsg = ''
 

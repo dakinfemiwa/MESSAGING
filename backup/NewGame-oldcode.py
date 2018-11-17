@@ -1,5 +1,5 @@
 from tkinter import *
-import threading
+import _thread
 import time
 from tools.logger import Logger
 import socket
@@ -45,13 +45,48 @@ class Connect:
             self.setVelocityY(Username, 0.00)
             self.setVelocityX(Username, 0.00)
 
+        def handlePosW(event):
+            if self.facing != 1:
+                if self.facing == 4:
+                    self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + 0.028
+                self.facing = 1
+                self.locations[self.locIndex][1] = self.locations[self.locIndex][1] - 0.0625
+                self.GAME_PIECE_PLAYER_2.config(text="""↑
+●""")
+
+        def handlePosS(event):
+            pass
+#            """
+#            if self.facing != 3:
+#                self.facing = 1
+#                self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + 0.0625
+#                self.GAME_PIECE_PLAYER_2.config(text="""●
+#↓""")
+
+        def handlePosA(event):
+            if self.facing != 4:
+                if self.facing == 1:
+                    self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + 0.0625
+                self.locations[self.locIndex][0] = self.locations[self.locIndex][0] - 0.028
+                self.facing = 4
+                self.GAME_PIECE_PLAYER_2.config(text="← ●")
+
+        def handlePosD(event):
+            if self.facing != 2:
+                if self.facing == 1:
+                    self.locations[self.locIndex][1] = self.locations[self.locIndex][1] + 0.0625
+                elif self.facing == 4:
+                    self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + 0.028
+                self.facing = 2
+                self.GAME_PIECE_PLAYER_2.config(text="● →")
+
         self.gamePlayers = ['Shivam', 'TEST', 'TEST2', 'TEST3']
         self.velocityX = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.velocityY = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.hasConnected = False
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clientSocket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.locations = [[0.05, 0.35], [0.92, 0.35], [0.05, 0.65], [0.92, 0.65]]
+        self.locations = [[0.05, 0.15], [0.05, 0.35], [0.05, 0.55], [0.05, 0.75]]
         self.playerColours = ['#e74c3c', '#16a085', '#3498db', '#f39c12']
 
         self.Window = Tk()
@@ -60,13 +95,17 @@ class Connect:
         self.Window.title(self.WINDOW_TITLE)
 
         self.locIndex = self.gamePlayers.index(uName)
+        self.delay = 0
+        self.incrementer = 1000
+        
+        self.facing = 3
 
-        self.speed = 35
+        self.tickrate = 40
         self.strVolX = '+0.00'
         self.strVolY = '-0.00'
 
         self.currentPosition = StringVar()
-        self.currentPosition.set(f'X: {self.getVelocityX(Username)} ● Y: {self.getVelocityY(Username)} | {self.locations[self.locIndex][0]:.2f}, {self.locations[self.locIndex][1]:.2f}  [SP: {self.speed}] [User: {Username}]')
+        self.currentPosition.set(f'X: {self.getVelocityX(Username)} ● Y: {self.getVelocityY(Username)} | {self.locations[self.locIndex][0]:.2f}, {self.locations[self.locIndex][1]:.2f}  [TR: {self.tickrate}] [User: {Username}]')
 
         self.notificationText = StringVar()
         self.notificationText.set(f'{uName} joined the game.')
@@ -83,19 +122,32 @@ class Connect:
         self.Window.bind('Z', createBullet)
 
         self.bullet = None
-        self.tempItem = None
+
+
+        '''
+
+        self.Window.bind('w', handlePosW)
+        self.Window.bind('W', handlePosW)
+        self.Window.bind('s', handlePosS)
+        self.Window.bind('S', handlePosS)
+        self.Window.bind('a', handlePosA)
+        self.Window.bind('A', handlePosA)
+        self.Window.bind('d', handlePosD)
+        self.Window.bind('D', handlePosD)
+
+        '''
 
         self.GAME_PIECE_PLAYER_1 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#e74c3c', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_1.place(relx=.05, rely=.35)
+        self.GAME_PIECE_PLAYER_1.place(relx=.05, rely=.15)
 
         self.GAME_PIECE_PLAYER_2 = Label(self.Window, text="●", bg=self.WINDOW_BACKGROUND, fg='#16a085', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_2.place(relx=.92, rely=.35)
+        self.GAME_PIECE_PLAYER_2.place(relx=.05, rely=.435)
 
         self.GAME_PIECE_PLAYER_3 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#3498db', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_3.place(relx=.05, rely=.65)
+        self.GAME_PIECE_PLAYER_3.place(relx=.05, rely=.55)
 
         self.GAME_PIECE_PLAYER_4 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#f39c12', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_4.place(relx=.92, rely=.65)
+        self.GAME_PIECE_PLAYER_4.place(relx=.05, rely=.75)
 
         self.currentVelocityX = Label(self.Window, textvariable=self.currentPosition, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND, font=('Courier New', 12, 'bold'))
         self.currentVelocityX.place(relx=.025, rely=.02)
@@ -109,35 +161,35 @@ class Connect:
 
         self.currentItemCoords = [0, 0]
 
-        Logger.log(f"Launched game window - running on {self.speed} speed.")
+        Logger.log(f"Launched game window -  running on {self.tickrate} tickrate.")
 
-        threading.Thread(target=self.startListening, args=()).start()
-        threading.Thread(target=self.updatePieces, args=()).start()
-        threading.Thread(target=self.threadingAll, args=()).start()
-        threading.Thread(target=self.Window.mainloop()).start()
-
-    def threadingAll(self):
-        while True:
-            Logger.log(f'Total number of threads: {threading.active_count()}')
-            if threading.active_count() > 20:
-                Logger.log('Total number of threads exceeded 20.', 'WARNING')
-            time.sleep(5)
+        # _thread.start_new_thread(self.updatePieces, ())
+        _thread.start_new_thread(self.startListening, ())
+        _thread.start_new_thread(self.updatePieces, ())
+        # _thread.start_new_thread(self.collisionDetection, ())
+        # _thread.start_new_thread(self.makeItems, ())
+        _thread.start_new_thread(self.Window.mainloop(), )
 
     def drawBullet(self, lx, ly, velx, vely, col):
         self.bullet = Label(self.Window, text='-', font=('Segoe UI', 14, 'bold'), fg=col, bg=self.WINDOW_BACKGROUND)
-        threading.Thread(target=self.updateItem, args=(self.bullet, lx, ly, velx, vely)).start()
+        _thread.start_new_thread(self.updateItem, (self.bullet, lx, ly, velx, vely))
 
     def updateItem(self, item, lx, ly, vx, vy):
+        self.newLX = lx
+        self.newLY = ly
         localNewLX = lx
         localNewLY = ly
         while True:
-            time.sleep(1 / self.speed)
+            time.sleep(1 / self.tickrate)
+            self.newLX = float(self.newLX) + float(vx)
+            self.newLY = float(self.newLY) + float(vy)
             localNewLX = float(localNewLX) + float(vx)
             localNewLY = float(localNewLY) + float(vy)
 
             item.place(relx=localNewLX, rely=localNewLY)
 
             try:
+
                 diffXItem = float(localNewLX) - 1
                 diffYItem = float(localNewLY) - 1
 
@@ -150,11 +202,12 @@ class Connect:
                 if 1 < float(localNewLX) or float(localNewLX) < 0:
                     item.place_forget()
                     item = None
+                    print('bullet out of bounds')
                     break
-
                 if 1 < float(localNewLY) or float(localNewLY) < 0:
                     item.place_forget()
                     item = None
+                    print('bullet out of bounds')
                     break
 
                 cached = self.locations
@@ -174,17 +227,29 @@ class Connect:
                 differenceX4 = cached[3][0] - 1.00
                 differenceY4 = cached[3][1] - 1.00
 
-                preDifferences = [[differenceX1, differenceY1], [differenceX2, differenceY2], [differenceX3, differenceY3], [differenceX4, differenceY4]]
+                if differenceX1 < 0:
+                    differenceX1 = differenceX1 * -1
 
-                for uncheckedDifference in preDifferences:
-                    diffIndex = preDifferences.index(uncheckedDifference)
-                    if uncheckedDifference[0] < 0:
-                        uncheckedDifference[0] = uncheckedDifference[0] * -1
-                    if uncheckedDifference[1] < 0:
-                        uncheckedDifference[1] = uncheckedDifference[1] * -1
-                    preDifferences[diffIndex] = uncheckedDifference
+                if differenceY1 < 0:
+                    differenceY1 = differenceY1 * -1
 
-                allDifferences = preDifferences
+                if differenceX2 < 0:
+                    differenceX2 = differenceX2 * -1
+
+                if differenceY2 < 0:
+                    differenceY2 = differenceY2 * -1
+
+                if differenceX3 < 0:
+                    differenceX3 = differenceX3 * -1
+
+                if differenceY3 < 0:
+                    differenceY3 = differenceY3 * -1
+
+                if differenceX4 < 0:
+                    differenceX4 = differenceX4 * -1
+
+                if differenceY4 < 0:
+                    differenceY4 = differenceY4 * -1
 
                 if playerDifferenceX < 0:
                     playerDifferenceX = playerDifferenceX * -1
@@ -192,9 +257,12 @@ class Connect:
                 if playerDifferenceY < 0:
                     playerDifferenceY = playerDifferenceY * -1
 
+                allDifferences = [[differenceX1, differenceY1], [differenceX2, differenceY2], [differenceX3, differenceY3], [differenceX4, differenceY4]]
                 differenceIndex = allDifferences.index([playerDifferenceX, playerDifferenceY])
 
                 differenceHit = None
+
+                # if item.cget("foreground") != self.playerColours[self.locIndex]:
 
                 for difference in allDifferences:
                     if diffXItem - 0.04 < difference[0] < diffXItem + 0.04:
@@ -210,13 +278,15 @@ class Connect:
                     if differenceHit == differenceIndex:
                         self.notificationText.set('You were hit!')
                         self.Window.after(3000, lambda: self.notificationText.set(''))
-                    else:
-                        self.notificationText.set(f'{[self.gamePlayers[differenceHitT]][0]} was hit by {self.gamePlayers[differenceIndex]}')
-                        self.Window.after(3000, lambda: self.notificationText.set(''))
+                        # self.
                     break
 
             except Exception as e:
                 Logger.error(e)
+
+    def notifMain(self, text, killed):
+        pass
+        # win.after(self.delay, lambda: (self.topBar.place(relx=self.deci, rely=.27), self.animate()))
 
     def makeItems(self):
         while True:
@@ -241,11 +311,12 @@ class Connect:
         self.locations[self.gamePlayers.index(u)][0] = float(x)
         self.locations[self.gamePlayers.index(u)][1] = float(y)
         self.gamePieces[self.gamePlayers.index(u)].place_forget()
-        self.Window.after(1, lambda: (self.gamePieces[self.gamePlayers.index(u)].place(relx=self.locations[self.gamePlayers.index(u)][0], rely=self.locations[self.gamePlayers.index(u)][1])))
+        self.Window.after(1, (self.gamePieces[self.gamePlayers.index(u)].place(relx=self.locations[self.gamePlayers.index(u)][0], rely=self.locations[self.gamePlayers.index(u)][1])))
 
     def updatePieces(self):
         while True:
-            time.sleep(1 / self.speed)
+
+            time.sleep(1 / self.tickrate)
 
             if self.getVelocityX(Username) < 0:
                 if self.locations[self.locIndex][0] > 0.02:
@@ -286,14 +357,16 @@ class Connect:
                     self.notificationText.set('Received power-up!')
                     self.Window.after(3000, lambda: self.notificationText.set(''))
 
+                    print('IN BOX, ', diffY, diffX)
+
             xloc = self.locations[self.locIndex][0]
             yloc = self.locations[self.locIndex][1]
 
             self.clientSocket.send(str.encode(f'POSITION<>{Username}<>{float(xloc):.2f},{float(yloc):.2f}'))
 
-            self.currentPosition.set(f'X: {self.getVelocityX(Username)} ● Y: {self.getVelocityY(Username)} | {self.locations[self.locIndex][0]:.2f}, {self.locations[self.locIndex][1]:.2f}  [SP: {self.speed}] [User: {Username}]')
+            self.currentPosition.set(f'X: {self.getVelocityX(Username)} ● Y: {self.getVelocityY(Username)} | {self.locations[self.locIndex][0]:.2f}, {self.locations[self.locIndex][1]:.2f}  [TR: {self.tickrate}] [User: {Username}]')
             self.gamePieces[self.gamePlayers.index(Username)].place_forget()
-            self.Window.after(1, lambda: (self.gamePieces[self.gamePlayers.index(Username)].place(relx=self.locations[self.locIndex][0], rely=self.locations[self.locIndex][1])))
+            self.Window.after(1, (self.gamePieces[self.gamePlayers.index(Username)].place(relx=self.locations[self.locIndex][0], rely=self.locations[self.locIndex][1])))
 
     def createItem(self, x, y):
         self.tempItem = Label(self.Window, text='▲', fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_BACKGROUND)
@@ -361,8 +434,8 @@ class Connect:
                     break
 
 
-Username = input('U: ').upper()
-# Username = 'TEST2'
+# Username = input('U: ')
+Username = 'TEST'
 
 clientInformation = {'Client Information': {'Username': Username, 'Version': '5.00', 'Rank': 'User'}}
 

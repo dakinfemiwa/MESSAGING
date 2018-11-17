@@ -1,4 +1,5 @@
 from tkinter import *
+import _thread
 import threading
 import time
 from tools.logger import Logger
@@ -51,7 +52,7 @@ class Connect:
         self.hasConnected = False
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clientSocket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.locations = [[0.05, 0.35], [0.92, 0.35], [0.05, 0.65], [0.92, 0.65]]
+        self.locations = [[0.05, 0.15], [0.05, 0.35], [0.05, 0.55], [0.05, 0.75]]
         self.playerColours = ['#e74c3c', '#16a085', '#3498db', '#f39c12']
 
         self.Window = Tk()
@@ -61,7 +62,7 @@ class Connect:
 
         self.locIndex = self.gamePlayers.index(uName)
 
-        self.speed = 35
+        self.speed = 40
         self.strVolX = '+0.00'
         self.strVolY = '-0.00'
 
@@ -86,16 +87,16 @@ class Connect:
         self.tempItem = None
 
         self.GAME_PIECE_PLAYER_1 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#e74c3c', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_1.place(relx=.05, rely=.35)
+        self.GAME_PIECE_PLAYER_1.place(relx=.05, rely=.15)
 
         self.GAME_PIECE_PLAYER_2 = Label(self.Window, text="●", bg=self.WINDOW_BACKGROUND, fg='#16a085', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_2.place(relx=.92, rely=.35)
+        self.GAME_PIECE_PLAYER_2.place(relx=.05, rely=.435)
 
         self.GAME_PIECE_PLAYER_3 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#3498db', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_3.place(relx=.05, rely=.65)
+        self.GAME_PIECE_PLAYER_3.place(relx=.05, rely=.55)
 
         self.GAME_PIECE_PLAYER_4 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#f39c12', font=('Segoe UI', 12, 'bold'))
-        self.GAME_PIECE_PLAYER_4.place(relx=.92, rely=.65)
+        self.GAME_PIECE_PLAYER_4.place(relx=.05, rely=.75)
 
         self.currentVelocityX = Label(self.Window, textvariable=self.currentPosition, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND, font=('Courier New', 12, 'bold'))
         self.currentVelocityX.place(relx=.025, rely=.02)
@@ -109,19 +110,11 @@ class Connect:
 
         self.currentItemCoords = [0, 0]
 
-        Logger.log(f"Launched game window - running on {self.speed} speed.")
+        Logger.log(f"Launched game window -  running on {self.speed} speed.")
 
         threading.Thread(target=self.startListening, args=()).start()
         threading.Thread(target=self.updatePieces, args=()).start()
-        threading.Thread(target=self.threadingAll, args=()).start()
         threading.Thread(target=self.Window.mainloop()).start()
-
-    def threadingAll(self):
-        while True:
-            Logger.log(f'Total number of threads: {threading.active_count()}')
-            if threading.active_count() > 20:
-                Logger.log('Total number of threads exceeded 20.', 'WARNING')
-            time.sleep(5)
 
     def drawBullet(self, lx, ly, velx, vely, col):
         self.bullet = Label(self.Window, text='-', font=('Segoe UI', 14, 'bold'), fg=col, bg=self.WINDOW_BACKGROUND)
@@ -241,7 +234,7 @@ class Connect:
         self.locations[self.gamePlayers.index(u)][0] = float(x)
         self.locations[self.gamePlayers.index(u)][1] = float(y)
         self.gamePieces[self.gamePlayers.index(u)].place_forget()
-        self.Window.after(1, lambda: (self.gamePieces[self.gamePlayers.index(u)].place(relx=self.locations[self.gamePlayers.index(u)][0], rely=self.locations[self.gamePlayers.index(u)][1])))
+        self.Window.after(1, (self.gamePieces[self.gamePlayers.index(u)].place(relx=self.locations[self.gamePlayers.index(u)][0], rely=self.locations[self.gamePlayers.index(u)][1])))
 
     def updatePieces(self):
         while True:
@@ -293,7 +286,7 @@ class Connect:
 
             self.currentPosition.set(f'X: {self.getVelocityX(Username)} ● Y: {self.getVelocityY(Username)} | {self.locations[self.locIndex][0]:.2f}, {self.locations[self.locIndex][1]:.2f}  [SP: {self.speed}] [User: {Username}]')
             self.gamePieces[self.gamePlayers.index(Username)].place_forget()
-            self.Window.after(1, lambda: (self.gamePieces[self.gamePlayers.index(Username)].place(relx=self.locations[self.locIndex][0], rely=self.locations[self.locIndex][1])))
+            self.Window.after(1, (self.gamePieces[self.gamePlayers.index(Username)].place(relx=self.locations[self.locIndex][0], rely=self.locations[self.locIndex][1])))
 
     def createItem(self, x, y):
         self.tempItem = Label(self.Window, text='▲', fg=self.WINDOW_FOREGROUND, bg=self.WINDOW_BACKGROUND)

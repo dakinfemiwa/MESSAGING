@@ -1,4 +1,4 @@
-import game
+from experimental import game
 import socket
 import time
 import os
