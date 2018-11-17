@@ -16,7 +16,7 @@ class GameServer:
         self.EXTERNAL_IP = '12.345.67.890'
         self.IP = '0.0.0.0'
         self.PORT = 6666
-        self.BUFFER_SIZE = 27
+        self.BUFFER_SIZE = 35
         self.LISTEN_INT = 10
         self.LIST = []
         self.MIN_VERSION = 0.00
@@ -183,13 +183,18 @@ class GameServer:
 
 
     def broadcast(self, message):
+        global tempMsg
         try:
             for connectedSocket in self.LIST:
                 if connectedSocket != self.serverSocket:
                     connectedSocket.send(str.encode(message))
-            Logger.log(message.rstrip().lstrip(), 'BROADCAST')
+            if message != tempMsg:
+                Logger.log(message.rstrip().lstrip(), 'BROADCAST')
+                tempMsg = message
         except Exception as error:
             Logger.error(error)
+
+tempMsg = ''
 
 
 if __name__ == '__main__':
