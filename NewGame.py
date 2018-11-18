@@ -61,7 +61,7 @@ class Connect:
 
         self.locIndex = self.gamePlayers.index(uName)
 
-        self.speed = 35
+        self.speed = 60
         self.strVolX = '+0.00'
         self.strVolY = '-0.00'
 
@@ -84,8 +84,19 @@ class Connect:
 
         self.bullet = None
         self.tempItem = None
+        self.locationFlag1 = [0.05, 0.50]
+        self.locationFlag2 = [0.92, 0.50]
 
-        self.GAME_PIECE_PLAYER_1 = Label(self.Window, text='●', bg=self.WINDOW_BACKGROUND, fg='#e74c3c', font=('Segoe UI', 12, 'bold'))
+        self.GAME_PIECE_FLAG_1 = Label(self.Window, text="▋", bg=self.WINDOW_BACKGROUND, fg='#9b59b6', font=('Segoe UI', 12, 'bold'))
+        self.GAME_PIECE_FLAG_1.place(relx=.05, rely=.50)
+
+        self.GAME_PIECE_FLAG_2 = Label(self.Window, text="▋", bg=self.WINDOW_BACKGROUND, fg='#d35400', font=('Segoe UI', 12, 'bold'))
+        self.GAME_PIECE_FLAG_2.place(relx=.92, rely=.50)
+
+        self.GAME_PIECE_OBSTACLE = Label(self.Window, text="▋", bg=self.WINDOW_FOREGROUND, fg=self.WINDOW_FOREGROUND, font=('Segoe UI', 11, 'bold'), height=10, width=1)
+        self.GAME_PIECE_OBSTACLE.place(relx=.475, rely=.25)
+
+        self.GAME_PIECE_PLAYER_1 = Label(self.Window, text="●", bg=self.WINDOW_BACKGROUND, fg='#e74c3c', font=('Segoe UI', 12, 'bold'))
         self.GAME_PIECE_PLAYER_1.place(relx=.05, rely=.35)
 
         self.GAME_PIECE_PLAYER_2 = Label(self.Window, text="●", bg=self.WINDOW_BACKGROUND, fg='#16a085', font=('Segoe UI', 12, 'bold'))
@@ -100,9 +111,6 @@ class Connect:
         self.currentVelocityX = Label(self.Window, textvariable=self.currentPosition, bg=self.WINDOW_BACKGROUND, fg=self.WINDOW_FOREGROUND, font=('Courier New', 12, 'bold'))
         self.currentVelocityX.place(relx=.025, rely=.02)
 
-        self.notification = Label(self.Window, textvariable=self.notificationText, bg=self.WINDOW_BACKGROUND, fg='#e74c3c', font=('Courier New', 12, 'bold'))
-        self.notification.place(relx=.025, rely=.90)
-
         self.gamePieces = [self.GAME_PIECE_PLAYER_1, self.GAME_PIECE_PLAYER_2, self.GAME_PIECE_PLAYER_3, self.GAME_PIECE_PLAYER_4]
 
         self.Window.after(3000, lambda: self.notificationText.set(''))
@@ -116,7 +124,8 @@ class Connect:
         threading.Thread(target=self.threadingAll, args=()).start()
         threading.Thread(target=self.Window.mainloop()).start()
 
-    def threadingAll(self):
+    @staticmethod
+    def threadingAll():
         while True:
             Logger.log(f'Total number of threads: {threading.active_count()}')
             if threading.active_count() > 20:
@@ -134,8 +143,13 @@ class Connect:
             time.sleep(1 / self.speed)
             localNewLX = float(localNewLX) + float(vx)
             localNewLY = float(localNewLY) + float(vy)
-
             item.place(relx=localNewLX, rely=localNewLY)
+
+            if 0.82 > float(localNewLY) > 0.18:
+                if round(localNewLX, 2) == 0.47 or round(localNewLX, 2) == 0.48 or round(localNewLX, 2) == 0.49:
+                    item.place_forget()
+                    item = None
+                    break
 
             try:
                 diffXItem = float(localNewLX) - 1
@@ -249,10 +263,21 @@ class Connect:
 
             if self.getVelocityX(Username) < 0:
                 if self.locations[self.locIndex][0] > 0.02:
-                    self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
+                    if 0.18 < self.locations[self.locIndex][1] < 0.83:
+                        if round(self.locations[self.locIndex][0], 2) > 0.50 or round(self.locations[self.locIndex][0], 2) < 0.44:
+                            self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
+                        else:
+                            if round(self.locations[self.locIndex][0], 2) < 0.50 and round(self.locations[self.locIndex][0], 2) <= 0.45:
+                                self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
+                    else:
+                        self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
             else:
                 if self.locations[self.locIndex][0] < 0.96:
-                    self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
+                    if 0.18 < self.locations[self.locIndex][1] < 0.83:
+                        if round(self.locations[self.locIndex][0], 2) <= 0.44 or round(self.locations[self.locIndex][0], 2) >= 0.50:
+                            self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
+                    else:
+                        self.locations[self.locIndex][0] = self.locations[self.locIndex][0] + self.getVelocityX(Username)
 
             if self.getVelocityY(Username) < 0:
                 if self.locations[self.locIndex][1] > 0.02:

@@ -34,10 +34,12 @@ class GameServer:
         self.serverConfig = configparser.ConfigParser()
         self.serverConfig.read('server-config.ini')
 
+        """
         self.SERVER_NAME = self.serverConfig['Server']['Name']
         self.SERVER_VERSION = float(self.serverConfig['Server']['Server Version'])
         self.MIN_VERSION = float(self.serverConfig['Server']['Minimum Version'])
         self.ALLOW_DUPLICATES = self.serverConfig['Server']['Duplicate Names']
+        """
 
         self.serverInformation = {
             'Server Information': {
