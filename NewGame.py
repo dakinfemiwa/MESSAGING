@@ -121,11 +121,11 @@ class Connect:
 
         threading.Thread(target=self.startListening, args=()).start()
         threading.Thread(target=self.updatePieces, args=()).start()
-        threading.Thread(target=self.threadingAll, args=()).start()
+        threading.Thread(target=self.showThreads, args=()).start()
         threading.Thread(target=self.Window.mainloop()).start()
 
     @staticmethod
-    def threadingAll():
+    def showThreads():
         while True:
             Logger.log(f'Total number of threads: {threading.active_count()}')
             if threading.active_count() > 20:
