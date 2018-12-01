@@ -12,6 +12,7 @@ class Game:
         self.W_BG = '#2F3542'
         self.W_FG = '#FFFFFF'
         self.W_SIZE = '600x300'
+        self.W_SIZE = '800x300'
         self.W_TITLE = 'PLACEHOLDER'
 
         self.W_FONT = ('MS PGothic', 30, 'bold')
@@ -36,6 +37,7 @@ class Game:
         self.S_LOGGING = 'LOG EVENTS'
         self.S_CHEAT = 'ALLOW CHEATS'
         self.S_LIVES = '3 LIVES REMAINING'
+        self.S_POSITION = 'SHOW POSITION'
 
         self.C_RED = '#E74C3C'
         self.C_GREEN = '#2ECC71'
@@ -71,6 +73,10 @@ class Game:
         self.SettingsUpdate = Label(self.GameWindow, text=self.S_UPDATE, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
         self.SettingsLog = Label(self.GameWindow, text=self.S_LOGGING, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
         self.SettingsCheat = Label(self.GameWindow, text=self.S_CHEAT, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+
+        self.SettingsPosition = Label(self.GameWindow, text=self.S_POSITION, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+
+        self.SettingsPositionSwitch = Switch(self.GameWindow)
 
         self.SettingsHelpSwitch = Switch(self.GameWindow)
         self.SettingsUpdateSwitch = Switch(self.GameWindow)
@@ -125,27 +131,28 @@ class Game:
                 P.setVelocityX(0)
 
         self.clearScreen()
-        #self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
-        #self.whiteFloor.place(relx=.0, rely=.85)
-        P = Player(self.GameWindow, 'white')
-        P.draw(.05, .5)
         self.GameWindow.bind('<Up>', evJump)
         self.GameWindow.bind('<Right>', evRight)
         self.GameWindow.bind('<Left>', evLeft)
         self.GameWindow.bind('<KeyRelease-Left>', evStopL)
         self.GameWindow.bind('<KeyRelease-Right>', evStopR)
+
+        self.drawPage(1)
+        self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
+        self.GameWindow.after(3000, lambda: self.GameLivesRemaining.place_forget())
+
+        P = Player(self.GameWindow, 'white')
+        P.draw(.05, .5)
+
         gThread = Thread(target=self.moveDown, args=(P, )).start()
         uThread = Thread(target=self.updateLocation, args=(P, )).start()
         cThread = Thread(target=self.changeLocation, args=(P, )).start()
         pThread = Thread(target=self.showLocation, args=(P, )).start()
         bThread = Thread(target=self.checkBoundary, args=(P, )).start()
-        self.drawPage(1)
-        self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
-        self.GameWindow.after(3000, lambda: self.GameLivesRemaining.place_forget())
 
     def drawPage(self, n):
         if n == 1:
-            self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
+            self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=200)
             self.whiteFloor.place(relx=.0, rely=.85)
         elif n == 2:
             self.whiteFloor.place_forget()
@@ -153,7 +160,7 @@ class Game:
             self.whiteFloor2.place(relx=.0, rely=.85)
 
             self.whiteFloor3 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
-            self.whiteFloor3.place(relx=.72, rely=.85)
+            self.whiteFloor3.place(relx=.70, rely=.85)
 
     def moveDown(self, p):
         while True:
@@ -166,7 +173,7 @@ class Game:
                     playerLocation = p.getLocation()
                     if playerLocation[1] < .79:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
-                    elif playerLocation[1] <= 1.10 and 0.5 < playerLocation[0] < 0.7:
+                    elif playerLocation[1] <= 1.10 and 0.39 < playerLocation[0] < 0.68:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                 sleep(0.005)
             else:
@@ -179,7 +186,6 @@ class Game:
             sleep(0.005)
 
     def loseLives(self, p):
-        playerLocation = p.getLocation()
         self.GameLives -= 1
         if self.GameLives == 0:
             print('Game over!')
@@ -188,13 +194,13 @@ class Game:
             self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
             self.GameWindow.after(3000, lambda: self.GameLivesRemaining.place_forget())
             self.GamePage = 1
-            self.drawPage(1 )
+            self.drawPage(1)
             p.setLocation(0.05, .5)
 
     def checkBoundary(self, p):
         while True:
             playerLocation = p.getLocation()
-            if playerLocation[1] > 0.9:
+            if playerLocation[1] > 0.85:
                 self.loseLives(p)
             if playerLocation[0] <= -0.02:
                 if self.GamePage > 1:
@@ -245,16 +251,19 @@ class Game:
         self.SettingsVersion.place(relx=.75, rely=.85)
 
         self.SettingsHelp.place(relx=.051, rely=.35)
-        self.SettingsHelpSwitch.place(0.3, 0.35)
+        self.SettingsHelpSwitch.place(0.28, 0.35)
 
         self.SettingsUpdate.place(relx=.051, rely=.45)
-        self.SettingsUpdateSwitch.place(0.3, 0.45)
+        self.SettingsUpdateSwitch.place(0.28, 0.45)
 
         self.SettingsLog.place(relx=.051, rely=.55)
-        self.SettingsLogSwitch.place(0.3, 0.55)
+        self.SettingsLogSwitch.place(0.28, 0.55)
 
         self.SettingsCheat.place(relx=.051, rely=.65)
-        self.SettingsCheatSwitch.place(0.3, 0.65)
+        self.SettingsCheatSwitch.place(0.28, 0.65)
+
+        self.SettingsPosition.place(relx=.351, rely=.35)
+        self.SettingsPositionSwitch.place(0.28, 0.35)
 
         Animate(self.GameWindow, .05, .1).scroll()
 
