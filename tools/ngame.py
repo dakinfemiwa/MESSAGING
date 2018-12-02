@@ -25,7 +25,7 @@ class Game:
         self.W_FONT4 = ('MS PGothic', 11, 'bold')
 
         self.G_GAMEMODE = 0
-        self.GamePage = 3
+        self.GamePage = 1
         self.GameLives = 3
         self.GameCooldown = 20
 
@@ -181,33 +181,63 @@ class Game:
             thread.start()
 
     def drawPage(self, n):
-        n = 3
         if n == 1:
+            try:
+                self.whiteFloor.place_forget()
+                self.whiteFloor2.place_forget()
+                self.whiteFloor3.place_forget()
+                self.whiteFloor4.place_forget()
+                self.whiteFloor5.place_forget()
+                self.whiteFloor6.place_forget()
+                self.whiteFloor7.place_forget()
+                self.whiteFloor8.place_forget()
+            except:
+                pass
             self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=200)
             self.whiteFloor.place(relx=.0, rely=.85)
         elif n == 2:
-            self.whiteFloor.place_forget()
+            try:
+                self.whiteFloor.place_forget()
+                self.whiteFloor2.place_forget()
+                self.whiteFloor3.place_forget()
+                self.whiteFloor4.place_forget()
+                self.whiteFloor5.place_forget()
+                self.whiteFloor6.place_forget()
+                self.whiteFloor7.place_forget()
+                self.whiteFloor8.place_forget()
+            except:
+                pass
             self.whiteFloor2 = Label(self.GameWindow, bg=self.W_FG, height=3, width=43)
             self.whiteFloor2.place(relx=.0, rely=.85)
 
             self.whiteFloor3 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
             self.whiteFloor3.place(relx=.70, rely=.85)
         elif n == 3:
-            '''
-            self.whiteFloor.place_forget()
-            self.whiteFloor2.place_forget()
-            self.whiteFloor3.place_forget()'''
+            try:
+                self.whiteFloor.place_forget()
+                self.whiteFloor2.place_forget()
+                self.whiteFloor3.place_forget()
+                self.whiteFloor4.place_forget()
+                self.whiteFloor5.place_forget()
+                self.whiteFloor6.place_forget()
+                self.whiteFloor7.place_forget()
+                self.whiteFloor8.place_forget()
+            except:
+                pass
             self.whiteFloor4 = Label(self.GameWindow, bg=self.W_FG, height=3, width=20)
             self.whiteFloor4.place(relx=.0, rely=.85)
 
             self.whiteFloor5 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
-            self.whiteFloor5.place(relx=.9, rely=.85)
+            self.whiteFloor5.place(relx=.925, rely=.85)
 
             self.whiteFloor6 = Label(self.GameWindow, bg=self.W_FG, height=1, width=10)
             self.whiteFloor6.place(relx=.2, rely=.7)
 
             self.whiteFloor7 = Label(self.GameWindow, bg=self.W_FG, height=1, width=8)
             self.whiteFloor7.place(relx=.4, rely=.6)
+
+            self.whiteFloor8 = Label(self.GameWindow, bg=self.W_FG, height=1, width=14)
+            self.whiteFloor8.place(relx=.68, rely=.65)
 
     def loadConfiguration(self):
         configEntries = ['Show-Help', 'Auto-Update', 'Log-Events', 'Allow-Cheats', 'Show-Position', 'Show-Pages']
@@ -240,14 +270,21 @@ class Game:
                         elif playerLocation[1] > 0.7:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     elif 0.39 >= round(playerLocation[0], 2) >= 0.29:
-                            print('t2')
-                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
-                    elif 0.46 >= playerLocation[0] >= 0.39:
-                        print('t3')
+                        p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.48 >= round(playerLocation[0], 2) >= 0.39:
                         if playerLocation[1] < .54:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                         elif playerLocation[1] > 0.6:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.66 >= playerLocation[0] >= 0.49:
+                        p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.79 >= playerLocation[0] >= 0.67:
+                        if playerLocation[1] < .59:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                        elif playerLocation[1] > 0.65:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.92 >= playerLocation[0] >= 0.80:
+                        p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     else:
                         print('t4')
                         print(round(playerLocation[0], 2))
@@ -271,6 +308,9 @@ class Game:
             self.clearScreen()
             t = Label(self.GameWindow, text='GAME OVER', font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
             t.place(relx=.45, rely=.3)
+            self.GamePage = 1
+            self.drawPage(1)
+            p.setLocation(0.05, .5)
         else:
             self.GameLivesRemaining.config(text=f'{self.GameLives} LIVES REMAINING')
             self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
@@ -284,7 +324,6 @@ class Game:
             playerLocation = p.getLocation()
             if playerLocation[1] > 0.85:
                 self.loseLives(p)
-                self.GamePage = 3
             if playerLocation[0] <= -0.02:
                 if self.GamePage > 1:
                     self.drawPage(self.GamePage - 1)
