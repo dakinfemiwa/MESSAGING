@@ -25,7 +25,7 @@ class Game:
         self.W_FONT4 = ('MS PGothic', 11, 'bold')
 
         self.G_GAMEMODE = 0
-        self.GamePage = 1
+        self.GamePage = 3
         self.GameLives = 3
         self.GameCooldown = 20
 
@@ -59,6 +59,8 @@ class Game:
         self.whiteFloor = None
         self.whiteFloor2 = None
         self.whiteFloor3 = None
+        self.whiteFloor4 = None
+        self.whiteFloor5 = None
 
         self.GameWindow = Tk()
         self.GameWindow.geometry(self.W_SIZE)
@@ -179,6 +181,7 @@ class Game:
             thread.start()
 
     def drawPage(self, n):
+        n = 3
         if n == 1:
             self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=200)
             self.whiteFloor.place(relx=.0, rely=.85)
@@ -189,6 +192,22 @@ class Game:
 
             self.whiteFloor3 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
             self.whiteFloor3.place(relx=.70, rely=.85)
+        elif n == 3:
+            '''
+            self.whiteFloor.place_forget()
+            self.whiteFloor2.place_forget()
+            self.whiteFloor3.place_forget()'''
+            self.whiteFloor4 = Label(self.GameWindow, bg=self.W_FG, height=3, width=20)
+            self.whiteFloor4.place(relx=.0, rely=.85)
+
+            self.whiteFloor5 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
+            self.whiteFloor5.place(relx=.9, rely=.85)
+
+            self.whiteFloor6 = Label(self.GameWindow, bg=self.W_FG, height=1, width=10)
+            self.whiteFloor6.place(relx=.2, rely=.7)
+
+            self.whiteFloor7 = Label(self.GameWindow, bg=self.W_FG, height=1, width=8)
+            self.whiteFloor7.place(relx=.4, rely=.6)
 
     def loadConfiguration(self):
         configEntries = ['Show-Help', 'Auto-Update', 'Log-Events', 'Allow-Cheats', 'Show-Position', 'Show-Pages']
@@ -212,6 +231,28 @@ class Game:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     elif playerLocation[1] <= 1.10 and 0.39 < playerLocation[0] < 0.68:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                elif self.GamePage == 3:
+                    playerLocation = p.getLocation()
+                    if 0.28 >= playerLocation[0] >= 0.20:
+                        print('t1')
+                        if playerLocation[1] < .64:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                        elif playerLocation[1] > 0.7:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.39 >= round(playerLocation[0], 2) >= 0.29:
+                            print('t2')
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.46 >= playerLocation[0] >= 0.39:
+                        print('t3')
+                        if playerLocation[1] < .54:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                        elif playerLocation[1] > 0.6:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    else:
+                        print('t4')
+                        print(round(playerLocation[0], 2))
+                        if playerLocation[1] < .79:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                 sleep(0.005)
             else:
                 sleep(0.005)
@@ -243,6 +284,7 @@ class Game:
             playerLocation = p.getLocation()
             if playerLocation[1] > 0.85:
                 self.loseLives(p)
+                self.GamePage = 3
             if playerLocation[0] <= -0.02:
                 if self.GamePage > 1:
                     self.drawPage(self.GamePage - 1)

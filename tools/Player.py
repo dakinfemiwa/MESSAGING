@@ -42,8 +42,9 @@ class Player:
                 self.Gravity = True
                 break
             sleep(0.001)
-        sleep(0.2)
+        sleep(0.20)
         self.setVelocityX(self.getVelocityX() / 2)
+        sleep(0.03)
         self.PlayerJumping = False
 
     def gravity(self):
