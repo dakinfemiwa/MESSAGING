@@ -1,9 +1,13 @@
-from tkinter import *
+import configparser
 from threading import Thread
-from tools.animator import Animate
+from time import sleep
+from tkinter import *
+
 from tools.Player import Player
 from tools.Switch import Switch
-from time import sleep
+from tools.animator import Animate
+
+
 # from tools.error import Error
 
 
@@ -23,6 +27,7 @@ class Game:
         self.G_GAMEMODE = 0
         self.GamePage = 1
         self.GameLives = 3
+        self.GameCooldown = 20
 
         self.S_GAME = 'PLACEHOLDER'
         self.S_SINGLEPLAYER = 'SINGLE-PLAYER'
@@ -38,6 +43,7 @@ class Game:
         self.S_CHEAT = 'ALLOW CHEATS'
         self.S_LIVES = '3 LIVES REMAINING'
         self.S_POSITION = 'SHOW POSITION'
+        self.S_PAGE = 'SHOW PAGE'
 
         self.C_RED = '#E74C3C'
         self.C_GREEN = '#2ECC71'
@@ -46,6 +52,13 @@ class Game:
         self.C_YELLOW = '#F1C40F'
         self.C_GRAY = '#95A5A6'
         self.C_LIGHTGRAY = '#BDC3C7'
+
+        self.Configuration = configparser.ConfigParser()
+        self.Configuration.read('game-config.ini')
+
+        self.whiteFloor = None
+        self.whiteFloor2 = None
+        self.whiteFloor3 = None
 
         self.GameWindow = Tk()
         self.GameWindow.geometry(self.W_SIZE)
@@ -75,8 +88,10 @@ class Game:
         self.SettingsCheat = Label(self.GameWindow, text=self.S_CHEAT, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
 
         self.SettingsPosition = Label(self.GameWindow, text=self.S_POSITION, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+        self.SettingsPage = Label(self.GameWindow, text=self.S_PAGE, font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
 
         self.SettingsPositionSwitch = Switch(self.GameWindow)
+        self.SettingsPageSwitch = Switch(self.GameWindow)
 
         self.SettingsHelpSwitch = Switch(self.GameWindow)
         self.SettingsUpdateSwitch = Switch(self.GameWindow)
@@ -89,51 +104,59 @@ class Game:
         self.GameAssets = [self.GameTitle, self.GameSingleplayer, self.GameMultiplayer, self.GameCustomize, self.GameSettings, self.GameExitGame]
         self.SettingsAssets = [self.SettingsVersion]
 
-        self.THREAD_MOVEMENT = Thread(target=self.handleMovement, args=())
+        self.THREAD_CONFIG = Thread(target=self.loadConfiguration, args=())
         self.THREAD_WINDOW = Thread(target=self.GameWindow.mainloop())
 
     def drawStart(self):
+        global keyPressedL, keyPressedR
 
-        global lPressed, rPressed
+        keyPressedR = False
+        keyPressedL = False
 
-        lPressed = False
-        rPressed = False
+        def handleKeyPress(event):
+            global keyPressedL, keyPressedR
+            if event.keysym == 'Left':
+                keyPressedL = True
+                P.setVelocityX(-0.0025)
+            elif event.keysym == 'Right':
+                keyPressedR = True
+                P.setVelocityX(+0.0025)
+            elif event.keysym == 'Up':
+                if not P.isJumping():
+                    if keyPressedL:
+                        P.jump(0)
+                    elif keyPressedR:
+                        P.jump(1)
+                    else:
+                        P.jump(2)
 
-        def evJump(event):
-            global lPressed, rPressed
-            if lPressed:
-                P.jump(0)
-            elif rPressed:
-                P.jump(1)
-            else:
-                P.jump(2)
-
-        def evLeft(event):
-            global lPressed, rPressed
-            lPressed = True
-            P.setVelocityX(-0.0025)
-
-        def evRight(event):
-            global lPressed, rPressed
-            rPressed = True
-            P.setVelocityX(0.0025)
+        def handleKeyRelease(event):
+            global keyPressedL, keyPressedR
+            if event.keysym == 'Left':
+                keyPressedL = False
+                if not keyPressedR:
+                    P.setVelocityX(0)
+            elif event.keysym == 'Right':
+                keyPressedR = False
+                if not keyPressedL:
+                    P.setVelocityX(0)
 
         def evStopL(event):
-            global lPressed, rPressed
-            lPressed = False
-            if not rPressed:
+            global keyPressedL, keyPressedR
+            keyPressedL = False
+            if not keyPressedR:
                 P.setVelocityX(0)
 
         def evStopR(event):
-            global lPressed, rPressed
-            rPressed = False
-            if not lPressed:
+            global keyPressedL, keyPressedR
+            keyPressedR = False
+            if not keyPressedL:
                 P.setVelocityX(0)
 
         self.clearScreen()
-        self.GameWindow.bind('<Up>', evJump)
-        self.GameWindow.bind('<Right>', evRight)
-        self.GameWindow.bind('<Left>', evLeft)
+        self.GameWindow.bind('<Up>', handleKeyPress)
+        self.GameWindow.bind('<Right>', handleKeyPress)
+        self.GameWindow.bind('<Left>', handleKeyPress)
         self.GameWindow.bind('<KeyRelease-Left>', evStopL)
         self.GameWindow.bind('<KeyRelease-Right>', evStopR)
 
@@ -144,11 +167,16 @@ class Game:
         P = Player(self.GameWindow, 'white')
         P.draw(.05, .5)
 
-        gThread = Thread(target=self.moveDown, args=(P, )).start()
-        uThread = Thread(target=self.updateLocation, args=(P, )).start()
-        cThread = Thread(target=self.changeLocation, args=(P, )).start()
-        pThread = Thread(target=self.showLocation, args=(P, )).start()
-        bThread = Thread(target=self.checkBoundary, args=(P, )).start()
+        gThread = Thread(target=self.moveDown, args=(P, ))
+        uThread = Thread(target=self.updateLocation, args=(P, ))
+        cThread = Thread(target=self.changeLocation, args=(P, ))
+        pThread = Thread(target=self.showLocation, args=(P, ))
+        bThread = Thread(target=self.checkBoundary, args=(P, ))
+
+        allThreads = [gThread, uThread, cThread, pThread, bThread]
+
+        for thread in allThreads:
+            thread.start()
 
     def drawPage(self, n):
         if n == 1:
@@ -161,6 +189,15 @@ class Game:
 
             self.whiteFloor3 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
             self.whiteFloor3.place(relx=.70, rely=.85)
+
+    def loadConfiguration(self):
+        configEntries = ['Show-Help', 'Auto-Update', 'Log-Events', 'Allow-Cheats', 'Show-Position', 'Show-Pages']
+        configValues = [0, 0, 0, 0, 0, 0]
+        configSwitches = [self.SettingsHelpSwitch, self.SettingsUpdateSwitch, self.SettingsLogSwitch, self.SettingsCheatSwitch, self.SettingsPositionSwitch, self.SettingsPageSwitch]
+
+        for value in configEntries:
+            configValues[configEntries.index(value)] = int(self.Configuration['Settings'][value])
+            configSwitches[configEntries.index(value)].set(int(self.Configuration['Settings'][value]))
 
     def moveDown(self, p):
         while True:
@@ -179,7 +216,8 @@ class Game:
             else:
                 sleep(0.005)
 
-    def changeLocation(self, p):
+    @staticmethod
+    def changeLocation(p):
         while True:
             playerLocation = p.getLocation()
             playerLocation[0] = playerLocation[0] + p.getVelocityX()
@@ -188,7 +226,10 @@ class Game:
     def loseLives(self, p):
         self.GameLives -= 1
         if self.GameLives == 0:
-            print('Game over!')
+            self.GamePage = 0
+            self.clearScreen()
+            t = Label(self.GameWindow, text='GAME OVER', font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
+            t.place(relx=.45, rely=.3)
         else:
             self.GameLivesRemaining.config(text=f'{self.GameLives} LIVES REMAINING')
             self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
@@ -214,7 +255,8 @@ class Game:
 
             sleep(0.01)
 
-    def updateLocation(self, p):
+    @staticmethod
+    def updateLocation(p):
         while True:
             p.refresh()
             sleep(0.001)
@@ -222,7 +264,6 @@ class Game:
     def startGame(self, t):
         self.setGamemode(t)
         self.drawStart()
-        self.THREAD_MOVEMENT.start()
 
     def exitGame(self):
         self.GameWindow.destroy()
@@ -236,9 +277,6 @@ class Game:
     def showConsole(self):
         pass
 
-    def handleMovement(self):
-        pass
-
     def clearScreen(self):
         for GameAsset in self.GameAssets:
             GameAsset.place_forget()
@@ -246,24 +284,28 @@ class Game:
     def changeSettings(self):
         for GameAsset in self.GameAssets:
             GameAsset.place_forget()
+        self.THREAD_CONFIG.start()
         self.GameTitle.config(text='SETTINGS')
         self.GameTitle.place(relx=.05, rely=.1)
         self.SettingsVersion.place(relx=.75, rely=.85)
 
         self.SettingsHelp.place(relx=.051, rely=.35)
-        self.SettingsHelpSwitch.place(0.28, 0.35)
+        self.SettingsHelpSwitch.place(0.275, 0.35)
 
         self.SettingsUpdate.place(relx=.051, rely=.45)
-        self.SettingsUpdateSwitch.place(0.28, 0.45)
+        self.SettingsUpdateSwitch.place(0.275, 0.45)
 
         self.SettingsLog.place(relx=.051, rely=.55)
-        self.SettingsLogSwitch.place(0.28, 0.55)
+        self.SettingsLogSwitch.place(0.275, 0.55)
 
         self.SettingsCheat.place(relx=.051, rely=.65)
-        self.SettingsCheatSwitch.place(0.28, 0.65)
+        self.SettingsCheatSwitch.place(0.275, 0.65)
 
-        self.SettingsPosition.place(relx=.351, rely=.35)
-        self.SettingsPositionSwitch.place(0.28, 0.35)
+        self.SettingsPosition.place(relx=.38, rely=.35)
+        self.SettingsPositionSwitch.place(0.604, 0.35)
+
+        self.SettingsPage.place(relx=.38, rely=.45)
+        self.SettingsPageSwitch.place(0.604, 0.45)
 
         Animate(self.GameWindow, .05, .1).scroll()
 

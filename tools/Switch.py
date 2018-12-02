@@ -12,6 +12,14 @@ class Switch:
     def get(self):
         return self.SwitchMode
 
+    def set(self, v):
+        if v == 1:
+            self.SwitchButton.config(text='YES')
+            self.SwitchMode = 1
+        else:
+            self.SwitchButton.config(text='NO')
+            self.SwitchMode = 0
+
     def switchSetting(self):
         if self.SwitchButton.cget('text') == 'YES':
             self.SwitchButton.config(text='NO')

@@ -14,6 +14,7 @@ class Player:
         self.Window = w
 
         self.PlayerItem = Label(self.Window, text='lol', fg=self.Colour, bg=self.Colour, width=2, height=1)
+        self.PlayerJumping = False
 
     def draw(self, x, y):
         self.Location = [x, y]
@@ -23,7 +24,7 @@ class Player:
         self.PlayerItem.place(relx=self.getLocation()[0], rely=self.getLocation()[1])
 
     def jump(self, ty):
-        print(self.getVelocityX())
+        self.PlayerJumping = True
         if ty == 1:
             self.setVelocityX(0.005)
         elif ty == 0:
@@ -43,6 +44,7 @@ class Player:
             sleep(0.001)
         sleep(0.2)
         self.setVelocityX(self.getVelocityX() / 2)
+        self.PlayerJumping = False
 
     def gravity(self):
         return self.Gravity
@@ -64,6 +66,9 @@ class Player:
 
     def setLocation(self, x, y):
         self.Location = [x, y]
+
+    def isJumping(self):
+        return self.PlayerJumping
 
     def updateLocation(self):
         while True:
