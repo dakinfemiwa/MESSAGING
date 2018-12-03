@@ -35,7 +35,6 @@ class Host:
                     connectedSocket.send(str.encode(str(self.randomID) + m))
         except Exception as error:
             Logger.error(error)
-        # self.gameSocket.send(str.encode(str(self.randomID) + m))
 
     def listen(self):
         while True:
@@ -63,11 +62,8 @@ class Host:
                             self.LIST.remove(sock)
                             continue
                         if receivedData:
-                            print(receivedData)
                             arguments = receivedData.split(';')
-                            print('SURE', arguments[0], str(self.randomID))
                             if arguments[0] != str(self.randomID):
-                                round(float(arguments[2]), 2), round(float(arguments[3]), 2)
                                 if arguments[1] == str(self.gameInstance.getPage()):
                                     self.otherPlayer.setLocation(round(float(arguments[2]), 2), round(float(arguments[3]), 2))
                                 else:
@@ -115,10 +111,7 @@ class Join:
                 print(data)
                 arguments = data.split(';')
                 if arguments[0] != str(self.randomID):
-                    print(arguments[1], str(self.gameInstance.getPage()))
                     if arguments[1] == str(self.gameInstance.getPage()):
-                        print('CHECK PASSED!!!!!!!!!!!!!')
-                        print(round(float(arguments[2]), 2), round(float(arguments[3]), 2))
                         self.gameInstance.getPlayer().setLocation(round(float(arguments[2]), 2), round(float(arguments[3]), 2))
                     else:
                         self.gameInstance.getPlayer().hide()
@@ -129,12 +122,4 @@ class Join:
 
 
 if __name__ == '__main__':
-    if input('T:') != '':
-        Network = Join()
-        if Network.connect():
-            Network.startlisten()
-        else:
-            print('noi')
-    else:
-        Network = Host()
-        Network.run()
+    pass

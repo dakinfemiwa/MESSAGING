@@ -29,6 +29,8 @@ class Game:
         self.GameLives = 3
         self.GameCooldown = 20
 
+        self.gs = 'host'
+
         self.S_GAME = 'PLACEHOLDER'
         self.S_SINGLEPLAYER = 'SINGLE-PLAYER'
         self.S_MULTIPLAYER = 'MULTI-PLAYER'
@@ -292,7 +294,6 @@ class Game:
                 elif self.GamePage == 3:
                     playerLocation = p.getLocation()
                     if 0.28 >= playerLocation[0] >= 0.20:
-                        print('t1')
                         if playerLocation[1] < .64:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                         elif playerLocation[1] > 0.7:
@@ -314,8 +315,6 @@ class Game:
                     elif 0.92 >= playerLocation[0] >= 0.80:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     else:
-                        print('t4')
-                        print(round(playerLocation[0], 2))
                         if playerLocation[1] < .79:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     if .99 > playerLocation[0] > .92 and playerLocation[1] > 0.79:
