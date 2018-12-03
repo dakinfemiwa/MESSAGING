@@ -2289,7 +2289,7 @@ ADMIN_MESSAGE_LEAVE = 'admin.messages.leave'
 
 INSUFFICIENT_PERMISSIONS = 'You do not have the permission to execute this command'
 USER_PERMISSIONS = []
-PORT = 6666
+PORT = 6969
 
 Manager = Manager()
 Updater = tools.updater.Updater()
@@ -2308,6 +2308,6 @@ if __name__ == '__main__':
     Client.configure()
     Window.draw()
 
-    IP = 'chat-sv.ddns.net'
+    IP = '127.0.0.1'
     Client.connect()
 

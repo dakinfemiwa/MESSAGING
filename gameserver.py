@@ -15,7 +15,7 @@ class GameServer:
         # self.EXTERNAL_IP = get('https://api.ipify.org').text
         self.EXTERNAL_IP = '12.345.67.890'
         self.IP = '0.0.0.0'
-        self.PORT = 6666
+        self.PORT = 6969
         self.BUFFER_SIZE = 35
         self.LISTEN_INT = 10
         self.LIST = []

@@ -6,7 +6,7 @@ from tkinter import *
 from tools.Player import Player
 from tools.Switch import Switch
 from tools.animator import Animate
-
+from tools.Network import Host, Join
 
 # from tools.error import Error
 
@@ -61,6 +61,12 @@ class Game:
         self.whiteFloor3 = None
         self.whiteFloor4 = None
         self.whiteFloor5 = None
+        self.whiteFloor6 = None
+        self.whiteFloor7 = None
+        self.whiteFloor8 = None
+        self.whiteFloor9 = None
+
+        self.allFloors = [self.whiteFloor, self.whiteFloor2, self.whiteFloor3, self.whiteFloor4, self.whiteFloor5, self.whiteFloor6, self.whiteFloor7, self.whiteFloor8]
 
         self.GameWindow = Tk()
         self.GameWindow.geometry(self.W_SIZE)
@@ -103,6 +109,9 @@ class Game:
         self.currentLocation = StringVar()
         self.PlayerPosition = Label(self.GameWindow, textvariable=self.currentLocation, font=self.W_FONT3, bg=self.W_BG, fg=self.C_GRAY)
 
+        self.currentPage = StringVar()
+        self.PlayerPage = Label(self.GameWindow, textvariable=self.currentPage, font=self.W_FONT3, bg=self.W_BG, fg=self.C_GREEN)
+
         self.GameAssets = [self.GameTitle, self.GameSingleplayer, self.GameMultiplayer, self.GameCustomize, self.GameSettings, self.GameExitGame]
         self.SettingsAssets = [self.SettingsVersion]
 
@@ -117,6 +126,7 @@ class Game:
 
         def handleKeyPress(event):
             global keyPressedL, keyPressedR
+
             if event.keysym == 'Left':
                 keyPressedL = True
                 P.setVelocityX(-0.0025)
@@ -162,68 +172,56 @@ class Game:
         self.GameWindow.bind('<KeyRelease-Left>', evStopL)
         self.GameWindow.bind('<KeyRelease-Right>', evStopR)
 
+        self.PlayerPage.place(relx=.825, rely=.05)
+
         self.drawPage(1)
-        self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
+        self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.41, rely=.15))
         self.GameWindow.after(3000, lambda: self.GameLivesRemaining.place_forget())
 
         P = Player(self.GameWindow, 'white')
         P.draw(.05, .5)
 
-        gThread = Thread(target=self.moveDown, args=(P, ))
-        uThread = Thread(target=self.updateLocation, args=(P, ))
-        cThread = Thread(target=self.changeLocation, args=(P, ))
-        pThread = Thread(target=self.showLocation, args=(P, ))
-        bThread = Thread(target=self.checkBoundary, args=(P, ))
+        if self.gs == 'host':
+
+            gThread = Thread(target=self.moveDown, args=(P, ))
+            uThread = Thread(target=self.updateLocation, args=(P, ))
+            cThread = Thread(target=self.changeLocation, args=(P, ))
+            pThread = Thread(target=self.showLocation, args=(P, ))
+            bThread = Thread(target=self.checkBoundary, args=(P, ))
+
+        else:
+
+            gThread = Thread(target=self.moveDown, args=(self.T, ))
+            uThread = Thread(target=self.updateLocation, args=(self.T, ))
+            cThread = Thread(target=self.changeLocation, args=(self.T, ))
+            pThread = Thread(target=self.showLocation, args=(self.T, ))
+            bThread = Thread(target=self.checkBoundary, args=(self.T, ))
 
         allThreads = [gThread, uThread, cThread, pThread, bThread]
 
         for thread in allThreads:
             thread.start()
 
+    def clearFloors(self):
+        try:
+            for floor in self.allFloors:
+                floor.place_forget()
+        except:
+            print('cleanup error')
+
     def drawPage(self, n):
+        self.currentPage.set('GAME PAGE: ' + str(n))
+        self.clearFloors()
         if n == 1:
-            try:
-                self.whiteFloor.place_forget()
-                self.whiteFloor2.place_forget()
-                self.whiteFloor3.place_forget()
-                self.whiteFloor4.place_forget()
-                self.whiteFloor5.place_forget()
-                self.whiteFloor6.place_forget()
-                self.whiteFloor7.place_forget()
-                self.whiteFloor8.place_forget()
-            except:
-                pass
             self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=200)
             self.whiteFloor.place(relx=.0, rely=.85)
         elif n == 2:
-            try:
-                self.whiteFloor.place_forget()
-                self.whiteFloor2.place_forget()
-                self.whiteFloor3.place_forget()
-                self.whiteFloor4.place_forget()
-                self.whiteFloor5.place_forget()
-                self.whiteFloor6.place_forget()
-                self.whiteFloor7.place_forget()
-                self.whiteFloor8.place_forget()
-            except:
-                pass
             self.whiteFloor2 = Label(self.GameWindow, bg=self.W_FG, height=3, width=43)
             self.whiteFloor2.place(relx=.0, rely=.85)
 
             self.whiteFloor3 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
             self.whiteFloor3.place(relx=.70, rely=.85)
         elif n == 3:
-            try:
-                self.whiteFloor.place_forget()
-                self.whiteFloor2.place_forget()
-                self.whiteFloor3.place_forget()
-                self.whiteFloor4.place_forget()
-                self.whiteFloor5.place_forget()
-                self.whiteFloor6.place_forget()
-                self.whiteFloor7.place_forget()
-                self.whiteFloor8.place_forget()
-            except:
-                pass
             self.whiteFloor4 = Label(self.GameWindow, bg=self.W_FG, height=3, width=20)
             self.whiteFloor4.place(relx=.0, rely=.85)
 
@@ -238,6 +236,7 @@ class Game:
 
             self.whiteFloor8 = Label(self.GameWindow, bg=self.W_FG, height=1, width=14)
             self.whiteFloor8.place(relx=.68, rely=.65)
+        self.allFloors = [self.whiteFloor, self.whiteFloor2, self.whiteFloor3, self.whiteFloor4, self.whiteFloor5, self.whiteFloor6, self.whiteFloor7, self.whiteFloor8]
 
     def loadConfiguration(self):
         configEntries = ['Show-Help', 'Auto-Update', 'Log-Events', 'Allow-Cheats', 'Show-Position', 'Show-Pages']
@@ -261,6 +260,8 @@ class Game:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     elif playerLocation[1] <= 1.10 and 0.39 < playerLocation[0] < 0.68:
                         p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    if .97 > playerLocation[0] > .70 and playerLocation[1] > 0.79:
+                        p.setLocation(playerLocation[0], 0.79)
                 elif self.GamePage == 3:
                     playerLocation = p.getLocation()
                     if 0.28 >= playerLocation[0] >= 0.20:
@@ -290,6 +291,8 @@ class Game:
                         print(round(playerLocation[0], 2))
                         if playerLocation[1] < .79:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    if .99 > playerLocation[0] > .92 and playerLocation[1] > 0.79:
+                        p.setLocation(playerLocation[0], 0.79)
                 sleep(0.005)
             else:
                 sleep(0.005)
@@ -306,14 +309,14 @@ class Game:
         if self.GameLives == 0:
             self.GamePage = 0
             self.clearScreen()
-            t = Label(self.GameWindow, text='GAME OVER', font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
-            t.place(relx=.45, rely=.3)
+            t = Label(self.GameWindow, text='GAME OVER', font=self.W_FONT, bg=self.W_BG, fg=self.C_RED)
+            t.place(relx=.049, rely=.2)
             self.GamePage = 1
             self.drawPage(1)
             p.setLocation(0.05, .5)
         else:
             self.GameLivesRemaining.config(text=f'{self.GameLives} LIVES REMAINING')
-            self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.37, rely=.15))
+            self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.41, rely=.15))
             self.GameWindow.after(3000, lambda: self.GameLivesRemaining.place_forget())
             self.GamePage = 1
             self.drawPage(1)
@@ -336,15 +339,44 @@ class Game:
 
             sleep(0.01)
 
-    @staticmethod
-    def updateLocation(p):
+    def updateLocation(self, p):
         while True:
             p.refresh()
+            if self.G_GAMEMODE == 1:
+                self.Session.send(str(self.GamePage) + ';' + str(round(p.getLocation()[0], 2)) + ';' + str(round(p.getLocation()[1], 2)))
             sleep(0.001)
 
     def startGame(self, t):
         self.setGamemode(t)
+        if t == 0:
+            self.drawStart()
+        else:
+            self.clearScreen()
+            b = Button(self.GameWindow, text='HOST', command=lambda: (b.place_forget(), b2.place_forget(), self.host()))
+            b.pack()
+            b2 = Button(self.GameWindow, text='JOIN', command=lambda: (b.place_forget(), b2.place_forget(), self.join()))
+            b2.pack()
+
+    def host(self):
+        self.gs = 'host'
+        self.T = Player(self.GameWindow, self.C_BLUE)
+        self.T.draw(.1, .5)
+        self.Session = Host(self.T, self)
         self.drawStart()
+        self.Session.run()
+
+    def join(self):
+        self.gs = 'join'
+        self.T = Player(self.GameWindow, self.C_BLUE)
+        self.T.draw(.1, .5)
+        self.Session = Join(self.T, self)
+        # Thread(target=Session.startlisten, args=()).start()
+        self.drawStart()
+        self.Session.connect()
+        self.Session.startlisten()
+
+    def getPage(self):
+        return self.GamePage
 
     def exitGame(self):
         self.GameWindow.destroy()
