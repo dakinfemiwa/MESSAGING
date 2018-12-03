@@ -126,44 +126,68 @@ class Game:
 
         def handleKeyPress(event):
             global keyPressedL, keyPressedR
-
-            if event.keysym == 'Left':
-                keyPressedL = True
-                P.setVelocityX(-0.0025)
-            elif event.keysym == 'Right':
-                keyPressedR = True
-                P.setVelocityX(+0.0025)
-            elif event.keysym == 'Up':
-                if not P.isJumping():
-                    if keyPressedL:
-                        P.jump(0)
-                    elif keyPressedR:
-                        P.jump(1)
-                    else:
-                        P.jump(2)
+            if self.gs == 'host':
+                if event.keysym == 'Left':
+                    keyPressedL = True
+                    P.setVelocityX(-0.0025)
+                elif event.keysym == 'Right':
+                    keyPressedR = True
+                    P.setVelocityX(+0.0025)
+                elif event.keysym == 'Up':
+                    if not P.isJumping():
+                        if keyPressedL:
+                            P.jump(0)
+                        elif keyPressedR:
+                            P.jump(1)
+                        else:
+                            P.jump(2)
+            else:
+                if event.keysym == 'Left':
+                    keyPressedL = True
+                    self.T.setVelocityX(-0.0025)
+                elif event.keysym == 'Right':
+                    keyPressedR = True
+                    self.T.setVelocityX(+0.0025)
+                elif event.keysym == 'Up':
+                    if not self.T.isJumping():
+                        if keyPressedL:
+                            self.T.jump(0)
+                        elif keyPressedR:
+                            self.T.jump(1)
+                        else:
+                            self.T.jump(2)
 
         def handleKeyRelease(event):
             global keyPressedL, keyPressedR
-            if event.keysym == 'Left':
-                keyPressedL = False
-                if not keyPressedR:
-                    P.setVelocityX(0)
-            elif event.keysym == 'Right':
-                keyPressedR = False
-                if not keyPressedL:
-                    P.setVelocityX(0)
+            if self.gs == 'host':
+                if event.keysym == 'Left':
+                    keyPressedL = False
+                    if not keyPressedR:
+                        P.setVelocityX(0)
+                elif event.keysym == 'Right':
+                    keyPressedR = False
+                    if not keyPressedL:
+                        P.setVelocityX(0)
+            else:
+                pass
 
         def evStopL(event):
             global keyPressedL, keyPressedR
             keyPressedL = False
-            if not keyPressedR:
-                P.setVelocityX(0)
+            if self.gs == 'host':
+                if not keyPressedR:
+                    P.setVelocityX(0)
+            else:
+                self.T.setVelocityX(0)
 
         def evStopR(event):
             global keyPressedL, keyPressedR
             keyPressedR = False
-            if not keyPressedL:
-                P.setVelocityX(0)
+            if self.gs == 'host':
+                if not keyPressedL:
+                    P.setVelocityX(0)
+            else:
+                self.T.setVelocityX(0)
 
         self.clearScreen()
         self.GameWindow.bind('<Up>', handleKeyPress)
@@ -343,7 +367,7 @@ class Game:
         while True:
             p.refresh()
             if self.G_GAMEMODE == 1:
-                self.Session.send(str(self.GamePage) + ';' + str(round(p.getLocation()[0], 2)) + ';' + str(round(p.getLocation()[1], 2)))
+                self.Session.send(';' + str(self.GamePage) + ';' + str(round(p.getLocation()[0], 2)) + ';' + str(round(p.getLocation()[1], 2)))
             sleep(0.001)
 
     def startGame(self, t):
