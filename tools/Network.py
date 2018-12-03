@@ -64,13 +64,14 @@ class Host:
                             continue
                         if receivedData:
                             print(receivedData)
-                            print(self.randomID)
                             arguments = receivedData.split(';')
+                            print('SURE', arguments[0], str(self.randomID))
                             if arguments[0] != str(self.randomID):
-                                print('check1')
-                                print(arguments[1], str(self.gameInstance.getPage()))
+                                round(float(arguments[2]), 2), round(float(arguments[3]), 2)
                                 if arguments[1] == str(self.gameInstance.getPage()):
                                     self.otherPlayer.setLocation(round(float(arguments[2]), 2), round(float(arguments[3]), 2))
+                                else:
+                                    self.otherPlayer.hide()
             except Exception as error:
                 Logger.error(error)
 
@@ -112,14 +113,15 @@ class Join:
                 break
             if data:
                 print(data)
-                print(self.randomID)
                 arguments = data.split(';')
                 if arguments[0] != str(self.randomID):
-                    print('check1')
                     print(arguments[1], str(self.gameInstance.getPage()))
                     if arguments[1] == str(self.gameInstance.getPage()):
                         print('CHECK PASSED!!!!!!!!!!!!!')
+                        print(round(float(arguments[2]), 2), round(float(arguments[3]), 2))
                         self.gameInstance.getPlayer().setLocation(round(float(arguments[2]), 2), round(float(arguments[3]), 2))
+                    else:
+                        self.gameInstance.getPlayer().hide()
 
     def send(self, m):
         print('JOIN', m)

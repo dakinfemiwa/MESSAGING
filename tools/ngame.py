@@ -129,18 +129,18 @@ class Game:
             if self.gs == 'host':
                 if event.keysym == 'Left':
                     keyPressedL = True
-                    P.setVelocityX(-0.0025)
+                    self.P.setVelocityX(-0.0025)
                 elif event.keysym == 'Right':
                     keyPressedR = True
-                    P.setVelocityX(+0.0025)
+                    self.P.setVelocityX(+0.0025)
                 elif event.keysym == 'Up':
-                    if not P.isJumping():
+                    if not self.P.isJumping():
                         if keyPressedL:
-                            P.jump(0)
+                            self.P.jump(0)
                         elif keyPressedR:
-                            P.jump(1)
+                            self.P.jump(1)
                         else:
-                            P.jump(2)
+                            self.P.jump(2)
             else:
                 if event.keysym == 'Left':
                     keyPressedL = True
@@ -163,11 +163,11 @@ class Game:
                 if event.keysym == 'Left':
                     keyPressedL = False
                     if not keyPressedR:
-                        P.setVelocityX(0)
+                        self.P.setVelocityX(0)
                 elif event.keysym == 'Right':
                     keyPressedR = False
                     if not keyPressedL:
-                        P.setVelocityX(0)
+                        self.P.setVelocityX(0)
             else:
                 pass
 
@@ -176,7 +176,7 @@ class Game:
             keyPressedL = False
             if self.gs == 'host':
                 if not keyPressedR:
-                    P.setVelocityX(0)
+                    self.P.setVelocityX(0)
             else:
                 self.T.setVelocityX(0)
 
@@ -185,7 +185,7 @@ class Game:
             keyPressedR = False
             if self.gs == 'host':
                 if not keyPressedL:
-                    P.setVelocityX(0)
+                    self.P.setVelocityX(0)
             else:
                 self.T.setVelocityX(0)
 
@@ -202,16 +202,16 @@ class Game:
         self.GameWindow.after(1, lambda: self.GameLivesRemaining.place(relx=.41, rely=.15))
         self.GameWindow.after(3000, lambda: self.GameLivesRemaining.place_forget())
 
-        P = Player(self.GameWindow, 'white')
-        P.draw(.05, .5)
+        self.P = Player(self.GameWindow, 'white')
+        self.P.draw(.05, .5)
 
         if self.gs == 'host':
 
-            gThread = Thread(target=self.moveDown, args=(P, ))
-            uThread = Thread(target=self.updateLocation, args=(P, ))
-            cThread = Thread(target=self.changeLocation, args=(P, ))
-            pThread = Thread(target=self.showLocation, args=(P, ))
-            bThread = Thread(target=self.checkBoundary, args=(P, ))
+            gThread = Thread(target=self.moveDown, args=(self.P, ))
+            uThread = Thread(target=self.updateLocation, args=(self.P, ))
+            cThread = Thread(target=self.changeLocation, args=(self.P, ))
+            pThread = Thread(target=self.showLocation, args=(self.P, ))
+            bThread = Thread(target=self.checkBoundary, args=(self.P, ))
 
         else:
 
@@ -225,6 +225,9 @@ class Game:
 
         for thread in allThreads:
             thread.start()
+
+    def getPlayer(self):
+        return self.P
 
     def clearFloors(self):
         try:
@@ -365,9 +368,12 @@ class Game:
 
     def updateLocation(self, p):
         while True:
-            p.refresh()
             if self.G_GAMEMODE == 1:
                 self.Session.send(';' + str(self.GamePage) + ';' + str(round(p.getLocation()[0], 2)) + ';' + str(round(p.getLocation()[1], 2)))
+                self.T.refresh()
+                self.P.refresh()
+            else:
+                p.refresh()
             sleep(0.001)
 
     def startGame(self, t):

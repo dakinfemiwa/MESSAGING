@@ -20,6 +20,9 @@ class Player:
         self.Location = [x, y]
         self.PlayerItem.place(relx=x, rely=y)
 
+    def hide(self):
+        self.PlayerItem.place_forget()
+
     def refresh(self):
         self.PlayerItem.place(relx=self.getLocation()[0], rely=self.getLocation()[1])
 
