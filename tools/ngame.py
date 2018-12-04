@@ -379,6 +379,9 @@ class Game:
         self.setGamemode(t)
         if t == 0:
             self.drawStart()
+            from tools.Enemy import Enemy
+            Test2 = Enemy(self.GameWindow, self.P, c='green')
+            Test2.draw(.4, 0.755)
         else:
             self.clearScreen()
             b = Button(self.GameWindow, text='HOST', command=lambda: (b.place_forget(), b2.place_forget(), self.host()))
