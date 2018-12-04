@@ -11,7 +11,10 @@ class Enemy:
         self.Location = [0.00, 0.00]
         self.Colour = c
         self.Window = w
-        self.GamePlayers = p
+        self.GamePlayers = []
+        self.GamePlayers.append(p)
+
+        self.BulletCooldown = False
 
         self.ShootingLeft = False
         self.ShootingRight = False
@@ -20,6 +23,13 @@ class Enemy:
 
         self.THREAD_AI = Thread(target=self.moveAround, args=())
         self.THREAD_MOVEMENT = Thread(target=self.updateLocation, args=())
+        self.THREAD_AROUND = Thread(target=self.checkSurroundings, args=())
+        self.THREAD_SHOOT = Thread(target=self.startShooting, args=())
+
+    def setCooldown(self):
+        self.BulletCooldown = True
+        sleep(0.9)
+        self.BulletCooldown = False
 
     def moveAround(self):
         while True:
@@ -40,24 +50,38 @@ class Enemy:
             for p in self.GamePlayers:
                 playerLocation = p.getLocation()
                 enemyLocation = self.getLocation()
-                if round(playerLocation[1], 1) == round(enemyLocation[1], 1):
-                    if abs(playerLocation[0]-enemyLocation[0]) > 0.1:
-                        if playerLocation[0] < enemyLocation[0]:
-                            print('Left')
-                            self.ShootingLeft = True
-                        else:
-                            print('Right')
-                            self.ShootingRight = True
+                if abs(playerLocation[0]-enemyLocation[0]) < 0.35:
+                    if playerLocation[0] < enemyLocation[0]:
+                        self.ShootingLeft = True
+                    else:
+                        self.ShootingRight = True
                 else:
                     self.ShootingLeft = False
                     self.ShootingRight = False
             sleep(0.02)
+
+    def startShooting(self):
+        from tools.Bullet import Bullet
+        while True:
+            if not self.BulletCooldown:
+                if self.ShootingLeft:
+                    B = Bullet(self.Window, c='#f1c40f')
+                    B.draw(self.getLocation()[0], self.getLocation()[1])
+                    B.setMovement(0)
+                if self.ShootingRight:
+                    B2 = Bullet(self.Window, c='#f1c40f')
+                    B2.draw(self.getLocation()[0], self.getLocation()[1])
+                    B2.setMovement(1)
+                Thread(target=self.setCooldown(), args=()).start()
+            sleep(0.01)
 
     def draw(self, x, y):
         self.Location = [x, y]
         self.EnemyItem.place(relx=x, rely=y)
         self.THREAD_AI.start()
         self.THREAD_MOVEMENT.start()
+        self.THREAD_AROUND.start()
+        self.THREAD_SHOOT.start()
 
     def hide(self):
         self.EnemyItem.place_forget()
