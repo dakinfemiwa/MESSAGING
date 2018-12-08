@@ -1,8 +1,10 @@
 import configparser
-from threading import Thread
+import os
+from threading import Thread, active_count
 from time import sleep
 from tkinter import *
 
+from tools.error import Error
 from tools.Player import Player
 from tools.Switch import Switch
 from tools.Network import Host, Join
@@ -11,8 +13,6 @@ from tools.animator import Animate
 from tools.Bullet import Bullet
 
 from tools.logger import Logger
-
-# from tools.error import Error
 
 
 class Game:
@@ -29,6 +29,8 @@ class Game:
         self.W_FONT4 = ('MS PGothic', 11, 'bold')
 
         self.G_GAMEMODE = 0
+        self.G_VERSION = 0.53
+
         self.GamePage = 1
         self.GameLives = 3
         self.GameCooldown = 20
@@ -41,6 +43,7 @@ class Game:
         self.S_CUSTOMIZE = 'CUSTOMIZE'
         self.S_SETTINGS = 'SETTINGS'
         self.S_EXITGAME = 'EXIT GAME'
+        self.S_UPDATEGAME = 'UPDATE GAME'
 
         self.S_VERSION = 'Version A - 0.1'
         self.S_HELP = 'SHOW HELP'
@@ -95,6 +98,8 @@ class Game:
                           self.whiteFloor7, self.whiteFloor8, self.whiteFloor9,
                           self.whiteFloor10, self.whiteFloor11, self.Slider, self.Slider2]
 
+        self.threadBypass = False
+
         self.GameWindow = Tk()
         self.GameWindow.geometry(self.W_SIZE)
         self.GameWindow.title(self.W_TITLE)
@@ -103,17 +108,13 @@ class Game:
         self.GameTitle = Label(self.GameWindow, text=self.S_GAME, font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
         self.GameTitle.place(relx=.05, rely=.1)
 
-        gamePhoto = PhotoImage(file="../assets/images/download.png", master=self.GameWindow)
-        gamePhoto = gamePhoto.subsample(3)
-
-        gamePhoto2 = PhotoImage(file="../assets/images/download1.png", master=self.GameWindow)
-        gamePhoto2 = gamePhoto2.subsample(3)
-
-        self.otherImg = Button(self.GameWindow, image=gamePhoto2, bd=0, command=lambda: (self.otherImg.place_forget()
-                                                                                         , self.CoinItem.place(relx=.75, rely=.3)))
-
-        self.CoinItem = Button(self.GameWindow, image=gamePhoto, bd=0, command=lambda: (self.CoinItem.place_forget(), self.otherImg.place(relx=.75, rely=.3)))
-        self.CoinItem.place(relx=.75, rely=.3)
+        # gamePhoto = PhotoImage(file="../assets/images/download.png", master=self.GameWindow)
+        # gamePhoto = gamePhoto.subsample(3)
+        # gamePhoto2 = PhotoImage(file="../assets/images/download1.png", master=self.GameWindow)
+        # gamePhoto2 = gamePhoto2.subsample(3)
+        # self.otherImg = Button(self.GameWindow, image=gamePhoto2, bd=0, command=lambda: (self.otherImg.place_forget(), self.CoinItem.place(relx=.75, rely=.3)))
+        # self.CoinItem = Button(self.GameWindow, image=gamePhoto, bd=0, command=lambda: (self.CoinItem.place_forget(), self.otherImg.place(relx=.75, rely=.3)))
+        # self.CoinItem.place(relx=.75, rely=.3)
 
         self.GameSingleplayer = Button(self.GameWindow, text=self.S_SINGLEPLAYER, font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG, bd=0, command=lambda: self.startGame(0))
         self.GameSingleplayer.place(relx=.05, rely=.3)
@@ -125,6 +126,8 @@ class Game:
         self.GameSettings.place(relx=.05, rely=.6)
         self.GameExitGame = Button(self.GameWindow, text=self.S_EXITGAME, font=self.W_FONT2, bg=self.W_BG, fg=self.C_RED, bd=0, command=lambda: self.exitGame())
         self.GameExitGame.place(relx=.05, rely=.7)
+        self.GameUpdate = Button(self.GameWindow, text=self.S_UPDATEGAME, font=self.W_FONT2, bg=self.W_BG, fg=self.C_GREEN, bd=0, command=lambda: self.updateGame())
+        self.GameUpdate.place(relx=.05, rely=.8)
 
         self.GameLivesRemaining = Label(self.GameWindow, text=self.S_LIVES, font=self.W_FONT4, bg=self.W_BG, fg=self.C_RED)
 
@@ -151,10 +154,11 @@ class Game:
         self.currentPage = StringVar()
         self.PlayerPage = Label(self.GameWindow, textvariable=self.currentPage, font=self.W_FONT3, bg=self.W_BG, fg=self.C_GREEN)
 
-        self.GameAssets = [self.GameTitle, self.GameSingleplayer, self.GameMultiplayer, self.GameCustomize, self.GameSettings, self.GameExitGame]
+        self.GameAssets = [self.GameTitle, self.GameSingleplayer, self.GameMultiplayer, self.GameCustomize, self.GameSettings, self.GameExitGame, self.GameUpdate]
         self.SettingsAssets = [self.SettingsVersion]
 
         self.THREAD_CONFIG = Thread(target=self.loadConfiguration, args=())
+        self.THREAD_PRINT = Thread(target=self.printThreads, args=()).start()
         self.THREAD_WINDOW = Thread(target=self.GameWindow.mainloop())
 
     def drawStart(self):
@@ -235,17 +239,79 @@ class Game:
         for thread in allThreads:
             thread.start()
 
+    def updateGame(self):
+        self.clearScreen()
+        self.updateTitle = Label(self.GameWindow, text='UPDATE GAME', font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
+        self.updateTitle.place(relx=.05, rely=.1)
+        self.currentVersion = Label(self.GameWindow, text='Current Version:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+        self.currentVersion.place(relx=.05, rely=.35)
+        self.currentSize = Label(self.GameWindow, text='Current Size:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+        self.currentSize.place(relx=.52, rely=.35)
+        self.latestVersion = Label(self.GameWindow, text='Latest Version:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+        self.latestVersion.place(relx=.05, rely=.45)
+        self.latestSize = Label(self.GameWindow, text='Latest Size:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
+        self.latestSize.place(relx=.52, rely=.45)
+
+
+        self.currentVersionV = Label(self.GameWindow, text=str(self.G_VERSION), font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.currentVersionV.place(relx=.36, rely=.35)
+        self.currentSizeV = Label(self.GameWindow, text='20142 KB', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.currentSizeV.place(relx=.82, rely=.35)
+        self.latestVersionV = Label(self.GameWindow, text='1.01', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.latestVersionV.place(relx=.36, rely=.45)
+        self.latestSizeV = Label(self.GameWindow, text='29381 KB', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.latestSizeV.place(relx=.82, rely=.45)
+
+        self.updateInformation = Label(self.GameWindow, text='Information: Current files and program data will be stored in a backup folder in the above directory.', font=('MS PGothic', 10, 'bold'), bg=self.W_BG, fg=self.C_BLUE)
+        self.updateInformation.place(relx=.05, rely=.55)
+
+        self.unfilledBar = Label(self.GameWindow, text=' ', font=('MS PGothic', 4, 'bold'), bg=self.C_GRAY, fg=self.C_GRAY, width=180)
+        self.unfilledBar.place(relx=.05, rely=.88)
+
+        self.filledBar = Label(self.GameWindow, text=' ', font=('MS PGothic', 4, 'bold'), bg=self.W_FG, fg=self.W_FG, width=40)
+        self.filledBar.place(relx=.05, rely=.88)
+
+        self.percentageValue = Label(self.GameWindow, text='22%', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY, anchor='e')
+        self.percentageValue.place(relx=.91, rely=.8)
+
+        self.updateProgress = Label(self.GameWindow, text='UPDATING GAME...', font=('MS PGothic', 18, 'bold'), bg=self.W_BG, fg=self.C_LIGHTGRAY, anchor='e')
+        # self.updateProgress.place(relx=.049, rely=.77)
+
+        self.updateButton = Button(self.GameWindow, text='UPDATE GAME', font=self.W_FONT2, fg=self.W_BG, bg=self.C_LIGHTGRAY, bd=0, command=lambda: (self.updateButton.place_forget(), self.performUpdate(), self.updateProgress.place(relx=.045, rely=.77)))
+        self.updateButton.place(relx=.05, rely=.78)
+
+        Animate(self.GameWindow, .05, .1).scroll()
+
+    def performUpdate(self):
+        pass
+
+    def printThreads(self):
+        while True:
+            Logger.log(f'Current number of threads: {active_count()}')
+            if active_count() > 30:
+                if not self.threadBypass:
+                    threadLimit = Error(text='Thread count exceeded 30 threads [warning level] - to carry on running the program and ignore any other warnings, click \'Ignore\', to close the program, click \'Exit\'. The program '
+                                             'will force close at 80 threads', options=['Ignore', 'Exit'])
+                    threadLimit.show()
+                    if threadLimit.outcome() == 'Ignore':
+                        self.threadBypass = True
+                    elif threadLimit.outcome() == 'Exit':
+                        self.GameWindow.destroy()
+                        exit(69)
+            if active_count() > 80:
+                Logger.log('Force shutdown - exceeded 80 threads.', 'ERROR')
+                self.GameWindow.destroy()
+            sleep(5)
+
     def getPlayer(self):
         return self.P
 
     def clearFloors(self):
         try:
             for floor in self.allFloors:
-                print(floor)
                 floor.place_forget()
         except Exception as e:
-            Logger.error(e)
-            print('cleanup error')
+            pass
 
     def myPlayer(self):
         if self.GameState == 'host':
