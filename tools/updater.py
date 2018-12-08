@@ -184,8 +184,14 @@ class Updater:
             pass
         zip.extractall()
 
+        t = 0
+
         for file in os.listdir(os.getcwd() + '/' + folder + '-master'):
+            print(os.stat(file).st_size)
+            t += os.stat(file).st_size
             os.rename(os.getcwd() + '/' + folder + '-master/' + file, os.getcwd() + '/' + folder + '/' + file)
+
+        print('t', t)
 
         zip.close()
         try:

@@ -240,25 +240,33 @@ class Game:
             thread.start()
 
     def updateGame(self):
+
+        def getFolderSize(d='..'):
+            total_size = 0
+            for dirpath, dirnames, filenames in os.walk(d):
+                for f in filenames:
+                    fp = os.path.join(dirpath, f)
+                    total_size += os.path.getsize(fp)
+            return total_size
+
         self.clearScreen()
         self.updateTitle = Label(self.GameWindow, text='UPDATE GAME', font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
         self.updateTitle.place(relx=.05, rely=.1)
         self.currentVersion = Label(self.GameWindow, text='Current Version:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
         self.currentVersion.place(relx=.05, rely=.35)
         self.currentSize = Label(self.GameWindow, text='Current Size:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
-        self.currentSize.place(relx=.52, rely=.35)
+        self.currentSize.place(relx=.54, rely=.35)
         self.latestVersion = Label(self.GameWindow, text='Latest Version:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
         self.latestVersion.place(relx=.05, rely=.45)
         self.latestSize = Label(self.GameWindow, text='Latest Size:', font=self.W_FONT2, bg=self.W_BG, fg=self.C_LIGHTGRAY)
-        self.latestSize.place(relx=.52, rely=.45)
+        self.latestSize.place(relx=.54, rely=.45)
 
-
-        self.currentVersionV = Label(self.GameWindow, text=str(self.G_VERSION), font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
-        self.currentVersionV.place(relx=.36, rely=.35)
-        self.currentSizeV = Label(self.GameWindow, text='20142 KB', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.currentVersionV = Label(self.GameWindow, text=('Version ' + str(self.G_VERSION)), font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.currentVersionV.place(relx=.28, rely=.35)
+        self.currentSizeV = Label(self.GameWindow, text=f'{getFolderSize() / 1000} KB', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
         self.currentSizeV.place(relx=.82, rely=.35)
-        self.latestVersionV = Label(self.GameWindow, text='1.01', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
-        self.latestVersionV.place(relx=.36, rely=.45)
+        self.latestVersionV = Label(self.GameWindow, text='Version 1.01', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
+        self.latestVersionV.place(relx=.28, rely=.45)
         self.latestSizeV = Label(self.GameWindow, text='29381 KB', font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG)
         self.latestSizeV.place(relx=.82, rely=.45)
 
