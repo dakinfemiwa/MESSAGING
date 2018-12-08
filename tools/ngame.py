@@ -291,7 +291,57 @@ class Game:
         Animate(self.GameWindow, .05, .1).scroll()
 
     def performUpdate(self):
-        pass
+
+
+        self.CONFIG_PROGRAM_GIT = 'moving'
+
+        import shutil, urllib.request, zipfile
+        cwd = str(os.getcwd())
+        cwd = cwd.replace(os.sep, '/')
+        counter = 0
+        folder = []
+        x = len(cwd) - 1
+        while True:
+            if cwd[x] != '/':
+                counter += 1
+                x = len(cwd) - counter
+                folder.insert(0, cwd[x])
+                continue
+            else:
+                break
+        folder.remove('/')
+        folder = "".join(folder)
+
+        os.chdir('../')
+        shutil.make_archive(folder + '-BACKUP', 'zip', folder)
+        urllib.request.urlretrieve(self.CONFIG_PROGRAM_GITHUB + '/archive/master.zip', folder + '-NEW.zip')
+        zip = zipfile.ZipFile(folder + '-NEW.zip')
+
+        try:
+            shutil.rmtree(folder, ignore_errors=True)
+        except PermissionError:
+            pass
+        zip.extractall()
+
+        t = 0
+
+        for file in os.listdir(os.getcwd() + '/' + folder + '-master'):
+            print(os.stat(file).st_size)
+            t += os.stat(file).st_size
+            os.rename(os.getcwd() + '/' + folder + '-master/' + file, os.getcwd() + '/' + folder + '/' + file)
+
+        print('t', t)
+
+        zip.close()
+        try:
+            shutil.rmtree(folder + '-master', ignore_errors=True)
+            shutil.rmtree(folder + '-NEW.zip', ignore_errors=True)
+        except PermissionError:
+            pass
+        try:
+            os.remove(folder + '-NEW.zip')
+        except:
+            pass
 
     def printThreads(self):
         while True:
