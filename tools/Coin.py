@@ -6,8 +6,8 @@ from tools.animator import Animate
 from tools.Player import Player
 
 
-class Bullet:
-    def __init__(self, w, c='red', p=None, g=None):
+class Coin:
+    def __init__(self, w, c='red', p=None, g=None, i=None):
         self.Velocity = [0.00, 0.00]
         self.Location = [0.00, 0.00]
         self.Colour = c
@@ -16,29 +16,35 @@ class Bullet:
         self.GameInstance = g
 
         self.Shooting = True
+
+        gamePhoto = PhotoImage(file="../assets/images/game-icon.gif", master=self.Window)
+        gamePhoto = gamePhoto.subsample(5)
+
+        self.CoinItem = Button(self.Window, image=gamePhoto, bd=0, command=lambda: (self.Window.destroy()))
+        self.CoinItem.place(relx=.05, rely=.22)
         
-        self.BulletItem = Label(self.Window, text='-', font=('Arial', 14, 'bold'), fg=self.Colour, bg='#2F3542', width=2, height=1)
+        # self.CoinItem = Button(self.Window, image=gamePhoto, width=10, height=10)
 
-        self.setMovement(0)
+        #elf.setMovement(0)
 
-        self.THREAD_MOVEMENT = Thread(target=self.updateLocation, args=())
+        #self.THREAD_MOVEMENT = Thread(target=self.updateLocation, args=())
         #self.THREAD_AROUND = Thread(target=self.checkSurroundings, args=())
 
     def checkSurroundings(self):
         while True:
-            bulletLocation = self.getLocation()
+            CoinLocation = self.getLocation()
             playerLocation = self.Players.getLocation()
-            if abs(playerLocation[0]-bulletLocation[0]) < 0.001:
-                if abs(playerLocation[1]-bulletLocation[1]) > 0.005:
-                    print('x', abs(playerLocation[1]-bulletLocation[1]))
-                    print('y', abs(playerLocation[0]-bulletLocation[0]))
+            if abs(playerLocation[0]-CoinLocation[0]) < 0.001:
+                if abs(playerLocation[1]-CoinLocation[1]) > 0.005:
+                    print('x', abs(playerLocation[1]-CoinLocation[1]))
+                    print('y', abs(playerLocation[0]-CoinLocation[0]))
                     print('t', playerLocation[0])
-                    print('t2', bulletLocation[0])
+                    print('t2', CoinLocation[0])
                     print('Shot')
                     self.Shooting = False
                     self.GameInstance.loseLives(self.Players)
-                    self.BulletItem.place_forget()
-                    self.BulletItem = None
+                    self.CoinItem.place_forget()
+                    self.CoinItem = None
                     break
             sleep(0.01)
 
@@ -66,15 +72,15 @@ class Bullet:
 
     def draw(self, x, y):
         self.Location = [x, y]
-        self.BulletItem.place(relx=x, rely=y)
-        self.THREAD_MOVEMENT.start()
+        self.CoinItem.place(relx=x, rely=y)
+        # self.THREAD_MOVEMENT.start()
         # self.THREAD_AROUND.start()
 
     def hide(self):
-        self.BulletItem.place_forget()
+        self.CoinItem.place_forget()
 
     def refresh(self):
-        self.BulletItem.place(relx=self.getLocation()[0], rely=self.getLocation()[1])
+        self.CoinItem.place(relx=self.getLocation()[0], rely=self.getLocation()[1])
 
     def setVelocityX(self, v):
         self.Velocity[0] = v
@@ -98,6 +104,6 @@ class Bullet:
 if __name__ == '__main__':
     root = Tk()
     root.geometry('400x200')
-    Test = Bullet(root, c='green', p=[])
-    button = Button(command=lambda: Test.draw(.45, .8)).pack()
+    Test = Coin(root, c='green', p=[])
+    button = Button(command=lambda: Test.draw(.45, .5)).pack()
     root.mainloop()

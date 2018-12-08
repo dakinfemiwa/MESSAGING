@@ -5,8 +5,12 @@ from tkinter import *
 
 from tools.Player import Player
 from tools.Switch import Switch
-from tools.animator import Animate
 from tools.Network import Host, Join
+from tools.Slider import Slider
+from tools.animator import Animate
+from tools.Bullet import Bullet
+
+from tools.logger import Logger
 
 # from tools.error import Error
 
@@ -29,7 +33,7 @@ class Game:
         self.GameLives = 3
         self.GameCooldown = 20
 
-        self.gs = 'host'
+        self.GameState = 'host'
 
         self.S_GAME = 'PLACEHOLDER'
         self.S_SINGLEPLAYER = 'SINGLE-PLAYER'
@@ -55,6 +59,13 @@ class Game:
         self.C_GRAY = '#95A5A6'
         self.C_LIGHTGRAY = '#BDC3C7'
 
+        self.CFG_HELP = 0
+        self.CFG_UPDATE = 0
+        self.CFG_LOGGING = 0
+        self.CFG_CHEATS = 0
+        self.CFG_POSITION = 0
+        self.CFG_PAGES = 0
+
         self.Configuration = configparser.ConfigParser()
         self.Configuration.read('game-config.ini')
 
@@ -67,8 +78,22 @@ class Game:
         self.whiteFloor7 = None
         self.whiteFloor8 = None
         self.whiteFloor9 = None
+        self.whiteFloor10 = None
+        self.whiteFloor11 = None
+        self.whiteFloor12 = None
+        self.whiteFloor13 = None
+        self.whiteFloor14 = None
+        self.whiteFloor15 = None
+        self.whiteFloor16 = None
+        self.whiteFloor17 = None
 
-        self.allFloors = [self.whiteFloor, self.whiteFloor2, self.whiteFloor3, self.whiteFloor4, self.whiteFloor5, self.whiteFloor6, self.whiteFloor7, self.whiteFloor8]
+        self.Slider = None
+        self.Slider2 = None
+
+        self.allFloors = [self.whiteFloor, self.whiteFloor2, self.whiteFloor3,
+                          self.whiteFloor4, self.whiteFloor5, self.whiteFloor6,
+                          self.whiteFloor7, self.whiteFloor8, self.whiteFloor9,
+                          self.whiteFloor10, self.whiteFloor11, self.Slider, self.Slider2]
 
         self.GameWindow = Tk()
         self.GameWindow.geometry(self.W_SIZE)
@@ -77,6 +102,18 @@ class Game:
 
         self.GameTitle = Label(self.GameWindow, text=self.S_GAME, font=self.W_FONT, bg=self.W_BG, fg=self.W_FG)
         self.GameTitle.place(relx=.05, rely=.1)
+
+        gamePhoto = PhotoImage(file="../assets/images/download.png", master=self.GameWindow)
+        gamePhoto = gamePhoto.subsample(3)
+
+        gamePhoto2 = PhotoImage(file="../assets/images/download1.png", master=self.GameWindow)
+        gamePhoto2 = gamePhoto2.subsample(3)
+
+        self.otherImg = Button(self.GameWindow, image=gamePhoto2, bd=0, command=lambda: (self.otherImg.place_forget()
+                                                                                         , self.CoinItem.place(relx=.75, rely=.3)))
+
+        self.CoinItem = Button(self.GameWindow, image=gamePhoto, bd=0, command=lambda: (self.CoinItem.place_forget(), self.otherImg.place(relx=.75, rely=.3)))
+        self.CoinItem.place(relx=.75, rely=.3)
 
         self.GameSingleplayer = Button(self.GameWindow, text=self.S_SINGLEPLAYER, font=self.W_FONT2, bg=self.W_BG, fg=self.W_FG, bd=0, command=lambda: self.startGame(0))
         self.GameSingleplayer.place(relx=.05, rely=.3)
@@ -128,68 +165,43 @@ class Game:
 
         def handleKeyPress(event):
             global keyPressedL, keyPressedR
-            if self.gs == 'host':
-                if event.keysym == 'Left':
-                    keyPressedL = True
-                    self.P.setVelocityX(-0.0025)
-                elif event.keysym == 'Right':
-                    keyPressedR = True
-                    self.P.setVelocityX(+0.0025)
-                elif event.keysym == 'Up':
-                    if not self.P.isJumping():
-                        if keyPressedL:
-                            self.P.jump(0)
-                        elif keyPressedR:
-                            self.P.jump(1)
-                        else:
-                            self.P.jump(2)
-            else:
-                if event.keysym == 'Left':
-                    keyPressedL = True
-                    self.T.setVelocityX(-0.0025)
-                elif event.keysym == 'Right':
-                    keyPressedR = True
-                    self.T.setVelocityX(+0.0025)
-                elif event.keysym == 'Up':
-                    if not self.T.isJumping():
-                        if keyPressedL:
-                            self.T.jump(0)
-                        elif keyPressedR:
-                            self.T.jump(1)
-                        else:
-                            self.T.jump(2)
+            if event.keysym == 'Left':
+                keyPressedL = True
+                self.myPlayer().setVelocityX(-0.0025)
+            elif event.keysym == 'Right':
+                keyPressedR = True
+                self.myPlayer().setVelocityX(+0.0025)
+            elif event.keysym == 'Up':
+                if not self.myPlayer().isJumping():
+                    if keyPressedL:
+                        self.myPlayer().jump(0)
+                    elif keyPressedR:
+                        self.myPlayer().jump(1)
+                    else:
+                        self.myPlayer().jump(2)
 
         def handleKeyRelease(event):
             global keyPressedL, keyPressedR
-            if self.gs == 'host':
-                if event.keysym == 'Left':
-                    keyPressedL = False
-                    if not keyPressedR:
-                        self.P.setVelocityX(0)
-                elif event.keysym == 'Right':
-                    keyPressedR = False
-                    if not keyPressedL:
-                        self.P.setVelocityX(0)
-            else:
-                pass
+            if event.keysym == 'Left':
+                keyPressedL = False
+                if not keyPressedR:
+                    self.myPlayer().setVelocityX(0)
+            elif event.keysym == 'Right':
+                keyPressedR = False
+                if not keyPressedL:
+                    self.myPlayer().setVelocityX(0)
 
         def evStopL(event):
             global keyPressedL, keyPressedR
             keyPressedL = False
-            if self.gs == 'host':
-                if not keyPressedR:
-                    self.P.setVelocityX(0)
-            else:
-                self.T.setVelocityX(0)
+            if not keyPressedR:
+                self.myPlayer().setVelocityX(0)
 
         def evStopR(event):
             global keyPressedL, keyPressedR
             keyPressedR = False
-            if self.gs == 'host':
-                if not keyPressedL:
-                    self.P.setVelocityX(0)
-            else:
-                self.T.setVelocityX(0)
+            if not keyPressedL:
+                self.myPlayer().setVelocityX(0)
 
         self.clearScreen()
         self.GameWindow.bind('<Up>', handleKeyPress)
@@ -206,22 +218,17 @@ class Game:
 
         self.P = Player(self.GameWindow, 'white')
         self.P.draw(.05, .5)
-
-        if self.gs == 'host':
-
-            gThread = Thread(target=self.moveDown, args=(self.P, ))
-            uThread = Thread(target=self.updateLocation, args=(self.P, ))
-            cThread = Thread(target=self.changeLocation, args=(self.P, ))
-            pThread = Thread(target=self.showLocation, args=(self.P, ))
-            bThread = Thread(target=self.checkBoundary, args=(self.P, ))
-
+        
+        if self.GameState == 'host':
+            arguments = (self.P, )
         else:
+            arguments = (self.T, )
 
-            gThread = Thread(target=self.moveDown, args=(self.T, ))
-            uThread = Thread(target=self.updateLocation, args=(self.T, ))
-            cThread = Thread(target=self.changeLocation, args=(self.T, ))
-            pThread = Thread(target=self.showLocation, args=(self.T, ))
-            bThread = Thread(target=self.checkBoundary, args=(self.T, ))
+        gThread = Thread(target=self.moveDown, args=arguments)
+        uThread = Thread(target=self.updateLocation, args=arguments)
+        cThread = Thread(target=self.changeLocation, args=arguments)
+        pThread = Thread(target=self.showLocation, args=arguments)
+        bThread = Thread(target=self.checkBoundary, args=arguments)
 
         allThreads = [gThread, uThread, cThread, pThread, bThread]
 
@@ -234,13 +241,22 @@ class Game:
     def clearFloors(self):
         try:
             for floor in self.allFloors:
+                print(floor)
                 floor.place_forget()
-        except:
+        except Exception as e:
+            Logger.error(e)
             print('cleanup error')
+
+    def myPlayer(self):
+        if self.GameState == 'host':
+            return self.P
+        elif self.GameState == 'join':
+            return self.T
 
     def drawPage(self, n):
         self.currentPage.set('GAME PAGE: ' + str(n))
         self.clearFloors()
+        n = 4
         if n == 1:
             self.whiteFloor = Label(self.GameWindow, bg=self.W_FG, height=3, width=200)
             self.whiteFloor.place(relx=.0, rely=.85)
@@ -265,7 +281,26 @@ class Game:
 
             self.whiteFloor8 = Label(self.GameWindow, bg=self.W_FG, height=1, width=14)
             self.whiteFloor8.place(relx=.68, rely=.65)
-        self.allFloors = [self.whiteFloor, self.whiteFloor2, self.whiteFloor3, self.whiteFloor4, self.whiteFloor5, self.whiteFloor6, self.whiteFloor7, self.whiteFloor8]
+        elif n == 4:
+            self.whiteFloor9 = Label(self.GameWindow, bg=self.W_FG, height=3, width=10)
+            self.whiteFloor9.place(relx=.0, rely=.85)
+
+            self.whiteFloor10 = Label(self.GameWindow, bg=self.W_FG, height=3, width=100)
+            self.whiteFloor10.place(relx=.925, rely=.85)
+
+            self.whiteFloor11 = Label(self.GameWindow, bg=self.W_FG, height=3, width=5)
+            self.whiteFloor11.place(relx=.47, rely=.85)
+
+            self.Slider = Slider(self.GameWindow, c='white', g=self)
+            self.Slider.draw(0.875, .85)
+
+            self.Slider2 = Slider(self.GameWindow, c='white', g=self)
+            self.Slider2.draw(0.415, .85)
+
+        self.allFloors = [self.whiteFloor, self.whiteFloor2, self.whiteFloor3,
+                          self.whiteFloor4, self.whiteFloor5, self.whiteFloor6,
+                          self.whiteFloor7, self.whiteFloor8, self.whiteFloor9,
+                          self.whiteFloor10, self.whiteFloor11, self.Slider, self.Slider2]
 
     def loadConfiguration(self):
         configEntries = ['Show-Help', 'Auto-Update', 'Log-Events', 'Allow-Cheats', 'Show-Position', 'Show-Pages']
@@ -275,6 +310,61 @@ class Game:
         for value in configEntries:
             configValues[configEntries.index(value)] = int(self.Configuration['Settings'][value])
             configSwitches[configEntries.index(value)].set(int(self.Configuration['Settings'][value]))
+
+        self.updateCurrentConfiguration(configEntries, configValues)
+
+    def updateCurrentConfiguration(self, e, v):
+        config = []
+        self.CFG_HELP = 0
+        self.CFG_UPDATE = 0
+        self.CFG_LOGGING = 0
+        self.CFG_CHEATS = 0
+        self.CFG_POSITION = 0
+        self.CFG_PAGES = 0
+
+        '''
+        
+        for entry in e:
+            config.append([entry, v[e.index(entry)]])
+        for configuration in config:
+            if configuration[0] == 'Show-Help':
+                if configuration[1] == 1:
+                    self.CFG_HELP = 1
+                else:
+                    self.CFG_HELP = 0
+            elif configuration[0] == 'Auto-Update':
+                if configuration[1] == 1:
+                    self.CFG_UPDATE = 1
+                    self.Log('Auto-update is turned on - searching for updates.', 'CONFIG')
+                else:
+                    self.CFG_UPDATE = 0
+                    self.Log('Auto-update is turned off.', 'CONFIG')
+            elif configuration[0] == 'Log-Events':
+                if configuration[1] == 1:
+                    self.CFG_LOGGING = 1
+                else:
+                    self.CFG_LOGGING = 0
+            elif configuration[0] == 'Allow-Cheats':
+                if configuration[1] == 1:
+                    self.CFG_CHEATS = 1
+                else:
+                    self.CFG_CHEATS = 0
+            elif configuration[0] == 'Show-Position':
+                if configuration[1] == 1:
+                    self.CFG_POSITION = 1
+                else:
+                    self.CFG_POSITION = 0
+            elif configuration[0] == 'Show-Pages':
+                if configuration[1] == 1:
+                    self.CFG_PAGES = 1
+                else:
+                    self.CFG_PAGES = 0
+        
+        '''
+
+    def Log(self, m, p='INFO'):
+        if self.Configuration['Settings']['Log-Events'] == '1':
+            Logger.log(m, p)
 
     def moveDown(self, p):
         while True:
@@ -319,9 +409,21 @@ class Game:
                             p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
                     if .99 > playerLocation[0] > .92 and playerLocation[1] > 0.79:
                         p.setLocation(playerLocation[0], 0.79)
+                elif self.GamePage == 4:
+                    playerLocation = p.getLocation()
+                    if 0.09 >= playerLocation[0] >= 0.00:
+                        if playerLocation[1] < .79:
+                            p.setLocation(playerLocation[0], playerLocation[1] + 0.005)
+                    elif 0.30 >= playerLocation[0] >= 0.10:
+                        if self.underSlider(p):
+                            pass
                 sleep(0.005)
             else:
                 sleep(0.005)
+
+    def underSlider(self, p):
+        # TODO: Add GameSliders array
+        pass
 
     @staticmethod
     def changeLocation(p):
@@ -380,10 +482,10 @@ class Game:
         if t == 0:
             self.drawStart()
             from tools.Enemy import Enemy
-            Test2 = Enemy(self.GameWindow, self.P, c=self.C_RED)
-            Test2.draw(.4, 0.755)
-            Test3 = Enemy(self.GameWindow, self.P, c=self.C_RED)
-            Test3.draw(.7, 0.755)
+            Test2 = Enemy(self.GameWindow, self.P, c=self.C_RED, g=self)
+            Test2.draw(.45, 0.755)
+            # Test3 = Enemy(self.GameWindow, self.P, c=self.C_RED, g=self)
+            # Test3.draw(.7, 0.755)
         else:
             self.clearScreen()
             b = Button(self.GameWindow, text='HOST', command=lambda: (b.place_forget(), b2.place_forget(), self.host()))
@@ -392,7 +494,7 @@ class Game:
             b2.pack()
 
     def host(self):
-        self.gs = 'host'
+        self.GameState = 'host'
         self.T = Player(self.GameWindow, self.C_BLUE)
         self.T.draw(.1, .5)
         self.Session = Host(self.T, self)
@@ -400,11 +502,10 @@ class Game:
         self.Session.run()
 
     def join(self):
-        self.gs = 'join'
+        self.GameState = 'join'
         self.T = Player(self.GameWindow, self.C_BLUE)
         self.T.draw(.1, .5)
         self.Session = Join(self.T, self)
-        # Thread(target=Session.startlisten, args=()).start()
         self.drawStart()
         self.Session.connect()
         self.Session.startlisten()
@@ -468,9 +569,10 @@ class Game:
         self.G_GAMEMODE = g
 
     def showLocation(self, p):
-        self.PlayerPosition.place(relx=.05, rely=.05)
         while True:
-            self.currentLocation.set(f'L: {p.getLocation()[0]:.2f}, {p.getLocation()[1]:.2f} | X: {p.getVelocityX()}')
+            if self.Configuration['Settings']['Show-Position'] == '1':
+                self.PlayerPosition.place(relx=.05, rely=.05)
+                self.currentLocation.set(f'L: {p.getLocation()[0]:.2f}, {p.getLocation()[1]:.2f} | X: {p.getVelocityX()}')
             sleep(0.01)
 
 

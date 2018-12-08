@@ -1,18 +1,17 @@
 from tkinter import *
 from threading import Thread
 from time import sleep
-from tools.animator import Animate
-# from tools.error import Error
 
 
 class Enemy:
-    def __init__(self, w, p, c='red'):
+    def __init__(self, w, p, c='red', g=None):
         self.Velocity = [0.00, 0.00]
         self.Location = [0.00, 0.00]
         self.Colour = c
         self.Window = w
         self.GamePlayers = []
         self.GamePlayers.append(p)
+        self.GameInstance = g
 
         self.BulletCooldown = False
 
@@ -65,11 +64,11 @@ class Enemy:
         while True:
             if not self.BulletCooldown:
                 if self.ShootingLeft:
-                    B = Bullet(self.Window, c='#f1c40f')
+                    B = Bullet(self.Window, c='#f1c40f', p=self.GamePlayers[0], g=self.GameInstance)
                     B.draw(self.getLocation()[0], self.getLocation()[1])
                     B.setMovement(0)
                 if self.ShootingRight:
-                    B2 = Bullet(self.Window, c='#f1c40f')
+                    B2 = Bullet(self.Window, c='#f1c40f', p=self.GamePlayers[0], g=self.GameInstance)
                     B2.draw(self.getLocation()[0], self.getLocation()[1])
                     B2.setMovement(1)
                 Thread(target=self.setCooldown(), args=()).start()
